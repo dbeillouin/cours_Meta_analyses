@@ -3,9 +3,7 @@
 <h1 align="center">
   <br>
   <img src="https://raw.githubusercontent.com/literaturesynthesis/.github/main/profile/logo-literaturesynthesis_150dpi.png" alt="Logo" width="200">  <br>
-  Quarto template
-  <br>
-  HTML presentation w/ RevealJS
+  Introduction to meta-analyses
   <br>
 </h1>
 
