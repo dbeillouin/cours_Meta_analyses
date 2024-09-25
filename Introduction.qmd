@@ -1,0 +1,269 @@
+---
+title: "An introduction to meta-analyses and systematic reviews"
+subtitle: "September 2024"
+authors: "Damien Beillouin  <br/> 
+CIRAD-Hortsys"
+format:
+  revealjs:
+    transition: slide
+    background-transition: fade
+    slide-number: true
+    show-slide-number: print
+    footer: "An introduction to meta-analyses and systematic reviews"
+editor: visual
+title-slide-attributes: 
+  data-background-image: elephant.png
+  data-background-size: 25%
+  data-background-position: 90% 80%
+include-in-header:
+  - text: |
+      <style>
+      #title-slide .title {
+        font-size: 1.5em;
+        color: black;
+      }
+      </style>
+---
+
+## Focus....
+
+![](One_can.jpg){fig-align="center"}
+
+## Step back
+
+![](several_cans.jpg){fig-align="center"}
+
+## Again...
+
+![](All_cans.jpg){fig-align="center"}
+
+-   G. Seurat: [Un dimanche après-midi à l'île de la Grande Jatte](https://fr.wikipedia.org/wiki/Un_dimanche_apr%C3%A8s-midi_%C3%A0_l%27%C3%AEle_de_la_Grande_Jatte)
+-   more info: <https://www.boumbang.com/chris-jordan/>
+
+## Let's play
+
+![](QRcode_vaccines.png){fig-align="center"}
+
+<https://etc.ch/TWnF>
+
+## At the global scale
+
+![](Vaccines_results-sondage.avif){fig-align="center"}
+
+-   more info: [Davidson, 2017](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5789217/)
+
+## What started the rumors?
+
+![](Wakefiled_crop.png){fig-align="center"}
+
+## Mis-information and meta-analyses
+
+\vspace{8em}
+
+**Misinformation:**
+
+-   Spreads via confirmation bias, and misinterpretation of studies.
+
+-   Harms public understanding and policy decisions.
+
+**Meta-analyses and systematic reviews**
+
+-   Counters isolated, misleading findings.
+
+-   Strengthens scientific credibility.
+
+-   Informs public policy with solid evidence.
+
+## Let's play (again)
+
+![](QRcode_vaccines.png){fig-align="center" width="239"}
+
+![](Pete.png){fig-align="center" width="141"}
+
+## State of the evidence
+
+![](cirhose_MA.jpg){fig-align="center"}
+
+## Contradictory evidence and meta-analyses
+
+\vspace{2em}
+
+**Contradictory evidence**
+
+-   Results from variations in study design, sample size, or methodology.
+
+-   Leads to uncertainty in scientific conclusions and decision-making.
+
+**Meta-analyses and systematic reviews**
+
+-   based on the 'means ' of many study -\> increase statistical power
+
+## Let's play (again?!)
+
+![](QRcode_vaccines.png){fig-align="center" width="239"}
+
+## Number of citation included in IPCC reports
+
+![](IPCC_reports.png){fig-align="center"}
+
+source: [Minx et al., 2017](https://www.sciencedirect.com/science/article/pii/S1462901117305464?casa_token=fGbjnAkzfnkAAAAA:KLAql5_S5MUqbE45BV9ueL9Ej1qzeXrP-rXzjv3XctC4EMtnidZk85QjdY08NBN4pb4qYzo)
+
+## Number of papers in ecology
+
+![](Gurevitch_MA.png){fig-align="center"}
+
+source: [Gurevitch et al., 2018](https://www.nature.com/articles/nature25753)
+
+## Number of papers and meta-analyses
+
+\vspace{2em}
+
+**Number of papers**
+
+-   over 7M papers published each year
+
+**Meta-analyses and systematic reviews**
+
+-   Meta-analyses synthesized 2 to XXXX papers!
+
+## A need for robust evidence
+
+![](Pyramid_evidence.png){fig-align="center"}
+
+## Some big projects/labs
+
+![](IDIV.png){fig-align="center"}
+
+## Some big projects/labs
+
+![](CESAB.png){fig-align="center"}
+
+## Some big projects/labs
+
+![](Predicts.png){fig-align="center"}
+
+## Some big projects/labs
+
+![](Predicts_exam.png){fig-align="center"}
+
+## Results: Increase in meta-analyses
+
+![](MA_increase.png){fig-align="center"}
+
+## But of variable quality
+
+![](Quality_MA.png){fig-align="center"}
+
+more info: [shinyApp](https://cropdiversification.shinyapps.io/Crop_diversification_2020/#section-quality-of-the-meta-analyses)
+
+## A lot of confusion in terms and methods to synthesized data
+
+-   Expert consultation, focus group, ...
+-   Rapid evidence assessment, non-systematic review
+-   Systematic maps
+-   meta-analyses
+-   ....
+
+## A typology of methods
+
+![](typology%20methods.png){fig-align="center"}
+
+## Systematic (evidence) maps
+
+-   Purpose: Provide an overview or 'landscape of knowledge" on a given issue
+
+![](map_example.png){fig-align="center"}
+
+## Systematic (evidence) maps
+
+-   Purpose: Provide an overview or 'landscape of knowledge" on a given issue
+
+![](Bonfanti_ex.jpg){fig-align="center"}
+
+## Stengths of evidence maps
+
+ 
+
+#### 1.Visual representation of the knowledge accumulated/gaps
+
+*(i.e. no need to read hundreds of primary studies!)*
+
+#### 2.Typology/categorization of the research
+
+*(often term and definition varies a lot to represent a same phenomena/practice )*
+
+#### 3. Offer a foundation for further, more focused research synthesis
+
+*(a first step for a new meta-analyis)*
+
+#### 4. Political/scientific agenda for future research
+
+## Weakness of evidence maps
+
+ 
+
+#### 1.Only descriptive - no analyses
+
+*(i.e. do not inform on the effectiveness of the interventions)*
+
+#### 2.The results could be presented in meta-analyses
+
+*(sometimes)*
+
+## Meta-analyses
+
+-   Purpose: Provide an estimate of an effect, identify source of heterogeneity, rank the moderators of the effect
+
+![](MA_example.png){fig-align="center"}
+
+## Stengths of meta-analyses
+
+ 
+
+#### 1.See the forest for the trees
+
+*(i.e. see effect/relationships that might not be visible in individual studies!)*
+
+#### 2.Synthesize knowledge on controversial issues
+
+*(find average effect while trying to minimize bias)*
+
+#### 3. Can compare apple and oranges (to some degree)
+
+*(meta-analyses are specifically design to deal with heterogeneity)*
+
+#### 4. Examine reasons for variation
+
+*(to some degree)*
+
+## Weakness of evidence maps
+
+ 
+
+#### 1.See the forest for the trees
+
+*(i.e. mask specific pattern/local effect?)*
+
+#### 2.Can not overcome bias
+
+*(fe.g. publication bias)*
+
+#### 3. Can compare apple and oranges (to some degree)
+
+*(combine things that should not be combined)*
+
+#### 4. Not representative
+
+*(study population =/= population of interest)*
+
+#### 5. Not able to examine causality
+
+## What you will do this week
+
+![](Steps_MA.png)
+
+## What you will do this week
+
+A training based on international golden standards
+
+![](Cochrane.png)

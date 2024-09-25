@@ -1,0 +1,34 @@
+---
+from: markdown+emoji
+format:
+  revealjs:
+    logo: images/logo-affiliation.png
+    footer: "{{< fa brands github >}} &nbsp;<https://github.com/dbeillouin/introduction_MA>"
+    smaller: true
+    auto-stretch: false
+    chalkboard: true
+    toc-depth: 1
+    theme: [default, "styles/main.scss"]
+engine: knitr
+---
+
+<!-- Insert section 'Title slide' -->
+
+```{r}
+#| child: "sections/title-slide.qmd"
+```
+
+
+<!-- Insert section 'Table of contents' -->
+
+```{r}
+#| child: "sections/table-of-contents.qmd"
+```
+
+
+<!-- Insert section 'Quarto basics' -->
+
+```{r}
+#| child: "sections/quarto-basics.qmd"
+```
+
