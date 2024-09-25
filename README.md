@@ -12,7 +12,8 @@
 
 <br>
 <p align="center">
-  <a href="https://github.com/dbeillouin/cours_Meta_analyses" target="_blank"><b>View presentation</b></a>
+  <a href="https://dbeillouin.github.io/Introduction"
+  target="_blank"><b>View presentation</b></a>
 </p>
 <br>
 
