@@ -102,7 +102,7 @@ include-in-header:
 
 ![](QRcode_vaccines.png){fig-align="center" width="239"}
 
-## Number of citation included in IPCC reports
+## Number of citations included in IPCC reports
 
 ![](IPCC_reports.png){fig-align="center"}
 
@@ -236,7 +236,7 @@ more info: [shinyApp](https://cropdiversification.shinyapps.io/Crop_diversificat
 
 *(to some degree)*
 
-## Weakness of evidence maps
+## Weakness of meta-analyses
 
  
 
