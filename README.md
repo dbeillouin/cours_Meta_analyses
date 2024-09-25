@@ -84,4 +84,4 @@ Please note that the `quarto-template` project is released with a [Contributor C
 
 ## Acknowledgments
 
-This project has been developed for the [FRB-CESAB](https://www.fondationbiodiversite.fr/en/about-the-foundation/le-cesab/) training courses [program](https://frbcesab.github.io/content/courses.html).
+This project has been developed based on the [FRB-CESAB](https://www.fondationbiodiversite.fr/en/about-the-foundation/le-cesab/) training courses [program](https://frbcesab.github.io/content/courses.html).
