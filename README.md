@@ -14,7 +14,7 @@
 
 <br>
 <p align="center">
-  <a href="https://github.com/dbeillouin/introduction_MA" target="_blank"><b>View presentation</b></a>
+  <a href="https://github.com/dbeillouin/cours_Meta_analyses" target="_blank"><b>View presentation</b></a>
 </p>
 <br>
 
@@ -73,7 +73,7 @@ Les méthodes systématiques pour réduire les biais dans les revues de littéra
 ## Citation
 
 Beilllouin D (2024) An introduction to meta-analyses and systematic reviews
-Why do we need systematic review and evidence maps?. <https://github.com/dbeillouin/introduction_MA>.
+Why do we need systematic review and evidence maps?. <https://github.com/dbeillouin/cours_Meta_analyses>.
 
 
 ## Contributing
