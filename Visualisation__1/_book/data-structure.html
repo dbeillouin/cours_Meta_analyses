@@ -1,0 +1,2336 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 2 Data Structure | Visualizing Data Distribution: Heatmaps, Cross-Analyses, and Beyond</title>
+  <meta name="description" content="<p>This is beta-version of the visualisation exercice.
+set in the _output.yml file.
+The HTML output format for this example is bookdown::gitbook,</p>" />
+  <meta name="generator" content="bookdown 0.40 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 2 Data Structure | Visualizing Data Distribution: Heatmaps, Cross-Analyses, and Beyond" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="<p>This is beta-version of the visualisation exercice.
+set in the _output.yml file.
+The HTML output format for this example is bookdown::gitbook,</p>" />
+  <meta name="github-repo" content="rstudio/bookdown-demo" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 2 Data Structure | Visualizing Data Distribution: Heatmaps, Cross-Analyses, and Beyond" />
+  
+  <meta name="twitter:description" content="<p>This is beta-version of the visualisation exercice.
+set in the _output.yml file.
+The HTML output format for this example is bookdown::gitbook,</p>" />
+  
+
+<meta name="author" content="Damien Beillouin" />
+
+
+<meta name="date" content="2024-09-25" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="index.html"/>
+<link rel="next" href="temporal-analysis-for-evidence-maps-importance-of-temporal-analysis-in-evidence-maps.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">A Minimal Book Example</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> About</a></li>
+<li class="chapter" data-level="2" data-path="data-structure.html"><a href="data-structure.html"><i class="fa fa-check"></i><b>2</b> Data Structure</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="data-structure.html"><a href="data-structure.html#toward-transparency-and-reproducibility"><i class="fa fa-check"></i><b>2.1</b> Toward transparency and reproducibility</a></li>
+<li class="chapter" data-level="2.2" data-path="data-structure.html"><a href="data-structure.html#publish-a-datapaper"><i class="fa fa-check"></i><b>2.2</b> Publish a DataPaper</a></li>
+<li class="chapter" data-level="2.3" data-path="data-structure.html"><a href="data-structure.html#best-practices-for-structuring-meta-analysis-datafiles"><i class="fa fa-check"></i><b>2.3</b> Best practices for structuring Meta-analysis DataFiles</a></li>
+<li class="chapter" data-level="2.4" data-path="data-structure.html"><a href="data-structure.html#example-meta-analysis-datasets"><i class="fa fa-check"></i><b>2.4</b> Example: Meta-analysis datasets</a>
+<ul>
+<li class="chapter" data-level="2.4.1" data-path="data-structure.html"><a href="data-structure.html#general-datasets"><i class="fa fa-check"></i><b>2.4.1</b> general datasets</a></li>
+<li class="chapter" data-level="2.4.2" data-path="data-structure.html"><a href="data-structure.html#dataset-for-our-exercises"><i class="fa fa-check"></i><b>2.4.2</b> Dataset for Our Exercises</a></li>
+<li class="chapter" data-level="2.4.3" data-path="data-structure.html"><a href="data-structure.html#steps-to-access-the-dataset"><i class="fa fa-check"></i><b>2.4.3</b> Steps to Access the Dataset</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="temporal-analysis-for-evidence-maps-importance-of-temporal-analysis-in-evidence-maps.html"><a href="temporal-analysis-for-evidence-maps-importance-of-temporal-analysis-in-evidence-maps.html"><i class="fa fa-check"></i><b>3</b> Temporal Analysis for Evidence Maps Importance of Temporal Analysis in Evidence Maps</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="temporal-analysis-for-evidence-maps-importance-of-temporal-analysis-in-evidence-maps.html"><a href="temporal-analysis-for-evidence-maps-importance-of-temporal-analysis-in-evidence-maps.html#recommended-graph-types"><i class="fa fa-check"></i><b>3.1</b> Recommended Graph Types</a></li>
+<li class="chapter" data-level="3.2" data-path="temporal-analysis-for-evidence-maps-importance-of-temporal-analysis-in-evidence-maps.html"><a href="temporal-analysis-for-evidence-maps-importance-of-temporal-analysis-in-evidence-maps.html#example-in-r"><i class="fa fa-check"></i><b>3.2</b> Example in R</a>
+<ul>
+<li class="chapter" data-level="3.2.1" data-path="temporal-analysis-for-evidence-maps-importance-of-temporal-analysis-in-evidence-maps.html"><a href="temporal-analysis-for-evidence-maps-importance-of-temporal-analysis-in-evidence-maps.html#count-graph"><i class="fa fa-check"></i><b>3.2.1</b> Count Graph</a></li>
+<li class="chapter" data-level="3.2.2" data-path="temporal-analysis-for-evidence-maps-importance-of-temporal-analysis-in-evidence-maps.html"><a href="temporal-analysis-for-evidence-maps-importance-of-temporal-analysis-in-evidence-maps.html#cumulative-sum-graph"><i class="fa fa-check"></i><b>3.2.2</b> Cumulative Sum Graph</a></li>
+<li class="chapter" data-level="3.2.3" data-path="temporal-analysis-for-evidence-maps-importance-of-temporal-analysis-in-evidence-maps.html"><a href="temporal-analysis-for-evidence-maps-importance-of-temporal-analysis-in-evidence-maps.html#grouped-graph-by-crop-type"><i class="fa fa-check"></i><b>3.2.3</b> Grouped Graph by Crop Type</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="temporal-analysis-for-evidence-maps-importance-of-temporal-analysis-in-evidence-maps.html"><a href="temporal-analysis-for-evidence-maps-importance-of-temporal-analysis-in-evidence-maps.html#brief-note-on-cumulative-meta-analyses"><i class="fa fa-check"></i><b>3.3</b> Brief Note on Cumulative Meta-Analyses</a></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Visualizing Data Distribution: Heatmaps, Cross-Analyses, and Beyond</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="data-structure" class="section level1 hasAnchor" number="2">
+<h1><span class="header-section-number">Chapter 2</span> Data Structure<a href="data-structure.html#data-structure" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>In the context of evidence maps and meta-analyses, data files typically contain structured information derived from primary studies.
+A well-organized dataset is essential for ensuring transparency, reproducibility, and clarity in statistical analyses.
+The structure of these files plays a crucial role in data management and visualization, particularly when handling large datasets that summarize study characteristics, interventions, and outcomes.
+Below are some best practices and examples to follow when preparing and using such files.</p>
+<div id="toward-transparency-and-reproducibility" class="section level2 hasAnchor" number="2.1">
+<h2><span class="header-section-number">2.1</span> Toward transparency and reproducibility<a href="data-structure.html#toward-transparency-and-reproducibility" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The <a href="https://www.ouvrirlascience.fr/fair-principles/"><strong>FAIR principles</strong></a> (Findable, Accessible, Interoperable, and Reusable) provide a framework for improving the management and sharing of digital research assets.
+These principles ensure that data is discoverable through search engines, accessible with appropriate authorization, interoperable with other datasets, and reusable for various purposes.
+A key aspect is <strong>machine-actionability</strong>, enabling computers to process and understand data without significant human intervention.</p>
+<p><strong>France</strong> has made significant strides in promoting <strong>open science</strong>.
+The <strong>French National Plan for Open Science (2021-2024)</strong> mandates open access to both scientific publications and research data generated with public funding.</p>
+<p>The overarching objective of this plan is to promote transparency, accessibility, and the preservation of scientific knowledge.
+By mandating open access, France ensures that research funded by public resources benefits the wider global community, fostering international collaboration and cross-disciplinary advancements.</p>
+<p>A cornerstone of this effort is the adoption of the FAIR principles (Findable, Accessible, Interoperable, Reusable), which are integral in addressing common challenges in data management.
+By adhering to these principles, research data becomes more reliably reusable, supporting better documentation, accessibility, and data compatibility across different systems and disciplines.</p>
+<p>Breakdown of FAIR Principles:</p>
+<ul>
+<li><p><strong>Findable</strong>: Data must be easy to locate for both humans and machines.
+This involves assigning globally unique identifiers (such as DOIs) to datasets and ensuring that metadata is searchable and indexed in databases.</p></li>
+<li><p><strong>Accessible</strong>: Data must be accessible under clear and transparent terms.
+This means storing datasets in repositories that guarantee long-term access, either through open-access platforms or specialized data journals that maintain the integrity of the data over time.</p></li>
+<li><p><strong>Interoperable</strong>: Data should be compatible with other datasets and tools.
+Standardized formats (e.g., CSV, JSON) and recognized metadata structures like Dublin Core help ensure that datasets can be integrated and compared across different systems.</p></li>
+<li><p><strong>Reusable</strong>: Data must be well-documented, with detailed metadata providing sufficient context to allow future researchers to reuse it effectively.
+This includes information on the dataset’s provenance, context, and usage conditions, ensuring that it can be reliably understood and repurposed in new research contexts.</p></li>
+</ul>
+</div>
+<div id="publish-a-datapaper" class="section level2 hasAnchor" number="2.2">
+<h2><span class="header-section-number">2.2</span> Publish a DataPaper<a href="data-structure.html#publish-a-datapaper" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>A Data Paper is a publication dedicated to describing the structure, collection, and value of a dataset.
+Unlike traditional research papers, which focus on findings and interpretations, Data Papers emphasize the metadata, methodology, and potential uses of the dataset itself.
+They offer detailed insights into how the data was gathered, processed, and structured, which is essential for reproducibility in scientific studies.
+Key Components of a Data Paper:</p>
+<ul>
+<li>Dataset Overview: Provides a summary of the dataset, including its purpose and potential applications.<br />
+</li>
+<li>Metadata: Describes each variable, including units of measurement, data types, and any transformations applied.<br />
+</li>
+<li>Collection Methods: Details the experimental or observational methods used to gather the data.<br />
+</li>
+<li>Limitations and Uncertainties: Discloses any potential biases, gaps, or limitations in the dataset.<br />
+</li>
+<li>Data Access: Specifies how the data can be accessed and reused, often with a permanent DOI link.</li>
+</ul>
+<p>In evidence mapping and meta-analyses, the publication of Data Papers ensures that large datasets, which could be difficult to interpret otherwise, are accompanied by clear, accessible documentation.
+This reduces barriers to data reuse and promotes collaboration across research communities.</p>
+<p>Journals Publishing Data Papers</p>
+<p>Several specialized journals focus on publishing Data Papers, promoting high-quality data curation and sharing.
+<a href="https://www.nature.com/sdata/">Scientific Data</a>(by Nature Research) and <a href="https://www.sciencedirect.com/journal/data-in-brief">Data in Brief</a> (by Elsevier) are prominent examples, offering platforms for data-specific publications.
+These journals often require the dataset to be archived in an open-access repository, accompanied by rich metadata, and adhere to rigorous peer review processes.
+For example, <a href="https://bdj.pensoft.net/">Biodiversity Data Journal</a> also publish data papers focused on biodiversity and ecological datasets.
+This ensures that the data shared is of high quality, reusable, and follows best practices for transparency and openness.</p>
+<p>Example of a Data Paper:</p>
+<ul>
+<li><p>Beillouin, Damien, Marc Corbeels, Julien Demenois, David Berre, Annie Boyer, Abigail Fallot, Frédéric Feder, and Rémi Cardinael.
+“A global meta-analysis of soil organic carbon in the Anthropocene.” <em>Nature Communications</em> 14, no. 1 (2023): 3700.</p></li>
+<li><p>Byun, E., Müller, C., Parisse, B., Napoli, R., Zhang, J.B., Rezanezhad, F., Van Cappellen, P., Moser, G., Jansen-Willems, A.B., Yang, W.H.
+and Urakawa, R., 2024.
+A global dataset of gross nitrogen transformation rates across terrestrial ecosystems.
+<em>Scientific Data</em>, <em>11</em>(1), p.1022.</p></li>
+</ul>
+<pre class="english"><code>useful links: 
+-   CIRAD publier un Datapaper https://coop-ist.cirad.fr/gerer-des-donnees/publier-un-data-paper/1-qu-est-ce-qu-un-data-paper 
+
+-   CINES, 2017. Les formats de fichier. https://www.cines.fr/archivage/des-expertises/les-formats-de-fichier/
+
+-   CNRS, 2023 (version 2.0) . Guide de bonnes pratiques sur la gestion des données de recherche. Publier un Datapaper pour valoriser et expliciter les données. https://mi-gt-donnees.pages.math.unistra.fr/guide/00-introduction.html
+
+-   DoRANum, 2018. La minute Publier un Data paper. https://doi.org/10.13143/4mhn-mq42</code></pre>
+</div>
+<div id="best-practices-for-structuring-meta-analysis-datafiles" class="section level2 hasAnchor" number="2.3">
+<h2><span class="header-section-number">2.3</span> Best practices for structuring Meta-analysis DataFiles<a href="data-structure.html#best-practices-for-structuring-meta-analysis-datafiles" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<ol style="list-style-type: decimal">
+<li><p><strong>Consistent Naming Conventions</strong>: Ensure that file names are clear, consistent, and meaningful.
+For example, naming columns such as <code>Study_ID</code>, <code>Outcome</code>, <code>Intervention</code>, and <code>Effect_Size</code> helps in avoiding confusion during data manipulation.
+Avoid special characters in column names, and use underscores or camel case for readability (e.g., <code>StudyName</code> or <code>study_name</code>).</p></li>
+<li><p><strong>Comprehensive Metadata</strong>: Metadata should accompany the main data file, providing explanations of each column and the coding used (e.g., what constitutes “intervention type” or “effect size unit”).
+A “Data Dictionary” should always be part of your dataset, explaining variables such as:</p>
+<ul>
+<li><code>Outcome</code>: The primary outcome measured in the study.</li>
+<li><code>Intervention</code>: Types of interventions, such as “land-use change” or “management.”</li>
+<li><code>Effect_Size</code>: Numeric or categorical data on effect size (e.g., Hedge’s g or Cohen’s d).</li>
+</ul></li>
+<li><p><strong>Wide vs. Long Format</strong>: Choose the format that best suits your analysis:</p></li>
+</ol>
+<ul>
+<li><p><em>Wide Format</em>: Used when each row represents a study, with multiple columns for each outcome (e.g., separate columns for effect sizes).</p>
+<table>
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>Soil pH</th>
+<th>Nitrogen Content (%)</th>
+<th>Crop Yield (kg/ha)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>6.5</td>
+<td>45</td>
+<td>3000</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>6.8</td>
+<td>50</td>
+<td>3200</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>6.2</td>
+<td>40</td>
+<td>2800</td>
+</tr>
+</tbody>
+</table></li>
+<li><p><em>Long Format</em>: More suitable for meta-analysis and visualization in R.
+Each row contains a single observation or a study’s outcome, which allows for easier aggregation, filtering, and plotting.</p></li>
+</ul>
+<table>
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>Variable</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>Soil pH</td>
+<td>6.5</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>Nitrogen Content</td>
+<td>45</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>Crop Yield</td>
+<td>3000</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>Soil pH</td>
+<td>6.8</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>Nitrogen Content</td>
+<td>50</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>Crop Yield</td>
+<td>3200</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>Soil pH</td>
+<td>6.2</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>Nitrogen Content</td>
+<td>40</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>Crop Yield</td>
+<td>2800</td>
+</tr>
+</tbody>
+</table>
+<ol start="4" style="list-style-type: decimal">
+<li><p><strong>Handling Missing Data</strong>: It’s common to encounter missing data in meta-analyses.
+Best practices include:</p>
+<ul>
+<li>Using a consistent code for missing values, such as <code>NA</code>.</li>
+<li>Avoiding empty cells, which can cause issues when importing data into R.</li>
+<li>Documenting missing data in the metadata.</li>
+</ul></li>
+<li><p><strong>Version Control</strong>: Ensure version control for your datasets.
+Tools like Git or a simple versioning system (e.g., <code>dataset_v1.csv</code>, <code>dataset_v2.csv</code>) can help track changes and maintain the integrity of your data over time.</p></li>
+<li><p><strong>Data Cleanliness</strong>: Ensure all numeric data are formatted correctly (e.g., avoid mixing numbers and text in the same column).
+Double-check for typographical errors, duplicates, and inconsistencies in categorical data.
+Tools like <code>dplyr::mutate()</code> and <code>tidyr::pivot_longer()</code> can aid in cleaning and restructuring data for analysis.</p></li>
+</ol>
+</div>
+<div id="example-meta-analysis-datasets" class="section level2 hasAnchor" number="2.4">
+<h2><span class="header-section-number">2.4</span> Example: Meta-analysis datasets<a href="data-structure.html#example-meta-analysis-datasets" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="general-datasets" class="section level3 hasAnchor" number="2.4.1">
+<h3><span class="header-section-number">2.4.1</span> general datasets<a href="data-structure.html#general-datasets" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>To explore and utilize meta-analysis datasets, you can refer to the metadat package in R, which provides a comprehensive collection of datasets tailored for teaching, illustrating meta-analytic methods, and validating published analyses.
+You can install the package from CRAN using:</p>
+<p>Once installed, you can browse available datasets by using:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="data-structure.html#cb2-1" tabindex="-1"></a><span class="co"># install metadat package</span></span>
+<span id="cb2-2"><a href="data-structure.html#cb2-2" tabindex="-1"></a><span class="co">#install.packages(&quot;metadat&quot;)</span></span>
+<span id="cb2-3"><a href="data-structure.html#cb2-3" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="data-structure.html#cb2-4" tabindex="-1"></a><span class="co"># load metadat package</span></span>
+<span id="cb2-5"><a href="data-structure.html#cb2-5" tabindex="-1"></a><span class="fu">library</span>(metadat)</span>
+<span id="cb2-6"><a href="data-structure.html#cb2-6" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="data-structure.html#cb2-7" tabindex="-1"></a><span class="co">#List of dataset included</span></span>
+<span id="cb2-8"><a href="data-structure.html#cb2-8" tabindex="-1"></a><span class="fu">help</span>(<span class="at">package =</span> metadat)</span></code></pre></div>
+<p>Each dataset is well-documented with metadata, including concept terms such as research field, outcome measures, and analytic models.
+These metadata provide insight into the structure and purpose of each dataset.
+Additionally, the datsearch() function allows you to search for datasets based on specific concept terms or perform a full-text search through their documentation.</p>
+<p>The datasets in metadat follow structured formats, typically containing variables related to effect sizes, moderators, and sample information.
+To contribute or explore more in-depth examples, visit the package’s online documentation at metadat GitHub, where you can also view the output of example analyses for each dataset</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="data-structure.html#cb3-1" tabindex="-1"></a><span class="co"># load curtis databse</span></span>
+<span id="cb3-2"><a href="data-structure.html#cb3-2" tabindex="-1"></a>dat <span class="ot">&lt;-</span> dat.curtis1998</span>
+<span id="cb3-3"><a href="data-structure.html#cb3-3" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="data-structure.html#cb3-4" tabindex="-1"></a><span class="co"># Explore curtis data</span></span>
+<span id="cb3-5"><a href="data-structure.html#cb3-5" tabindex="-1"></a><span class="co">#install.packages(&quot;skimr&quot;)</span></span>
+<span id="cb3-6"><a href="data-structure.html#cb3-6" tabindex="-1"></a><span class="fu">library</span>(skimr)</span>
+<span id="cb3-7"><a href="data-structure.html#cb3-7" tabindex="-1"></a><span class="fu">skim</span>(dat)</span></code></pre></div>
+<table>
+<caption><span id="tab:unnamed-chunk-2">Table 2.1: </span>Data summary</caption>
+<tbody>
+<tr class="odd">
+<td align="left">Name</td>
+<td align="left">dat</td>
+</tr>
+<tr class="even">
+<td align="left">Number of rows</td>
+<td align="left">102</td>
+</tr>
+<tr class="odd">
+<td align="left">Number of columns</td>
+<td align="left">20</td>
+</tr>
+<tr class="even">
+<td align="left">_______________________</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">Column type frequency:</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">character</td>
+<td align="left">9</td>
+</tr>
+<tr class="odd">
+<td align="left">numeric</td>
+<td align="left">11</td>
+</tr>
+<tr class="even">
+<td align="left">________________________</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">Group variables</td>
+<td align="left">None</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: character</strong></p>
+<table>
+<colgroup>
+<col width="19%" />
+<col width="13%" />
+<col width="19%" />
+<col width="5%" />
+<col width="5%" />
+<col width="8%" />
+<col width="12%" />
+<col width="15%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">skim_variable</th>
+<th align="right">n_missing</th>
+<th align="right">complete_rate</th>
+<th align="right">min</th>
+<th align="right">max</th>
+<th align="right">empty</th>
+<th align="right">n_unique</th>
+<th align="right">whitespace</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">genus</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="right">13</td>
+<td align="right">0</td>
+<td align="right">21</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">species</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="right">14</td>
+<td align="right">0</td>
+<td align="right">35</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">fungrp</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">5</td>
+<td align="right">5</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">units</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">8</td>
+<td align="right">0</td>
+<td align="right">6</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">pot</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">5</td>
+<td align="right">0</td>
+<td align="right">22</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">method</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">stock</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="right">4</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">xtrt</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="right">6</td>
+<td align="right">0</td>
+<td align="right">8</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">level</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">7</td>
+<td align="right">0</td>
+<td align="right">6</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: numeric</strong></p>
+<table>
+<colgroup>
+<col width="14%" />
+<col width="10%" />
+<col width="14%" />
+<col width="8%" />
+<col width="7%" />
+<col width="6%" />
+<col width="7%" />
+<col width="8%" />
+<col width="8%" />
+<col width="8%" />
+<col width="6%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">skim_variable</th>
+<th align="right">n_missing</th>
+<th align="right">complete_rate</th>
+<th align="right">mean</th>
+<th align="right">sd</th>
+<th align="right">p0</th>
+<th align="right">p25</th>
+<th align="right">p50</th>
+<th align="right">p75</th>
+<th align="right">p100</th>
+<th align="left">hist</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">id</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">432.50</td>
+<td align="right">228.26</td>
+<td align="right">21.00</td>
+<td align="right">256.25</td>
+<td align="right">447.50</td>
+<td align="right">621.00</td>
+<td align="right">783.00</td>
+<td align="left">▅▅▇▅▇</td>
+</tr>
+<tr class="even">
+<td align="left">paper</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1473.08</td>
+<td align="right">838.76</td>
+<td align="right">44.00</td>
+<td align="right">553.00</td>
+<td align="right">2037.00</td>
+<td align="right">2115.25</td>
+<td align="right">2224.00</td>
+<td align="left">▂▂▁▁▇</td>
+</tr>
+<tr class="odd">
+<td align="left">co2.ambi</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">339.96</td>
+<td align="right">62.83</td>
+<td align="right">34.50</td>
+<td align="right">350.00</td>
+<td align="right">350.00</td>
+<td align="right">350.00</td>
+<td align="right">395.00</td>
+<td align="left">▁▁▁▁▇</td>
+</tr>
+<tr class="even">
+<td align="left">co2.elev</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">673.46</td>
+<td align="right">127.46</td>
+<td align="right">69.30</td>
+<td align="right">700.00</td>
+<td align="right">700.00</td>
+<td align="right">700.00</td>
+<td align="right">795.00</td>
+<td align="left">▁▁▁▁▇</td>
+</tr>
+<tr class="odd">
+<td align="left">time</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">319.85</td>
+<td align="right">382.87</td>
+<td align="right">34.00</td>
+<td align="right">111.00</td>
+<td align="right">165.00</td>
+<td align="right">255.00</td>
+<td align="right">1095.00</td>
+<td align="left">▇▁▁▁▂</td>
+</tr>
+<tr class="even">
+<td align="left">m1i</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">75.45</td>
+<td align="right">172.27</td>
+<td align="right">0.09</td>
+<td align="right">3.99</td>
+<td align="right">14.68</td>
+<td align="right">69.78</td>
+<td align="right">1439.00</td>
+<td align="left">▇▁▁▁▁</td>
+</tr>
+<tr class="odd">
+<td align="left">sd1i</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">9.32</td>
+<td align="right">20.35</td>
+<td align="right">0.01</td>
+<td align="right">0.60</td>
+<td align="right">2.17</td>
+<td align="right">8.92</td>
+<td align="right">142.03</td>
+<td align="left">▇▁▁▁▁</td>
+</tr>
+<tr class="even">
+<td align="left">n1i</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">7.72</td>
+<td align="right">9.33</td>
+<td align="right">2.00</td>
+<td align="right">2.25</td>
+<td align="right">5.00</td>
+<td align="right">8.00</td>
+<td align="right">48.00</td>
+<td align="left">▇▁▁▁▁</td>
+</tr>
+<tr class="odd">
+<td align="left">m2i</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">58.66</td>
+<td align="right">135.74</td>
+<td align="right">0.07</td>
+<td align="right">3.45</td>
+<td align="right">10.19</td>
+<td align="right">52.12</td>
+<td align="right">1140.60</td>
+<td align="left">▇▁▁▁▁</td>
+</tr>
+<tr class="even">
+<td align="left">sd2i</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">8.56</td>
+<td align="right">16.34</td>
+<td align="right">0.01</td>
+<td align="right">0.51</td>
+<td align="right">1.97</td>
+<td align="right">8.04</td>
+<td align="right">96.37</td>
+<td align="left">▇▁▁▁▁</td>
+</tr>
+<tr class="odd">
+<td align="left">n2i</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">7.75</td>
+<td align="right">9.37</td>
+<td align="right">2.00</td>
+<td align="right">2.25</td>
+<td align="right">5.00</td>
+<td align="right">8.00</td>
+<td align="right">48.00</td>
+<td align="left">▇▁▁▁▁</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="dataset-for-our-exercises" class="section level3 hasAnchor" number="2.4.2">
+<h3><span class="header-section-number">2.4.2</span> Dataset for Our Exercises<a href="data-structure.html#dataset-for-our-exercises" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>We will be using the dataset titled <a href="https://www.nature.com/articles/s41597-021-01000-y">A Global Database of Diversified Farming Effects on Biodiversity and Yield</a>.
+This comprehensive dataset includes 4,076 comparisons of biodiversity outcomes and 1,214 comparisons of yield in diversified farming systems, contrasting these outcomes with two reference systems.</p>
+<p>The dataset encompasses evidence from 48 countries and evaluates the effects of diversified farming systems on species across 33 taxonomic orders, including insects, plants, birds, mammals, eukaryotes, annelids, fungi, and bacteria.
+It specifically addresses systems that produce both annual and perennial crops across 12 commodity groups.</p>
+<p>This dataset serves as a valuable resource for researchers and practitioners, facilitating access to critical information regarding the positive contributions of diversified farming systems to both biodiversity and food production outcomes.</p>
+</div>
+<div id="steps-to-access-the-dataset" class="section level3 hasAnchor" number="2.4.3">
+<h3><span class="header-section-number">2.4.3</span> Steps to Access the Dataset<a href="data-structure.html#steps-to-access-the-dataset" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<ol style="list-style-type: decimal">
+<li><strong>Load the File from Harvard Dataverse</strong><br />
+Visit the <a href="https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/XIDI1X">Harvard Dataverse website</a>.<br />
+Download all files and save them in your current working directory.</li>
+</ol>
+<p>By following these steps, you will be well-equipped to utilize the dataset for the upcoming exercises in this module.<br />
+</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="data-structure.html#cb4-1" tabindex="-1"></a><span class="co">#installer le package pour lire des données depuis Excel</span></span>
+<span id="cb4-2"><a href="data-structure.html#cb4-2" tabindex="-1"></a><span class="co">#install.packages(&quot;readxl&quot;)</span></span>
+<span id="cb4-3"><a href="data-structure.html#cb4-3" tabindex="-1"></a><span class="co">#Charger le package</span></span>
+<span id="cb4-4"><a href="data-structure.html#cb4-4" tabindex="-1"></a><span class="fu">library</span>(readxl)</span>
+<span id="cb4-5"><a href="data-structure.html#cb4-5" tabindex="-1"></a><span class="co"># charge le fichier</span></span>
+<span id="cb4-6"><a href="data-structure.html#cb4-6" tabindex="-1"></a>Meta_Data <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">&quot;data/Dataset 1_sources.xlsx&quot;</span>, <span class="at">sheet =</span> <span class="st">&quot;Literature_screened&quot;</span>)</span>
+<span id="cb4-7"><a href="data-structure.html#cb4-7" tabindex="-1"></a><span class="fu">skim</span>(Meta_Data)</span></code></pre></div>
+<table>
+<caption><span id="tab:unnamed-chunk-3">Table 2.2: </span>Data summary</caption>
+<tbody>
+<tr class="odd">
+<td align="left">Name</td>
+<td align="left">Meta_Data</td>
+</tr>
+<tr class="even">
+<td align="left">Number of rows</td>
+<td align="left">1590</td>
+</tr>
+<tr class="odd">
+<td align="left">Number of columns</td>
+<td align="left">19</td>
+</tr>
+<tr class="even">
+<td align="left">_______________________</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">Column type frequency:</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">character</td>
+<td align="left">17</td>
+</tr>
+<tr class="odd">
+<td align="left">numeric</td>
+<td align="left">2</td>
+</tr>
+<tr class="even">
+<td align="left">________________________</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">Group variables</td>
+<td align="left">None</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: character</strong></p>
+<table style="width:100%;">
+<colgroup>
+<col width="28%" />
+<col width="12%" />
+<col width="17%" />
+<col width="4%" />
+<col width="4%" />
+<col width="7%" />
+<col width="11%" />
+<col width="13%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">skim_variable</th>
+<th align="right">n_missing</th>
+<th align="right">complete_rate</th>
+<th align="right">min</th>
+<th align="right">max</th>
+<th align="right">empty</th>
+<th align="right">n_unique</th>
+<th align="right">whitespace</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Article_source</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">13</td>
+<td align="right">26</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Inclusion_yes_no</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Exclusion_reasion_pico</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">23</td>
+<td align="right">0</td>
+<td align="right">10</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Exclusion_reason</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">47</td>
+<td align="right">0</td>
+<td align="right">21</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Authors</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">6</td>
+<td align="right">721</td>
+<td align="right">0</td>
+<td align="right">1555</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Title</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">36</td>
+<td align="right">428</td>
+<td align="right">0</td>
+<td align="right">1569</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Source.title</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">224</td>
+<td align="right">0</td>
+<td align="right">426</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Volume</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="right">0</td>
+<td align="right">272</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Issue</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">8</td>
+<td align="right">0</td>
+<td align="right">57</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Art_No</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">9</td>
+<td align="right">0</td>
+<td align="right">85</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Page_start</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">6</td>
+<td align="right">0</td>
+<td align="right">835</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Page_end</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">5</td>
+<td align="right">0</td>
+<td align="right">876</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Page_count</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">33</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">DOI</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">70</td>
+<td align="right">0</td>
+<td align="right">1441</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Link</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">251</td>
+<td align="right">0</td>
+<td align="right">1261</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">ISSN</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">28</td>
+<td align="right">0</td>
+<td align="right">294</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">ISBN</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">28</td>
+<td align="right">0</td>
+<td align="right">20</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: numeric</strong></p>
+<table style="width:100%;">
+<colgroup>
+<col width="15%" />
+<col width="10%" />
+<col width="15%" />
+<col width="8%" />
+<col width="7%" />
+<col width="5%" />
+<col width="8%" />
+<col width="7%" />
+<col width="8%" />
+<col width="5%" />
+<col width="6%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">skim_variable</th>
+<th align="right">n_missing</th>
+<th align="right">complete_rate</th>
+<th align="right">mean</th>
+<th align="right">sd</th>
+<th align="right">p0</th>
+<th align="right">p25</th>
+<th align="right">p50</th>
+<th align="right">p75</th>
+<th align="right">p100</th>
+<th align="left">hist</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">ID</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">926.43</td>
+<td align="right">461.64</td>
+<td align="right">13</td>
+<td align="right">529.25</td>
+<td align="right">926.5</td>
+<td align="right">1325.75</td>
+<td align="right">1724</td>
+<td align="left">▅▇▇▇▇</td>
+</tr>
+<tr class="even">
+<td align="left">Year</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2008.08</td>
+<td align="right">6.84</td>
+<td align="right">1961</td>
+<td align="right">2005.00</td>
+<td align="right">2009.0</td>
+<td align="right">2013.00</td>
+<td align="right">2021</td>
+<td align="left">▁▁▁▇▇</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="data-structure.html#cb5-1" tabindex="-1"></a>Outcome <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">&quot;data/Dataset_2_outcomes.xlsx&quot;</span>, <span class="at">sheet =</span> <span class="st">&quot;Data&quot;</span>)</span>
+<span id="cb5-2"><a href="data-structure.html#cb5-2" tabindex="-1"></a><span class="fu">skim</span>(Outcome)</span></code></pre></div>
+<table>
+<caption><span id="tab:unnamed-chunk-3">Table 2.2: </span>Data summary</caption>
+<tbody>
+<tr class="odd">
+<td align="left">Name</td>
+<td align="left">Outcome</td>
+</tr>
+<tr class="even">
+<td align="left">Number of rows</td>
+<td align="left">4076</td>
+</tr>
+<tr class="odd">
+<td align="left">Number of columns</td>
+<td align="left">105</td>
+</tr>
+<tr class="even">
+<td align="left">_______________________</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">Column type frequency:</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">character</td>
+<td align="left">89</td>
+</tr>
+<tr class="odd">
+<td align="left">numeric</td>
+<td align="left">16</td>
+</tr>
+<tr class="even">
+<td align="left">________________________</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">Group variables</td>
+<td align="left">None</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: character</strong></p>
+<table style="width:100%;">
+<colgroup>
+<col width="33%" />
+<col width="11%" />
+<col width="15%" />
+<col width="4%" />
+<col width="5%" />
+<col width="6%" />
+<col width="10%" />
+<col width="12%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">skim_variable</th>
+<th align="right">n_missing</th>
+<th align="right">complete_rate</th>
+<th align="right">min</th>
+<th align="right">max</th>
+<th align="right">empty</th>
+<th align="right">n_unique</th>
+<th align="right">whitespace</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Experiment_stage</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">24</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Comparison_ID_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">5</td>
+<td align="right">0</td>
+<td align="right">20</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Comparison_class_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">7</td>
+<td align="right">10</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Crop_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="right">23</td>
+<td align="right">0</td>
+<td align="right">69</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Crop_FAO_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">51</td>
+<td align="right">0</td>
+<td align="right">14</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Crop_ann_pen_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">9</td>
+<td align="right">0</td>
+<td align="right">6</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Crop_woodiness_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">7</td>
+<td align="right">0</td>
+<td align="right">7</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">crops_all_common_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">296</td>
+<td align="right">0</td>
+<td align="right">229</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">crops_all_scientific_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">306</td>
+<td align="right">0</td>
+<td align="right">249</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">crops_all_scientific_level_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">62</td>
+<td align="right">0</td>
+<td align="right">30</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">System_raw_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">5</td>
+<td align="right">37</td>
+<td align="right">0</td>
+<td align="right">16</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">System_details_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">461</td>
+<td align="right">0</td>
+<td align="right">423</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">System_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">7</td>
+<td align="right">16</td>
+<td align="right">0</td>
+<td align="right">4</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Fertiliser_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Fertiliser_chem_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">9</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Pesticide_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Pesticide_quantity_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">235</td>
+<td align="right">0</td>
+<td align="right">36</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Soil_management_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">10</td>
+<td align="right">0</td>
+<td align="right">5</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Time_state_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">21</td>
+<td align="right">0</td>
+<td align="right">37</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Study_length_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="right">0</td>
+<td align="right">63</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Sampling_unit_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">1732</td>
+<td align="right">0</td>
+<td align="right">311</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">B_error_measure_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">10</td>
+<td align="right">24</td>
+<td align="right">0</td>
+<td align="right">7</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">B_error_range_l_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">21</td>
+<td align="right">0</td>
+<td align="right">95</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">B_error_range_u_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">19</td>
+<td align="right">0</td>
+<td align="right">97</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Yield_value_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">19</td>
+<td align="right">0</td>
+<td align="right">123</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Yield_SD_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">21</td>
+<td align="right">0</td>
+<td align="right">100</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Yield_N_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">29</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Yield_error_measure_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">24</td>
+<td align="right">0</td>
+<td align="right">8</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Yield_error_value_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">21</td>
+<td align="right">0</td>
+<td align="right">100</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Yield_error_range_l_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">18</td>
+<td align="right">0</td>
+<td align="right">5</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Yield_error_range_u_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">5</td>
+<td align="right">0</td>
+<td align="right">5</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Lat_original_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">22</td>
+<td align="right">0</td>
+<td align="right">232</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Long_original_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">20</td>
+<td align="right">0</td>
+<td align="right">235</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Comparison_ID_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">5</td>
+<td align="right">0</td>
+<td align="right">24</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Comparison_class_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">11</td>
+<td align="right">11</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Crop_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="right">23</td>
+<td align="right">0</td>
+<td align="right">101</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Crop_FAO_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">51</td>
+<td align="right">0</td>
+<td align="right">14</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Crop_ann_pen_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">9</td>
+<td align="right">0</td>
+<td align="right">6</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Crop_woodiness_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">7</td>
+<td align="right">0</td>
+<td align="right">7</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">crops_all_common_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">511</td>
+<td align="right">0</td>
+<td align="right">339</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">crops_all_scientific_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">554</td>
+<td align="right">0</td>
+<td align="right">368</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">crops_all_scientific_level_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">53</td>
+<td align="right">0</td>
+<td align="right">41</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">System_raw_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">8</td>
+<td align="right">33</td>
+<td align="right">0</td>
+<td align="right">35</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">System_details_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">5</td>
+<td align="right">1254</td>
+<td align="right">0</td>
+<td align="right">534</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">System_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">12</td>
+<td align="right">24</td>
+<td align="right">0</td>
+<td align="right">7</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Fertiliser_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Fertiliser_chem_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">7</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Pesticide_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Pesticide_quantity_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">235</td>
+<td align="right">0</td>
+<td align="right">36</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Soil_management_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">10</td>
+<td align="right">0</td>
+<td align="right">5</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Time_state_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">21</td>
+<td align="right">0</td>
+<td align="right">37</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Study_length_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="right">0</td>
+<td align="right">62</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Sampling_unit_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">1732</td>
+<td align="right">0</td>
+<td align="right">290</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">B_error_measure_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">10</td>
+<td align="right">24</td>
+<td align="right">0</td>
+<td align="right">7</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">B_error_range_l_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">21</td>
+<td align="right">0</td>
+<td align="right">118</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">B_error_range_u_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">19</td>
+<td align="right">0</td>
+<td align="right">119</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">B_measure</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">9</td>
+<td align="right">41</td>
+<td align="right">0</td>
+<td align="right">21</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Yield_measure</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">64</td>
+<td align="right">0</td>
+<td align="right">26</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Yield_value_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">19</td>
+<td align="right">0</td>
+<td align="right">233</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Yield_SD_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">21</td>
+<td align="right">0</td>
+<td align="right">194</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Yield_N_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">35</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Yield_error_measure_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">24</td>
+<td align="right">0</td>
+<td align="right">8</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Yield_error_value_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">21</td>
+<td align="right">0</td>
+<td align="right">163</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Yield_error_range_l_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">7</td>
+<td align="right">0</td>
+<td align="right">5</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Yield_error_range_u_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">18</td>
+<td align="right">0</td>
+<td align="right">5</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Taxa</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="right">28</td>
+<td align="right">0</td>
+<td align="right">84</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Taxa_details</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">892</td>
+<td align="right">0</td>
+<td align="right">456</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Taxa_class</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="right">10</td>
+<td align="right">0</td>
+<td align="right">19</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Taxa_order</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="right">24</td>
+<td align="right">0</td>
+<td align="right">34</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Taxa_phylum</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">5</td>
+<td align="right">10</td>
+<td align="right">0</td>
+<td align="right">7</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Functional_group</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">5</td>
+<td align="right">15</td>
+<td align="right">0</td>
+<td align="right">12</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">B_ground</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">5</td>
+<td align="right">11</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Farm_size</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">21</td>
+<td align="right">0</td>
+<td align="right">95</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Farm_context</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">485</td>
+<td align="right">0</td>
+<td align="right">32</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Landscape_context</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">1595</td>
+<td align="right">0</td>
+<td align="right">140</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Lat_original_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">22</td>
+<td align="right">0</td>
+<td align="right">242</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Long_original_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">20</td>
+<td align="right">0</td>
+<td align="right">244</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Location</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">528</td>
+<td align="right">0</td>
+<td align="right">277</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Country</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="right">24</td>
+<td align="right">0</td>
+<td align="right">48</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Authors</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">8</td>
+<td align="right">226</td>
+<td align="right">0</td>
+<td align="right">231</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Title</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">39</td>
+<td align="right">334</td>
+<td align="right">0</td>
+<td align="right">237</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Notes</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">5</td>
+<td align="right">1204</td>
+<td align="right">0</td>
+<td align="right">509</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Validity_N_yield_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Validity_N_yield_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Validity_time_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Validity_time_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Validity_location</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Validity_biodiversity_overall</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Validity_yield_overall</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">4</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: numeric</strong></p>
+<table>
+<colgroup>
+<col width="22%" />
+<col width="8%" />
+<col width="12%" />
+<col width="7%" />
+<col width="7%" />
+<col width="7%" />
+<col width="7%" />
+<col width="7%" />
+<col width="7%" />
+<col width="8%" />
+<col width="5%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">skim_variable</th>
+<th align="right">n_missing</th>
+<th align="right">complete_rate</th>
+<th align="right">mean</th>
+<th align="right">sd</th>
+<th align="right">p0</th>
+<th align="right">p25</th>
+<th align="right">p50</th>
+<th align="right">p75</th>
+<th align="right">p100</th>
+<th align="left">hist</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">ID</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">625.01</td>
+<td align="right">389.25</td>
+<td align="right">13.00</td>
+<td align="right">319.00</td>
+<td align="right">576.00</td>
+<td align="right">722.00</td>
+<td align="right">1724.00</td>
+<td align="left">▅▇▂▁▂</td>
+</tr>
+<tr class="even">
+<td align="left">B_error_value_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">23.99</td>
+<td align="right">296.33</td>
+<td align="right">0.00</td>
+<td align="right">0.11</td>
+<td align="right">0.74</td>
+<td align="right">4.15</td>
+<td align="right">15217.39</td>
+<td align="left">▇▁▁▁▁</td>
+</tr>
+<tr class="odd">
+<td align="left">B_value_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">177.35</td>
+<td align="right">2826.93</td>
+<td align="right">-2.60</td>
+<td align="right">0.52</td>
+<td align="right">4.48</td>
+<td align="right">18.90</td>
+<td align="right">161956.52</td>
+<td align="left">▇▁▁▁▁</td>
+</tr>
+<tr class="even">
+<td align="left">B_SD_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">140.66</td>
+<td align="right">2927.83</td>
+<td align="right">0.00</td>
+<td align="right">0.30</td>
+<td align="right">1.85</td>
+<td align="right">7.69</td>
+<td align="right">152173.90</td>
+<td align="left">▇▁▁▁▁</td>
+</tr>
+<tr class="odd">
+<td align="left">B_N_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">66.96</td>
+<td align="right">227.84</td>
+<td align="right">2.00</td>
+<td align="right">6.00</td>
+<td align="right">11.00</td>
+<td align="right">36.00</td>
+<td align="right">2000.00</td>
+<td align="left">▇▁▁▁▁</td>
+</tr>
+<tr class="even">
+<td align="left">Lat_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">21.35</td>
+<td align="right">23.58</td>
+<td align="right">-43.64</td>
+<td align="right">9.82</td>
+<td align="right">26.15</td>
+<td align="right">39.97</td>
+<td align="right">63.75</td>
+<td align="left">▂▃▇▇▆</td>
+</tr>
+<tr class="odd">
+<td align="left">Long_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">-18.97</td>
+<td align="right">84.04</td>
+<td align="right">-158.08</td>
+<td align="right">-92.32</td>
+<td align="right">-35.86</td>
+<td align="right">32.57</td>
+<td align="right">172.46</td>
+<td align="left">▇▆▇▁▅</td>
+</tr>
+<tr class="even">
+<td align="left">B_error_value_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">20.94</td>
+<td align="right">210.84</td>
+<td align="right">0.00</td>
+<td align="right">0.10</td>
+<td align="right">0.85</td>
+<td align="right">4.27</td>
+<td align="right">6521.74</td>
+<td align="left">▇▁▁▁▁</td>
+</tr>
+<tr class="odd">
+<td align="left">B_value_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">154.24</td>
+<td align="right">1530.23</td>
+<td align="right">-2.90</td>
+<td align="right">0.74</td>
+<td align="right">4.65</td>
+<td align="right">22.80</td>
+<td align="right">47826.09</td>
+<td align="left">▇▁▁▁▁</td>
+</tr>
+<tr class="even">
+<td align="left">B_SD_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">112.19</td>
+<td align="right">2047.49</td>
+<td align="right">0.00</td>
+<td align="right">0.31</td>
+<td align="right">1.92</td>
+<td align="right">8.79</td>
+<td align="right">65217.40</td>
+<td align="left">▇▁▁▁▁</td>
+</tr>
+<tr class="odd">
+<td align="left">B_N_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">67.41</td>
+<td align="right">227.94</td>
+<td align="right">2.00</td>
+<td align="right">6.00</td>
+<td align="right">12.00</td>
+<td align="right">36.00</td>
+<td align="right">2000.00</td>
+<td align="left">▇▁▁▁▁</td>
+</tr>
+<tr class="even">
+<td align="left">Lat_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">21.35</td>
+<td align="right">23.58</td>
+<td align="right">-43.64</td>
+<td align="right">9.82</td>
+<td align="right">26.15</td>
+<td align="right">39.97</td>
+<td align="right">63.75</td>
+<td align="left">▂▃▇▇▆</td>
+</tr>
+<tr class="odd">
+<td align="left">Long_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">-18.97</td>
+<td align="right">84.04</td>
+<td align="right">-158.08</td>
+<td align="right">-92.33</td>
+<td align="right">-35.86</td>
+<td align="right">32.57</td>
+<td align="right">172.46</td>
+<td align="left">▇▆▇▁▅</td>
+</tr>
+<tr class="even">
+<td align="left">Year</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2007.06</td>
+<td align="right">7.59</td>
+<td align="right">1986.00</td>
+<td align="right">2003.00</td>
+<td align="right">2008.00</td>
+<td align="right">2013.00</td>
+<td align="right">2021.00</td>
+<td align="left">▂▂▇▇▃</td>
+</tr>
+<tr class="odd">
+<td align="left">Validity_N_biodiversity_C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0.81</td>
+<td align="right">0.39</td>
+<td align="right">0.00</td>
+<td align="right">1.00</td>
+<td align="right">1.00</td>
+<td align="right">1.00</td>
+<td align="right">1.00</td>
+<td align="left">▂▁▁▁▇</td>
+</tr>
+<tr class="even">
+<td align="left">Validity_N_biodiversity_T</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0.81</td>
+<td align="right">0.39</td>
+<td align="right">0.00</td>
+<td align="right">1.00</td>
+<td align="right">1.00</td>
+<td align="right">1.00</td>
+<td align="right">1.00</td>
+<td align="left">▂▁▁▁▇</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="index.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="temporal-analysis-for-evidence-maps-importance-of-temporal-analysis-in-evidence-maps.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/USERNAME/REPO/edit/BRANCH/01-Data-structure.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["_main.pdf", "_main.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+</body>
+
+</html>

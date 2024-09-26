@@ -1,0 +1,23 @@
+project:
+  type: book
+
+book:
+  title: "Visualisation: How to Create Charts to Visualize Data Distribution: Heatmaps, Cross-Analyses, and More"
+  author: "Damien Beillouin"
+  date: "9/25/2024"
+  chapters:
+    - index.qmd
+    - intro.qmd
+    - summary.qmd
+    - references.qmd
+
+bibliography: references.bib
+
+format:
+  html:
+    theme: cosmo
+  pdf:
+    documentclass: scrreprt
+
+editor: visual
+

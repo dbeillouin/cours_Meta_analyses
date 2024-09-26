@@ -1,0 +1,158 @@
+---
+editor_options: 
+  markdown: 
+    wrap: sentence
+---
+
+# Spatial Analyses and Exploration for Evidence Maps
+
+Spatial analysis is an invaluable tool for meta-analyses and evidence maps, enabling researchers to explore how intervention outcomes and environmental impacts vary across different geographic contexts.
+In meta-analytic research, spatial dimensions often add a critical layer of understanding that cannot be captured through temporal or non-spatial methods alone.
+For example, the geographic distribution of evidence can reveal clusters of research in certain regions or highlight underrepresented areas that might need targeted studies or interventions.
+This spatial context becomes even more relevant when interventions are applied in fields such as agriculture or ecology, where environmental heterogeneity significantly influences intervention outcomes.
+
+In meta-analyses, spatial data is often available in the form of GPS coordinates (point data), though precision can vary.
+This variability poses challenges but also offers opportunities for spatial exploration at different scales.
+Depending on the granularity and completeness of spatial data, researchers can choose from a range of spatial units for analysis, including administrative boundaries (e.g., country, region), environmental zones (e.g., biomes), or climate classifications.
+By considering these spatial frameworks, it becomes possible to detect location-specific patterns, assess the transferability of interventions across ecological zones, and draw more nuanced conclusions that account for geographic variability.
+
+Additionally, experimental data can be enriched by integrating geolocated climate or soil data from global or regional databases, such as WorldClim, TerraClimate, or the Harmonized World Soil Database.
+These external datasets allow researchers to map experimental sites onto broader environmental gradients, thereby capturing key contextual factors like precipitation, temperature, or soil texture that might moderate intervention effects.
+This comprehensive spatial integration provides a richer understanding of the environmental conditions underlying intervention success and helps refine location-specific recommendations
+
+### Recommended Graph Types for Spatial Analysis
+
+1.  **Choropleth Maps**: Choropleth maps use different color intensities to represent the value of a variable across predefined spatial units (e.g., countries, regions, or districts).
+    These maps are effective for visualizing spatial distributions of interventions or outcomes and can highlight regions of high or low research density.
+
+2.  **Whitaker Plots:** Whitaker plots are particularly useful for visualizing the distribution of study sites or intervention outcomes across ecological or climatic gradients, such as biomes or climate zones.
+    This visualization technique is valuable in meta-analyses focusing on agroecological or environmental interventions, as it emphasizes the interaction between climatic conditions and intervention effectiveness.
+    By illustrating how study outcomes vary across different ecological contexts, Whitaker plots enable researchers to identify key environmental factors that may influence the success of interventions, facilitating more tailored and effective recommendations.
+
+### Examples of Spatial Analysis in R
+
+For practical implementation, we recommend utilizing a suite of R packages that facilitate efficient spatial data handling and visualization, including `sf`, `sp`, `terra`, `raster`, and `ggplot2`.
+
+The `sf` package (Pebesma, 2022a) is designed for representing and working with spatial vector data, such as points, polygons, and lines, along with their associated attributes.
+It employs **sf** objects, which extend data frames to contain collections of simple features or spatial objects with potentially linked data.
+
+The `terra` package (Hijmans, 2022) provides robust functions for creating, reading, manipulating, and writing both raster and vector data.
+Raster data is particularly valuable for representing spatially continuous phenomena, as it divides the study area into a grid of equally sized cells or pixels, each assigned a value corresponding to the variable of interest.
+Notably, `terra` is the latest and most powerful tool for raster analyses, offering enhanced functionality and improved performance for working with spatial data.
+
+Furthermore, the `naturalearth` package streamlines access to country boundaries directly from the internet, thereby eliminating the need for manual downloads and ensuring users have the most current spatial data available.
+
+When performing spatial analyses, it is crucial to ensure that all datasets are in the same coordinate projection before extracting values based on latitude and longitude.
+Inconsistent projections can lead to inaccuracies in analysis, so careful attention to this detail is essential for reliable results.
+Below, we present examples of spatial analyses using sample data on intervention outcomes across different regions.
+
+#### Example 1: Creating a Choropleth Map
+
+This example demonstrates how to create a basic choropleth map using `ggplot2` and the `sf` package.
+The dataset represents intervention effectiveness scores across different European regions.
+
+```{r, message=FALSE, warning=FALSE}
+# Install necessary packages (uncomment to install if not already done)}
+# install.packages("rnaturalearth")
+# install.packages("sf")
+# install.packages("dplyr")
+# install.packages("ggplot2")
+
+# Load required libraries for map creation and data manipulation
+library(rnaturalearth)  # For world map data
+library(sf)             # For spatial data handling
+library(dplyr)          # For data manipulation
+library(ggplot2)        # For visualization
+
+# Load the dataset from the chosen CSV file
+DATA <- Outcome %>%
+  mutate(Country = factor(tolower(Country))) %>%
+  rename(geounit = Country) %>%
+  group_by(geounit) %>%
+  count()
+
+# Load the world map with medium scale
+world <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf") %>%
+  mutate(geounit = tolower(geounit)) %>%
+  # Rename certain countries for consistency
+  mutate(geounit = case_when(
+    geounit == "united kingdom" ~ "uk",
+    geounit == "united states of america" ~ "usa",
+    TRUE ~ geounit
+  ))
+
+# Merge the world map with the study count data
+world2 <- merge(world, DATA, by = "geounit", all = TRUE) %>%
+  # Create a discrete variable for legend representation
+  mutate(cut_n = cut(n, breaks = c(0, 10, 40, 80, 500), include.lowest = TRUE))
+
+# Create the map visualizing the number of publications
+map_plot <- ggplot(world2) +
+  geom_sf(aes(fill = cut_n), size = 0.2, color = "gray20") +
+  guides(fill = guide_legend(reverse = TRUE)) +
+  labs(
+    fill = 'Nombre d\'expériences',
+    title = 'Répartition des publications par pays',
+    x = NULL,
+    y = NULL
+  ) +
+  theme_classic() +
+  scale_fill_manual(values = c('#f6e8c3', "#dfc283", '#ba966c', '#e5f5e0', '#a1d99b', '#31a354'), na.value = "white")
+
+# Display the map
+map_plot
+```
+
+### Example 2: Creating a Whitaker Plot
+
+This example illustrates how to create a Whitaker plot using `ggplot2`.
+
+```{r, message=FALSE, warning=FALSE}
+# Install the plotbiomes package from GitHub (uncomment to install if not done yet)
+# install.packages("devtools")
+# devtools::install_github("valentinitnelav/plotbiomes")
+
+# Load necessary libraries
+library(plotbiomes)
+library(sp)
+library(raster)
+library(ggplot2)
+
+# Load temperature and precipitation raster data
+path <- system.file("extdata", "temp_pp.tif", package = "plotbiomes")
+temp_pp <- raster::stack(path)
+names(temp_pp) <- c("temperature", "precipitation")
+
+# Prepare spatial coordinates from Outcome dataset
+coordinates <- cbind(as.numeric(Outcome$Lat_C), as.numeric(Outcome$Lat_T))
+coordinates[is.na(coordinates)] <- 1  # Handle NA values
+spatial_points <- SpatialPoints(coordinates)
+
+# Extract temperature and precipitation values from the raster datasets
+extractions <- raster::extract(temp_pp, spatial_points, df = TRUE)
+
+# Adjust temperature values (WorldClim temperature data has a scale factor of 10)
+extractions$temperature <- extractions$temperature / 10
+
+# Convert precipitation from mm to cm
+extractions$precipitation <- extractions$precipitation / 10
+
+# Create a Whittaker base plot and add the temperature-precipitation data points
+whittaker_base_plot() +
+  geom_point(data = extractions, 
+             aes(x = temperature, 
+                 y = precipitation), 
+             size = 3,
+             shape = 21,
+             color = "gray95", 
+             fill = "black",
+             stroke = 1,
+             alpha = 0.5) +
+  theme_bw() +
+  labs(
+    title = "Temperature vs. Precipitation",
+    x = "Temperature (°C)",
+    y = "Precipitation (cm)"
+  )
+
+```

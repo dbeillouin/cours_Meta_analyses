@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="Chapter 4 Spatial Analyses and Exploration for Evidence Maps | Exploring and visualizing meta-analytical datasets using R" />
+<meta property="og:type" content="book" />
+
+<meta property="og:description" content="<p>This is beta-version of the visualisation exercice.
+set in the _output.yml file.
+The HTML output format for this example is bookdown::gitbook,</p>" />
+<meta name="github-repo" content="rstudio/bookdown-demo" />
+
+<meta name="author" content="Damien Beillouin" />
+
+<meta name="date" content="2024-09-26" />
+
+
+<meta name="description" content="<p>This is beta-version of the visualisation exercice.
+set in the _output.yml file.
+The HTML output format for this example is bookdown::gitbook,</p>">
+
+<title>Chapter 4 Spatial Analyses and Exploration for Evidence Maps | Exploring and visualizing meta-analytical datasets using R</title>
+
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="libs/navigation-1.1/tabsets.js"></script>
+<script src="libs/core-js-2.5.3/shim.min.js"></script>
+<script src="libs/react-18.2.0/react.min.js"></script>
+<script src="libs/react-18.2.0/react-dom.min.js"></script>
+<script src="libs/reactwidget-2.0.0/react-tools.js"></script>
+<link href="libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet" />
+<script src="libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<link href="libs/reactable-0.4.4/reactable.css" rel="stylesheet" />
+<script src="libs/reactable-binding-0.4.4/reactable.js"></script>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+/* show arrow before summary tag as in bootstrap
+TODO: remove if bootstrap in updated in html_document (rmarkdown#1485) */
+details > summary {
+  display: list-item;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container-fluid main-container">
+
+
+<div class="row">
+<div class="col-sm-12">
+<div id="TOC">
+<ul>
+<li><a href="index.html#about" id="toc-about"><span class="toc-section-number">1</span> About</a></li>
+<li class="has-sub"><a href="2-before-starting-the-analyses.html#before-starting-the-analyses" id="toc-before-starting-the-analyses"><span class="toc-section-number">2</span> Before starting the analyses</a>
+<ul>
+<li><a href="2.1-toward-transparency-and-reproducibility.html#toward-transparency-and-reproducibility" id="toc-toward-transparency-and-reproducibility"><span class="toc-section-number">2.1</span> Toward transparency and reproducibility</a></li>
+<li><a href="2.2-publishing-fully-reproducible-protocols.html#publishing-fully-reproducible-protocols" id="toc-publishing-fully-reproducible-protocols"><span class="toc-section-number">2.2</span> Publishing Fully Reproducible Protocols</a></li>
+<li class="has-sub"><a href="2.3-publish-a-datapaper.html#publish-a-datapaper" id="toc-publish-a-datapaper"><span class="toc-section-number">2.3</span> Publish a DataPaper</a>
+<ul>
+<li><a href="2.3-publish-a-datapaper.html#publishing-in-open-access-journals" id="toc-publishing-in-open-access-journals"><span class="toc-section-number">2.3.1</span> Publishing in Open Access Journals</a></li>
+</ul></li>
+<li class="has-sub"><a href="2.4-best-practices-for-structuring-meta-analysis-datafiles.html#best-practices-for-structuring-meta-analysis-datafiles" id="toc-best-practices-for-structuring-meta-analysis-datafiles"><span class="toc-section-number">2.4</span> Best practices for structuring Meta-analysis DataFiles</a>
+<ul>
+<li><a href="2.4-best-practices-for-structuring-meta-analysis-datafiles.html#generalities" id="toc-generalities"><span class="toc-section-number">2.4.1</span> Generalities</a></li>
+<li><a href="2.4-best-practices-for-structuring-meta-analysis-datafiles.html#harmonisable-classifications-of-practices-and-outcome" id="toc-harmonisable-classifications-of-practices-and-outcome"><span class="toc-section-number">2.4.2</span> harmonisable classifications of practices and outcome</a></li>
+</ul></li>
+<li class="has-sub"><a href="2.5-example-meta-analysis-datasets-general-datasets.html#example-meta-analysis-datasets-general-datasets" id="toc-example-meta-analysis-datasets-general-datasets"><span class="toc-section-number">2.5</span> Example: Meta-analysis datasets general datasets</a>
+<ul>
+<li><a href="2.5-example-meta-analysis-datasets-general-datasets.html#dataset-for-our-exercises" id="toc-dataset-for-our-exercises"><span class="toc-section-number">2.5.1</span> Dataset for Our Exercises</a></li>
+<li><a href="2.5-example-meta-analysis-datasets-general-datasets.html#steps-to-access-the-dataset" id="toc-steps-to-access-the-dataset"><span class="toc-section-number">2.5.2</span> Steps to Access the Dataset</a></li>
+</ul></li>
+</ul></li>
+<li class="has-sub"><a href="3-temporal-analysis-for-evidence-maps.html#temporal-analysis-for-evidence-maps" id="toc-temporal-analysis-for-evidence-maps"><span class="toc-section-number">3</span> Temporal Analysis for evidence maps</a>
+<ul>
+<li><a href="3.1-recommended-graph-types.html#recommended-graph-types" id="toc-recommended-graph-types"><span class="toc-section-number">3.1</span> Recommended Graph Types</a></li>
+<li class="has-sub"><a href="3.2-example-in-r.html#example-in-r" id="toc-example-in-r"><span class="toc-section-number">3.2</span> Example in R</a>
+<ul>
+<li><a href="3.2-example-in-r.html#count-graph" id="toc-count-graph"><span class="toc-section-number">3.2.1</span> Count Graph</a></li>
+<li><a href="3.2-example-in-r.html#cumulative-sum-graph" id="toc-cumulative-sum-graph"><span class="toc-section-number">3.2.2</span> Cumulative Sum Graph</a></li>
+<li><a href="3.2-example-in-r.html#grouped-graph-by-categories" id="toc-grouped-graph-by-categories"><span class="toc-section-number">3.2.3</span> Grouped Graph by categories</a></li>
+</ul></li>
+<li><a href="3.3-brief-note-on-cumulative-meta-analyses.html#brief-note-on-cumulative-meta-analyses" id="toc-brief-note-on-cumulative-meta-analyses"><span class="toc-section-number">3.3</span> Brief Note on Cumulative Meta-Analyses</a></li>
+</ul></li>
+<li class="has-sub"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#spatial-analyses-and-exploration-for-evidence-maps" id="toc-spatial-analyses-and-exploration-for-evidence-maps"><span class="toc-section-number">4</span> Spatial Analyses and Exploration for Evidence Maps</a>
+<ul>
+<li><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#recommended-graph-types-for-spatial-analysis" id="toc-recommended-graph-types-for-spatial-analysis"><span class="toc-section-number">4.0.1</span> Recommended Graph Types for Spatial Analysis</a></li>
+<li><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#examples-of-spatial-analysis-in-r" id="toc-examples-of-spatial-analysis-in-r"><span class="toc-section-number">4.0.2</span> Examples of Spatial Analysis in R</a></li>
+<li><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#example-2-creating-a-whitaker-plot" id="toc-example-2-creating-a-whitaker-plot"><span class="toc-section-number">4.0.3</span> Example 2: Creating a Whitaker Plot</a></li>
+</ul></li>
+<li class="has-sub"><a href="5-d-analyses-for-meta-analyses-and-evidence-maps.html#d-analyses-for-meta-analyses-and-evidence-maps" id="toc-d-analyses-for-meta-analyses-and-evidence-maps"><span class="toc-section-number">5</span> 2D Analyses for Meta-analyses and Evidence Maps</a>
+<ul>
+<li><a href="5.1-key-2-d-analysis-techniques.html#key-2-d-analysis-techniques" id="toc-key-2-d-analysis-techniques"><span class="toc-section-number">5.1</span> Key 2-D Analysis Techniques</a></li>
+<li class="has-sub"><a href="5.2-practical-examples-in-r.html#practical-examples-in-r" id="toc-practical-examples-in-r"><span class="toc-section-number">5.2</span> Practical Examples in R</a>
+<ul>
+<li><a href="5.2-practical-examples-in-r.html#example-1-creating-a-simple-contingency-table" id="toc-example-1-creating-a-simple-contingency-table"><span class="toc-section-number">5.2.1</span> Example 1: Creating a Simple Contingency Table</a></li>
+<li><a href="5.2-practical-examples-in-r.html#example-2-generating-a-heatmap" id="toc-example-2-generating-a-heatmap"><span class="toc-section-number">5.2.2</span> Example 2: Generating a Heatmap</a></li>
+<li><a href="5.2-practical-examples-in-r.html#example-3-bubble-plots" id="toc-example-3-bubble-plots"><span class="toc-section-number">5.2.3</span> Example 3: Bubble plots</a></li>
+<li><a href="5.2-practical-examples-in-r.html#example-3-building-an-interactive-table" id="toc-example-3-building-an-interactive-table"><span class="toc-section-number">5.2.4</span> Example 3: Building an Interactive Table</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="row">
+<div class="col-sm-12">
+<div id="spatial-analyses-and-exploration-for-evidence-maps" class="section level1" number="4">
+<h1><span class="header-section-number">Chapter 4</span> Spatial Analyses and Exploration for Evidence Maps</h1>
+<p>Spatial analysis is an invaluable tool for meta-analyses and evidence maps, enabling researchers to explore how intervention outcomes and environmental impacts vary across different geographic contexts.
+In meta-analytic research, spatial dimensions often add a critical layer of understanding that cannot be captured through temporal or non-spatial methods alone.
+For example, the geographic distribution of evidence can reveal clusters of research in certain regions or highlight underrepresented areas that might need targeted studies or interventions.
+This spatial context becomes even more relevant when interventions are applied in fields such as agriculture or ecology, where environmental heterogeneity significantly influences intervention outcomes.</p>
+<p>In meta-analyses, spatial data is often available in the form of GPS coordinates (point data), though precision can vary.
+This variability poses challenges but also offers opportunities for spatial exploration at different scales.
+Depending on the granularity and completeness of spatial data, researchers can choose from a range of spatial units for analysis, including administrative boundaries (e.g., country, region), environmental zones (e.g., biomes), or climate classifications.
+By considering these spatial frameworks, it becomes possible to detect location-specific patterns, assess the transferability of interventions across ecological zones, and draw more nuanced conclusions that account for geographic variability.</p>
+<p>Additionally, experimental data can be enriched by integrating geolocated climate or soil data from global or regional databases, such as WorldClim, TerraClimate, or the Harmonized World Soil Database.
+These external datasets allow researchers to map experimental sites onto broader environmental gradients, thereby capturing key contextual factors like precipitation, temperature, or soil texture that might moderate intervention effects.
+This comprehensive spatial integration provides a richer understanding of the environmental conditions underlying intervention success and helps refine location-specific recommendations</p>
+<div id="recommended-graph-types-for-spatial-analysis" class="section level3" number="4.0.1">
+<h3><span class="header-section-number">4.0.1</span> Recommended Graph Types for Spatial Analysis</h3>
+<ol style="list-style-type: decimal">
+<li><p><strong>Choropleth Maps</strong>: Choropleth maps use different color intensities to represent the value of a variable across predefined spatial units (e.g., countries, regions, or districts).
+These maps are effective for visualizing spatial distributions of interventions or outcomes and can highlight regions of high or low research density.</p></li>
+<li><p><strong>Whitaker Plots:</strong> Whitaker plots are particularly useful for visualizing the distribution of study sites or intervention outcomes across ecological or climatic gradients, such as biomes or climate zones.
+This visualization technique is valuable in meta-analyses focusing on agroecological or environmental interventions, as it emphasizes the interaction between climatic conditions and intervention effectiveness.
+By illustrating how study outcomes vary across different ecological contexts, Whitaker plots enable researchers to identify key environmental factors that may influence the success of interventions, facilitating more tailored and effective recommendations.</p></li>
+</ol>
+</div>
+<div id="examples-of-spatial-analysis-in-r" class="section level3" number="4.0.2">
+<h3><span class="header-section-number">4.0.2</span> Examples of Spatial Analysis in R</h3>
+<p>For practical implementation, we recommend utilizing a suite of R packages that facilitate efficient spatial data handling and visualization, including <code>sf</code>, <code>sp</code>, <code>terra</code>, <code>raster</code>, and <code>ggplot2</code>.</p>
+<p>The <code>sf</code> package (Pebesma, 2022a) is designed for representing and working with spatial vector data, such as points, polygons, and lines, along with their associated attributes.
+It employs <strong>sf</strong> objects, which extend data frames to contain collections of simple features or spatial objects with potentially linked data.</p>
+<p>The <code>terra</code> package (Hijmans, 2022) provides robust functions for creating, reading, manipulating, and writing both raster and vector data.
+Raster data is particularly valuable for representing spatially continuous phenomena, as it divides the study area into a grid of equally sized cells or pixels, each assigned a value corresponding to the variable of interest.
+Notably, <code>terra</code> is the latest and most powerful tool for raster analyses, offering enhanced functionality and improved performance for working with spatial data.</p>
+<p>Furthermore, the <code>naturalearth</code> package streamlines access to country boundaries directly from the internet, thereby eliminating the need for manual downloads and ensuring users have the most current spatial data available.</p>
+<p>When performing spatial analyses, it is crucial to ensure that all datasets are in the same coordinate projection before extracting values based on latitude and longitude.
+Inconsistent projections can lead to inaccuracies in analysis, so careful attention to this detail is essential for reliable results.
+Below, we present examples of spatial analyses using sample data on intervention outcomes across different regions.</p>
+<div id="example-1-creating-a-choropleth-map" class="section level4" number="4.0.2.1">
+<h4><span class="header-section-number">4.0.2.1</span> Example 1: Creating a Choropleth Map</h4>
+<p>This example demonstrates how to create a basic choropleth map using <code>ggplot2</code> and the <code>sf</code> package.
+The dataset represents intervention effectiveness scores across different European regions.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-1" tabindex="-1"></a><span class="co"># Install necessary packages (uncomment to install if not already done)}</span></span>
+<span id="cb16-2"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-2" tabindex="-1"></a><span class="co"># install.packages(&quot;rnaturalearth&quot;)</span></span>
+<span id="cb16-3"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-3" tabindex="-1"></a><span class="co"># install.packages(&quot;sf&quot;)</span></span>
+<span id="cb16-4"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-4" tabindex="-1"></a><span class="co"># install.packages(&quot;dplyr&quot;)</span></span>
+<span id="cb16-5"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-5" tabindex="-1"></a><span class="co"># install.packages(&quot;ggplot2&quot;)</span></span>
+<span id="cb16-6"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-6" tabindex="-1"></a></span>
+<span id="cb16-7"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-7" tabindex="-1"></a><span class="co"># Load required libraries for map creation and data manipulation</span></span>
+<span id="cb16-8"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-8" tabindex="-1"></a><span class="fu">library</span>(rnaturalearth)  <span class="co"># For world map data</span></span>
+<span id="cb16-9"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-9" tabindex="-1"></a><span class="fu">library</span>(sf)             <span class="co"># For spatial data handling</span></span>
+<span id="cb16-10"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-10" tabindex="-1"></a><span class="fu">library</span>(dplyr)          <span class="co"># For data manipulation</span></span>
+<span id="cb16-11"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-11" tabindex="-1"></a><span class="fu">library</span>(ggplot2)        <span class="co"># For visualization</span></span>
+<span id="cb16-12"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-12" tabindex="-1"></a></span>
+<span id="cb16-13"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-13" tabindex="-1"></a><span class="co"># Load the dataset from the chosen CSV file</span></span>
+<span id="cb16-14"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-14" tabindex="-1"></a>DATA <span class="ot">&lt;-</span> Outcome <span class="sc">%&gt;%</span></span>
+<span id="cb16-15"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-15" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Country =</span> <span class="fu">factor</span>(<span class="fu">tolower</span>(Country))) <span class="sc">%&gt;%</span></span>
+<span id="cb16-16"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-16" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">geounit =</span> Country) <span class="sc">%&gt;%</span></span>
+<span id="cb16-17"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-17" tabindex="-1"></a>  <span class="fu">group_by</span>(geounit) <span class="sc">%&gt;%</span></span>
+<span id="cb16-18"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-18" tabindex="-1"></a>  <span class="fu">count</span>()</span>
+<span id="cb16-19"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-19" tabindex="-1"></a></span>
+<span id="cb16-20"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-20" tabindex="-1"></a><span class="co"># Load the world map with medium scale</span></span>
+<span id="cb16-21"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-21" tabindex="-1"></a>world <span class="ot">&lt;-</span> rnaturalearth<span class="sc">::</span><span class="fu">ne_countries</span>(<span class="at">scale =</span> <span class="st">&quot;medium&quot;</span>, <span class="at">returnclass =</span> <span class="st">&quot;sf&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb16-22"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-22" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">geounit =</span> <span class="fu">tolower</span>(geounit)) <span class="sc">%&gt;%</span></span>
+<span id="cb16-23"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-23" tabindex="-1"></a>  <span class="co"># Rename certain countries for consistency</span></span>
+<span id="cb16-24"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-24" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">geounit =</span> <span class="fu">case_when</span>(</span>
+<span id="cb16-25"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-25" tabindex="-1"></a>    geounit <span class="sc">==</span> <span class="st">&quot;united kingdom&quot;</span> <span class="sc">~</span> <span class="st">&quot;uk&quot;</span>,</span>
+<span id="cb16-26"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-26" tabindex="-1"></a>    geounit <span class="sc">==</span> <span class="st">&quot;united states of america&quot;</span> <span class="sc">~</span> <span class="st">&quot;usa&quot;</span>,</span>
+<span id="cb16-27"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-27" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> geounit</span>
+<span id="cb16-28"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-28" tabindex="-1"></a>  ))</span>
+<span id="cb16-29"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-29" tabindex="-1"></a></span>
+<span id="cb16-30"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-30" tabindex="-1"></a><span class="co"># Merge the world map with the study count data</span></span>
+<span id="cb16-31"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-31" tabindex="-1"></a>world2 <span class="ot">&lt;-</span> <span class="fu">merge</span>(world, DATA, <span class="at">by =</span> <span class="st">&quot;geounit&quot;</span>, <span class="at">all =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb16-32"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-32" tabindex="-1"></a>  <span class="co"># Create a discrete variable for legend representation</span></span>
+<span id="cb16-33"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-33" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">cut_n =</span> <span class="fu">cut</span>(n, <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">10</span>, <span class="dv">40</span>, <span class="dv">80</span>, <span class="dv">500</span>), <span class="at">include.lowest =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb16-34"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-34" tabindex="-1"></a></span>
+<span id="cb16-35"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-35" tabindex="-1"></a><span class="co"># Create the map visualizing the number of publications</span></span>
+<span id="cb16-36"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-36" tabindex="-1"></a>map_plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(world2) <span class="sc">+</span></span>
+<span id="cb16-37"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-37" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="fu">aes</span>(<span class="at">fill =</span> cut_n), <span class="at">size =</span> <span class="fl">0.2</span>, <span class="at">color =</span> <span class="st">&quot;gray20&quot;</span>) <span class="sc">+</span></span>
+<span id="cb16-38"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-38" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">fill =</span> <span class="fu">guide_legend</span>(<span class="at">reverse =</span> <span class="cn">TRUE</span>)) <span class="sc">+</span></span>
+<span id="cb16-39"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-39" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb16-40"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-40" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">&#39;Nombre d</span><span class="sc">\&#39;</span><span class="st">expériences&#39;</span>,</span>
+<span id="cb16-41"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-41" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&#39;Répartition des publications par pays&#39;</span>,</span>
+<span id="cb16-42"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-42" tabindex="-1"></a>    <span class="at">x =</span> <span class="cn">NULL</span>,</span>
+<span id="cb16-43"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-43" tabindex="-1"></a>    <span class="at">y =</span> <span class="cn">NULL</span></span>
+<span id="cb16-44"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-44" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb16-45"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-45" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
+<span id="cb16-46"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-46" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&#39;#f6e8c3&#39;</span>, <span class="st">&quot;#dfc283&quot;</span>, <span class="st">&#39;#ba966c&#39;</span>, <span class="st">&#39;#e5f5e0&#39;</span>, <span class="st">&#39;#a1d99b&#39;</span>, <span class="st">&#39;#31a354&#39;</span>), <span class="at">na.value =</span> <span class="st">&quot;white&quot;</span>)</span>
+<span id="cb16-47"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-47" tabindex="-1"></a></span>
+<span id="cb16-48"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-48" tabindex="-1"></a><span class="co"># Display the map</span></span>
+<span id="cb16-49"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb16-49" tabindex="-1"></a>map_plot</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+</div>
+</div>
+<div id="example-2-creating-a-whitaker-plot" class="section level3" number="4.0.3">
+<h3><span class="header-section-number">4.0.3</span> Example 2: Creating a Whitaker Plot</h3>
+<p>This example illustrates how to create a Whitaker plot using <code>ggplot2</code>.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-1" tabindex="-1"></a><span class="co"># Install the plotbiomes package from GitHub (uncomment to install if not done yet)</span></span>
+<span id="cb17-2"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-2" tabindex="-1"></a><span class="co"># install.packages(&quot;devtools&quot;)</span></span>
+<span id="cb17-3"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-3" tabindex="-1"></a><span class="co"># devtools::install_github(&quot;valentinitnelav/plotbiomes&quot;)</span></span>
+<span id="cb17-4"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-4" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-5" tabindex="-1"></a><span class="co"># Load necessary libraries</span></span>
+<span id="cb17-6"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-6" tabindex="-1"></a><span class="fu">library</span>(plotbiomes)</span>
+<span id="cb17-7"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-7" tabindex="-1"></a><span class="fu">library</span>(sp)</span>
+<span id="cb17-8"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-8" tabindex="-1"></a><span class="fu">library</span>(raster)</span>
+<span id="cb17-9"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-9" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb17-10"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-10" tabindex="-1"></a></span>
+<span id="cb17-11"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-11" tabindex="-1"></a><span class="co"># Load temperature and precipitation raster data</span></span>
+<span id="cb17-12"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-12" tabindex="-1"></a>path <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;temp_pp.tif&quot;</span>, <span class="at">package =</span> <span class="st">&quot;plotbiomes&quot;</span>)</span>
+<span id="cb17-13"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-13" tabindex="-1"></a>temp_pp <span class="ot">&lt;-</span> raster<span class="sc">::</span><span class="fu">stack</span>(path)</span>
+<span id="cb17-14"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-14" tabindex="-1"></a><span class="fu">names</span>(temp_pp) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;temperature&quot;</span>, <span class="st">&quot;precipitation&quot;</span>)</span>
+<span id="cb17-15"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-15" tabindex="-1"></a></span>
+<span id="cb17-16"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-16" tabindex="-1"></a><span class="co"># Prepare spatial coordinates from Outcome dataset</span></span>
+<span id="cb17-17"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-17" tabindex="-1"></a>coordinates <span class="ot">&lt;-</span> <span class="fu">cbind</span>(<span class="fu">as.numeric</span>(Outcome<span class="sc">$</span>Lat_C), <span class="fu">as.numeric</span>(Outcome<span class="sc">$</span>Lat_T))</span>
+<span id="cb17-18"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-18" tabindex="-1"></a>coordinates[<span class="fu">is.na</span>(coordinates)] <span class="ot">&lt;-</span> <span class="dv">1</span>  <span class="co"># Handle NA values</span></span>
+<span id="cb17-19"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-19" tabindex="-1"></a>spatial_points <span class="ot">&lt;-</span> <span class="fu">SpatialPoints</span>(coordinates)</span>
+<span id="cb17-20"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-20" tabindex="-1"></a></span>
+<span id="cb17-21"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-21" tabindex="-1"></a><span class="co"># Extract temperature and precipitation values from the raster datasets</span></span>
+<span id="cb17-22"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-22" tabindex="-1"></a>extractions <span class="ot">&lt;-</span> raster<span class="sc">::</span><span class="fu">extract</span>(temp_pp, spatial_points, <span class="at">df =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb17-23"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-23" tabindex="-1"></a></span>
+<span id="cb17-24"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-24" tabindex="-1"></a><span class="co"># Adjust temperature values (WorldClim temperature data has a scale factor of 10)</span></span>
+<span id="cb17-25"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-25" tabindex="-1"></a>extractions<span class="sc">$</span>temperature <span class="ot">&lt;-</span> extractions<span class="sc">$</span>temperature <span class="sc">/</span> <span class="dv">10</span></span>
+<span id="cb17-26"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-26" tabindex="-1"></a></span>
+<span id="cb17-27"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-27" tabindex="-1"></a><span class="co"># Convert precipitation from mm to cm</span></span>
+<span id="cb17-28"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-28" tabindex="-1"></a>extractions<span class="sc">$</span>precipitation <span class="ot">&lt;-</span> extractions<span class="sc">$</span>precipitation <span class="sc">/</span> <span class="dv">10</span></span>
+<span id="cb17-29"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-29" tabindex="-1"></a></span>
+<span id="cb17-30"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-30" tabindex="-1"></a><span class="co"># Create a Whittaker base plot and add the temperature-precipitation data points</span></span>
+<span id="cb17-31"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-31" tabindex="-1"></a><span class="fu">whittaker_base_plot</span>() <span class="sc">+</span></span>
+<span id="cb17-32"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-32" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> extractions, </span>
+<span id="cb17-33"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-33" tabindex="-1"></a>             <span class="fu">aes</span>(<span class="at">x =</span> temperature, </span>
+<span id="cb17-34"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-34" tabindex="-1"></a>                 <span class="at">y =</span> precipitation), </span>
+<span id="cb17-35"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-35" tabindex="-1"></a>             <span class="at">size =</span> <span class="dv">3</span>,</span>
+<span id="cb17-36"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-36" tabindex="-1"></a>             <span class="at">shape =</span> <span class="dv">21</span>,</span>
+<span id="cb17-37"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-37" tabindex="-1"></a>             <span class="at">color =</span> <span class="st">&quot;gray95&quot;</span>, </span>
+<span id="cb17-38"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-38" tabindex="-1"></a>             <span class="at">fill =</span> <span class="st">&quot;black&quot;</span>,</span>
+<span id="cb17-39"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-39" tabindex="-1"></a>             <span class="at">stroke =</span> <span class="dv">1</span>,</span>
+<span id="cb17-40"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-40" tabindex="-1"></a>             <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb17-41"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-41" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb17-42"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-42" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb17-43"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-43" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Temperature vs. Precipitation&quot;</span>,</span>
+<span id="cb17-44"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-44" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">&quot;Temperature (°C)&quot;</span>,</span>
+<span id="cb17-45"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-45" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">&quot;Precipitation (cm)&quot;</span></span>
+<span id="cb17-46"><a href="4-spatial-analyses-and-exploration-for-evidence-maps.html#cb17-46" tabindex="-1"></a>  )</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+
+</div>
+</div>
+<p style="text-align: center;">
+<a href="3.3-brief-note-on-cumulative-meta-analyses.html"><button class="btn btn-default">Previous</button></a>
+<a href="5-d-analyses-for-meta-analyses-and-evidence-maps.html"><button class="btn btn-default">Next</button></a>
+</p>
+</div>
+</div>
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+$(document).ready(function () {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+});
+
+</script>
+
+</body>
+</html>

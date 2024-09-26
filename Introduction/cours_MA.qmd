@@ -27,34 +27,34 @@ include-in-header:
 
 ## Focus....
 
-![](One_can.jpg){fig-align="center"}
+![](images/One_can.jpg){fig-align="center"}
 
 ## Step back
 
-![](several_cans.jpg){fig-align="center"}
+![](images/several_cans.jpg){fig-align="center"}
 
 ## Again...
 
-![](All_cans.jpg){fig-align="center"}
+![](images/All_cans.jpg){fig-align="center"}
 
 -   G. Seurat: [Un dimanche après-midi à l'île de la Grande Jatte](https://fr.wikipedia.org/wiki/Un_dimanche_apr%C3%A8s-midi_%C3%A0_l%27%C3%AEle_de_la_Grande_Jatte)
 -   more info: <https://www.boumbang.com/chris-jordan/>
 
 ## Let's play
 
-![](QRcode_vaccines.png){fig-align="center"}
+![](images/QRcode_vaccines.png){fig-align="center"}
 
 <https://etc.ch/TWnF>
 
 ## At the global scale
 
-![](Vaccines_results-sondage.avif){fig-align="center"}
+![](images/Vaccines_results-sondage.avif){fig-align="center"}
 
 -   more info: [Davidson, 2017](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5789217/)
 
 ## What started the rumors?
 
-![](Wakefiled_crop.png){fig-align="center"}
+![](images/Wakefiled_crop.png){fig-align="center"}
 
 ## Mis-information and meta-analyses
 
@@ -76,13 +76,13 @@ include-in-header:
 
 ## Let's play (again)
 
-![](QRcode_vaccines.png){fig-align="center" width="239"}
+![](images/QRcode_vaccines.png){fig-align="center" width="313"}
 
-![](Pete.png){fig-align="center" width="141"}
+![](images/Pete.png){fig-align="center" width="146"}
 
 ## State of the evidence
 
-![](cirhose_MA.jpg){fig-align="center"}
+![](images/cirhose_MA.jpg){fig-align="center"}
 
 ## Contradictory evidence and meta-analyses
 
@@ -100,17 +100,17 @@ include-in-header:
 
 ## Let's play (again?!)
 
-![](QRcode_vaccines.png){fig-align="center" width="239"}
+![](images/QRcode_vaccines.png){fig-align="center"}
 
 ## Number of citations included in IPCC reports
 
-![](IPCC_reports.png){fig-align="center"}
+![](images/IPCC_reports.png){fig-align="center"}
 
 source: [Minx et al., 2017](https://www.sciencedirect.com/science/article/pii/S1462901117305464?casa_token=fGbjnAkzfnkAAAAA:KLAql5_S5MUqbE45BV9ueL9Ej1qzeXrP-rXzjv3XctC4EMtnidZk85QjdY08NBN4pb4qYzo)
 
 ## Number of papers in ecology
 
-![](Gurevitch_MA.png){fig-align="center"}
+![](images/Gurevitch_MA.png){fig-align="center"}
 
 source: [Gurevitch et al., 2018](https://www.nature.com/articles/nature25753)
 
@@ -128,31 +128,31 @@ source: [Gurevitch et al., 2018](https://www.nature.com/articles/nature25753)
 
 ## A need for robust evidence
 
-![](Pyramid_evidence.png){fig-align="center"}
+![](images/Pyramid_evidence.png){fig-align="center"}
 
 ## Some big projects/labs
 
-![](IDIV.png){fig-align="center"}
+![](images/IDIV.png){fig-align="center"}
 
 ## Some big projects/labs
 
-![](CESAB.png){fig-align="center"}
+![](images/CESAB.png){fig-align="center"}
 
 ## Some big projects/labs
 
-![](Predicts.png){fig-align="center"}
+![](images/Predicts.png){fig-align="center"}
 
 ## Some big projects/labs
 
-![](Predicts_exam.png){fig-align="center"}
+![](images/Predicts_exam.png){fig-align="center"}
 
 ## Results: Increase in meta-analyses
 
-![](MA_increase.png){fig-align="center"}
+![](images/MA_increase.png){fig-align="center"}
 
 ## But of variable quality
 
-![](Quality_MA.png){fig-align="center"}
+![](images/Quality_MA.png){fig-align="center"}
 
 more info: [shinyApp](https://cropdiversification.shinyapps.io/Crop_diversification_2020/#section-quality-of-the-meta-analyses)
 
@@ -166,19 +166,19 @@ more info: [shinyApp](https://cropdiversification.shinyapps.io/Crop_diversificat
 
 ## A typology of methods
 
-![](typology%20methods.png){fig-align="center"}
+![](images/typology%20methods.png){fig-align="center"}
 
 ## Systematic (evidence) maps
 
 -   Purpose: Provide an overview or 'landscape of knowledge" on a given issue
 
-![](map_example.png){fig-align="center"}
+![](images/map_example.png){fig-align="center"}
 
 ## Systematic (evidence) maps
 
 -   Purpose: Provide an overview or 'landscape of knowledge" on a given issue
 
-![](Bonfanti_ex.jpg){fig-align="center"}
+![](images/Bonfanti_ex.jpg){fig-align="center"}
 
 ## Stengths of evidence maps
 
@@ -214,7 +214,7 @@ more info: [shinyApp](https://cropdiversification.shinyapps.io/Crop_diversificat
 
 -   Purpose: Provide an estimate of an effect, identify source of heterogeneity, rank the moderators of the effect
 
-![](MA_example.png){fig-align="center"}
+![](images/MA_example.png){fig-align="center"}
 
 ## Stengths of meta-analyses
 
@@ -260,10 +260,10 @@ more info: [shinyApp](https://cropdiversification.shinyapps.io/Crop_diversificat
 
 ## What you will do this week
 
-![](Steps_MA.png)
+![](images/Steps_MA.png)
 
 ## What you will do this week
 
 A training based on international golden standards
 
-![](Cochrane.png)
+![](images/Cochrane.png)

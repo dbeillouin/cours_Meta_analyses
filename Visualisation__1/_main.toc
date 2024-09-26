@@ -1,0 +1,39 @@
+\contentsline {chapter}{\numberline {1}About}{5}{chapter.1}%
+\contentsline {chapter}{\numberline {2}Before starting the analyses}{7}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Toward transparency and reproducibility}{7}{section.2.1}%
+\contentsline {subsubsection}{\numberline {2.1.0.1}Reporting Standards in systematic reviews: PRISMA, ROSES, and Beyond}{8}{subsubsection.2.1.0.1}%
+\contentsline {section}{\numberline {2.2}Publishing Fully Reproducible Protocols}{9}{section.2.2}%
+\contentsline {subsubsection}{\numberline {2.2.0.1}Key Components of a Research Protocol}{9}{subsubsection.2.2.0.1}%
+\contentsline {subsubsection}{\numberline {2.2.0.2}Importance in Meta-Analyses and Evidence Synthesis}{10}{subsubsection.2.2.0.2}%
+\contentsline {subsubsection}{\numberline {2.2.0.3}Standards and Guidelines}{10}{subsubsection.2.2.0.3}%
+\contentsline {subsubsection}{\numberline {2.2.0.4}Journals Specializing in Protocols}{11}{subsubsection.2.2.0.4}%
+\contentsline {subsubsection}{\numberline {2.2.0.5}Example of a Protocol Publication}{11}{subsubsection.2.2.0.5}%
+\contentsline {subsubsection}{\numberline {2.2.0.6}Useful Links for Protocol Standards and Templates}{12}{subsubsection.2.2.0.6}%
+\contentsline {section}{\numberline {2.3}Publish a DataPaper}{12}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}Publishing in Open Access Journals}{13}{subsection.2.3.1}%
+\contentsline {section}{\numberline {2.4}Best practices for structuring Meta-analysis DataFiles}{14}{section.2.4}%
+\contentsline {subsection}{\numberline {2.4.1}Generalities}{14}{subsection.2.4.1}%
+\contentsline {subsection}{\numberline {2.4.2}harmonisable classifications of practices and outcome}{15}{subsection.2.4.2}%
+\contentsline {section}{\numberline {2.5}Example: Meta-analysis datasets general datasets}{16}{section.2.5}%
+\contentsline {subsection}{\numberline {2.5.1}Dataset for Our Exercises}{17}{subsection.2.5.1}%
+\contentsline {subsection}{\numberline {2.5.2}Steps to Access the Dataset}{17}{subsection.2.5.2}%
+\contentsline {chapter}{\numberline {3}Temporal Analysis for evidence maps}{19}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Recommended Graph Types}{19}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Example in R}{20}{section.3.2}%
+\contentsline {subsubsection}{\numberline {3.2.0.1}Initial Data Manipulation}{20}{subsubsection.3.2.0.1}%
+\contentsline {subsection}{\numberline {3.2.1}Count Graph}{20}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}Cumulative Sum Graph}{21}{subsection.3.2.2}%
+\contentsline {subsection}{\numberline {3.2.3}Grouped Graph by categories}{22}{subsection.3.2.3}%
+\contentsline {section}{\numberline {3.3}Brief Note on Cumulative Meta-Analyses}{23}{section.3.3}%
+\contentsline {chapter}{\numberline {4}Spatial Analyses and Exploration for Evidence Maps}{25}{chapter.4}%
+\contentsline {subsection}{\numberline {4.0.1}Recommended Graph Types for Spatial Analysis}{26}{subsection.4.0.1}%
+\contentsline {subsection}{\numberline {4.0.2}Examples of Spatial Analysis in R}{26}{subsection.4.0.2}%
+\contentsline {subsubsection}{\numberline {4.0.2.1}Example 1: Creating a Choropleth Map}{27}{subsubsection.4.0.2.1}%
+\contentsline {subsection}{\numberline {4.0.3}Example 2: Creating a Whitaker Plot}{29}{subsection.4.0.3}%
+\contentsline {chapter}{\numberline {5}2D Analyses for Meta-analyses and Evidence Maps}{31}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Key 2-D Analysis Techniques}{31}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Practical Examples in R}{32}{section.5.2}%
+\contentsline {subsection}{\numberline {5.2.1}Example 1: Creating a Simple Contingency Table}{32}{subsection.5.2.1}%
+\contentsline {subsection}{\numberline {5.2.2}Example 2: Generating a Heatmap}{33}{subsection.5.2.2}%
+\contentsline {subsection}{\numberline {5.2.3}Example 3: Bubble plots}{34}{subsection.5.2.3}%
+\contentsline {subsection}{\numberline {5.2.4}Example 3: Building an Interactive Table}{35}{subsection.5.2.4}%

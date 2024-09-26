@@ -1,0 +1,6 @@
+delete_merged_file: true
+language:
+  ui:
+    chapter_name: "Chapter "
+    
+    always_allow_html: true

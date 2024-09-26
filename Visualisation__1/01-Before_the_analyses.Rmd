@@ -1,0 +1,329 @@
+---
+editor_options: 
+  markdown: 
+    wrap: sentence
+---
+
+# Before starting the analyses
+
+In the context of evidence maps and meta-analyses, data files typically contain structured information derived from primary studies.
+A well-organized dataset is essential for ensuring transparency, reproducibility, and clarity in statistical analyses.
+The structure of these files plays a crucial role in data management and visualization, particularly when handling large datasets that summarize study characteristics, interventions, and outcomes.
+Below are some best practices and examples to follow when preparing and using such files.
+
+## Toward transparency and reproducibility
+
+The [**FAIR principles**](https://www.ouvrirlascience.fr/fair-principles/) (Findable, Accessible, Interoperable, and Reusable) provide a framework for improving the management and sharing of digital research assets.
+These principles ensure that data is discoverable through search engines, accessible with appropriate authorization, interoperable with other datasets, and reusable for various purposes.
+A key aspect is **machine-actionability**, enabling computers to process and understand data without significant human intervention.
+
+**France** has made significant strides in promoting **open science**.
+The **French National Plan for Open Science (2021-2024)** mandates open access to both scientific publications and research data generated with public funding.
+
+The overarching objective of this plan is to promote transparency, accessibility, and the preservation of scientific knowledge.
+By mandating open access, France ensures that research funded by public resources benefits the wider global community, fostering international collaboration and cross-disciplinary advancements.
+
+A cornerstone of this effort is the adoption of the FAIR principles (Findable, Accessible, Interoperable, Reusable), which are integral in addressing common challenges in data management.
+By adhering to these principles, research data becomes more reliably reusable, supporting better documentation, accessibility, and data compatibility across different systems and disciplines.
+
+Breakdown of FAIR Principles:
+
+-   **Findable**: Data must be easy to locate for both humans and machines.
+    This involves assigning globally unique identifiers (such as DOIs) to datasets and ensuring that metadata is searchable and indexed in databases.
+
+-   **Accessible**: Data must be accessible under clear and transparent terms.
+    This means storing datasets in repositories that guarantee long-term access, either through open-access platforms or specialized data journals that maintain the integrity of the data over time.
+
+-   **Interoperable**: Data should be compatible with other datasets and tools.
+    Standardized formats (e.g., CSV, JSON) and recognized metadata structures like Dublin Core help ensure that datasets can be integrated and compared across different systems.
+
+-   **Reusable**: Data must be well-documented, with detailed metadata providing sufficient context to allow future researchers to reuse it effectively.
+    This includes information on the dataset’s provenance, context, and usage conditions, ensuring that it can be reliably understood and repurposed in new research contexts.
+
+#### Reporting Standards in systematic reviews: PRISMA, ROSES, and Beyond
+
+In systematic reviews and meta-analyses, following standardized reporting guidelines is essential for transparency and reproducibility.
+The most widely used framework is the **PRISMA (Preferred Reporting Items for Systematic Reviews and Meta-Analyses)** guideline, which outlines the minimum information that should be included in a systematic review, covering everything from search strategies to result synthesis.
+PRISMA encourages the use of flow diagrams to illustrate the study selection process, making the review process clear and replicable.
+
+For environmental and social sciences, the **ROSES (Reporting Standards for Systematic Evidence Syntheses)** framework offers a tailored alternative.
+It includes checklists and flow diagrams similar to PRISMA but adapted for the specific challenges of conducting systematic reviews in complex, interdisciplinary fields like ecology, conservation, and agriculture.
+
+**Using these frameworks ensures:**
+
+1.  **Transparency in Study Selection and Data Extraction**: Flow diagrams such as the PRISMA diagram clearly document how many studies were identified, screened, and ultimately included in the synthesis.
+    This transparency helps prevent biases in study selection and allows future researchers to see the logic behind inclusion and exclusion criteria.
+
+2.  **Comprehensive Reporting of Methods and Results**: Both PRISMA and ROSES encourage detailed reporting of the data extraction process, statistical methods used in meta-analyses, and sensitivity analyses, which are crucial for assessing the robustness of results.
+
+3.  **Enhanced Reproducibility**: These guidelines ensure that other researchers can reproduce the review process, validate findings, and use the extracted data for new meta-analyses, secondary syntheses, or policy assessments.
+
+## Publishing Fully Reproducible Protocols
+
+While pre-registration of protocols has become standard practice in fields like medicine—facilitated by platforms such as PROSPERO—it is still in the early stages of adoption within agronomy and ecology.
+In evidence synthesis and meta-analysis, publishing detailed and reproducible research protocols is increasingly recognized as essential for enhancing transparency and minimizing bias.
+This approach is well-established in medical research, where systematic reviews and meta-analyses typically adhere to stringent pre-registration guidelines.
+However, it has yet to gain similar traction in agronomy and ecology, highlighting an important area for growth and improvement in these disciplines.
+Encouraging the use of pre-published protocols in these fields would improve methodological rigor, comparability of results, and overall transparency in environmental and agricultural research.
+Protocols describe the step-by-step methodologies researchers intend to follow before conducting a study.
+They ensure transparency, reproducibility, and consistency in systematic reviews, meta-analyses, and other research designs by pre-registering the research questions, criteria for study inclusion, and planned analytical methods.
+This practice minimizes bias, prevents selective reporting, and enhances the credibility of findings.
+
+#### Key Components of a Research Protocol
+
+1.  **Research Objectives and Questions**: Clearly defines the goals of the study and the specific research questions to be addressed.
+
+2.  **Eligibility Criteria**: Specifies which studies will be included or excluded based on predefined parameters (e.g., study design, population characteristics, intervention type).
+
+3.  **Search Strategy**: Describes the databases, search terms, and timeframe for literature searches.
+
+4.  **Data Extraction and Coding**: Outlines the methods for extracting, coding, and managing data, including variable definitions and metadata structures.
+
+5.  **Risk of Bias and Quality Assessment**: Details the criteria and tools used to assess the quality and potential biases of included studies.
+
+6.  **Analytical Plan**: Pre-specifies statistical methods, models, and subgroup analyses to be used, ensuring that analytical choices are not influenced by observed results.
+
+#### Importance in Meta-Analyses and Evidence Synthesis
+
+Publishing a detailed protocol before initiating a meta-analysis or systematic review is crucial for avoiding bias and maintaining scientific rigor.
+Protocols act as a roadmap, guiding researchers through the review process and serving as a reference point against which deviations can be assessed.
+This is particularly important for high-stakes reviews, such as those informing policy decisions or large-scale evidence syntheses in public health and environmental sciences.
+
+Well-developed protocols also enhance collaboration and standardization within research communities by enabling other researchers to replicate or build upon the same methodology.
+In ecological and agronomic meta-analyses, where diverse study designs and heterogeneous data sources are common, robust protocols are indispensable for harmonizing evidence and ensuring comparability across studies.
+
+#### Standards and Guidelines
+
+Several frameworks provide comprehensive guidance for developing and publishing reproducible protocols:
+
+-   **Cochrane Handbook for Systematic Reviews**: The Cochrane Collaboration sets the gold standard for systematic reviews in health and medical research.
+    Its protocols follow a highly structured format that emphasizes transparency, replicability, and methodological rigor.
+
+-   **ROSES (RepOrting standards for Systematic Evidence Syntheses)**: Tailored for ecological and environmental sciences, the ROSES framework outlines specific guidelines for planning and reporting systematic reviews and maps in these fields.
+
+-   **PRISMA-P (Preferred Reporting Items for Systematic Review and Meta-Analysis Protocols)**: PRISMA-P is designed to standardize the reporting of protocols for systematic reviews and meta-analyses, ensuring all critical elements are included.
+
+#### Journals Specializing in Protocols
+
+Several specialized journals focus on publishing research protocols, providing a platform for researchers to share detailed methodological plans and facilitate reproducibility:
+
+-   **BMC Systematic Reviews**: Publishes protocols and reviews in health, social, and environmental sciences.
+    BMC Systematic Reviews requires that all protocols adhere to PRISMA-P or similar reporting standards.
+
+-   **Protocols.io**: An open-access platform that allows researchers to publish detailed experimental protocols, workflows, and analysis pipelines.
+    It is widely used across disciplines to promote transparent research.
+
+-   **BMJ Open**: Features protocols for any research area, including environmental, health, and social sciences.
+    The journal emphasizes open science and reproducibility.
+
+-   **Nature Protocols**: Focuses on detailed experimental protocols in life sciences.
+    Although primarily designed for laboratory research, it offers high visibility for methodological papers.
+
+-   **PROSPERO**: An international database for pre-registering protocols of systematic reviews focused on health and social care.
+
+#### Example of a Protocol Publication
+
+**Rousset, C., Segura, C., Gilgen, A., Alfaro, M., Mendes, L.A., Dodd, M., Dashpurev, B., Bastidas, M., Rivera, J., Merbold, L. and Vázquez, E., 2024. What evidence exists relating the impact of different grassland management practices to soil carbon in livestock systems? A systematic map protocol. *Environmental Evidence*, *13*(1), p.22.**
+
+This protocol describes a systematic review and meta-analysis aimed at adapting health systems in crisis settings.
+The document pre-specifies all methodological details, including eligibility criteria, data extraction strategies, and planned analyses, ensuring reproducibility and transparency throughout the study.
+
+#### Useful Links for Protocol Standards and Templates
+
+-   **Cochrane Handbook for Systematic Reviews of Interventions**: Cochrane Handbook
+
+-   **PRISMA-P Reporting Guidelines**: PRISMA-P Checklist
+
+-   **ROSES Guidelines for Environmental Sciences**: [ROSES Reporting Standards](http://www.roses-reporting.com)
+
+-   **Equator Network**: A comprehensive resource for research reporting guidelines and protocol standards: [Equator Network](https://www.equator-network.org)
+
+```         
+useful links: https://environmentalevidencejournal.biomedcentral.com/submission-guidelines/preparing-your-manuscript/systematic-review-protocol
+```
+
+## Publish a DataPaper
+
+A Data Paper is a publication dedicated to describing the structure, collection, and value of a dataset.
+Unlike traditional research papers, which focus on findings and interpretations, Data Papers emphasize the metadata, methodology, and potential uses of the dataset itself.
+They offer detailed insights into how the data was gathered, processed, and structured, which is essential for reproducibility in scientific studies.
+Key Components of a Data Paper:
+
+-   Dataset Overview: Provides a summary of the dataset, including its purpose and potential applications.\
+-   Metadata: Describes each variable, including units of measurement, data types, and any transformations applied.\
+-   Collection Methods: Details the experimental or observational methods used to gather the data.\
+-   Limitations and Uncertainties: Discloses any potential biases, gaps, or limitations in the dataset.\
+-   Data Access: Specifies how the data can be accessed and reused, often with a permanent DOI link.
+
+In evidence mapping and meta-analyses, the publication of Data Papers ensures that large datasets, which could be difficult to interpret otherwise, are accompanied by clear, accessible documentation.
+This reduces barriers to data reuse and promotes collaboration across research communities.
+
+Journals Publishing Data Papers
+
+Several specialized journals focus on publishing Data Papers, promoting high-quality data curation and sharing.
+[Scientific Data](https://www.nature.com/sdata/)(by Nature Research) and [Data in Brief](https://www.sciencedirect.com/journal/data-in-brief) (by Elsevier) are prominent examples, offering platforms for data-specific publications.
+These journals often require the dataset to be archived in an open-access repository, accompanied by rich metadata, and adhere to rigorous peer review processes.
+For example, [Biodiversity Data Journal](https://bdj.pensoft.net/) also publish data papers focused on biodiversity and ecological datasets.
+This ensures that the data shared is of high quality, reusable, and follows best practices for transparency and openness.
+
+Example of a Data Paper:
+
+-   Beillouin, Damien, Marc Corbeels, Julien Demenois, David Berre, Annie Boyer, Abigail Fallot, Frédéric Feder, and Rémi Cardinael.
+    "A global meta-analysis of soil organic carbon in the Anthropocene." *Nature Communications* 14, no. 1 (2023): 3700.
+
+-   Byun, E., Müller, C., Parisse, B., Napoli, R., Zhang, J.B., Rezanezhad, F., Van Cappellen, P., Moser, G., Jansen-Willems, A.B., Yang, W.H.
+    and Urakawa, R., 2024.
+    A global dataset of gross nitrogen transformation rates across terrestrial ecosystems.
+    *Scientific Data*, *11*(1), p.1022.
+
+``` english
+useful links: 
+-   CIRAD publier un Datapaper https://coop-ist.cirad.fr/gerer-des-donnees/publier-un-data-paper/1-qu-est-ce-qu-un-data-paper 
+
+-   CINES, 2017. Les formats de fichier. https://www.cines.fr/archivage/des-expertises/les-formats-de-fichier/
+
+-   CNRS, 2023 (version 2.0) . Guide de bonnes pratiques sur la gestion des données de recherche. Publier un Datapaper pour valoriser et expliciter les données. https://mi-gt-donnees.pages.math.unistra.fr/guide/00-introduction.html
+
+-   DoRANum, 2018. La minute Publier un Data paper. https://doi.org/10.13143/4mhn-mq42
+```
+
+### Publishing in Open Access Journals
+
+When submitting research for publication, consider choosing open access journals, particularly those that operate on a non-profit basis.
+This approach ensures that publicly funded research is readily accessible to the public, promoting transparency and facilitating broader dissemination of knowledge.
+Open access publishing removes paywalls, allowing researchers, practitioners, and policymakers to engage with your work without financial barriers, thereby enhancing the impact and reach of your findings.
+Prioritizing non-profit journals also supports sustainable publishing practices that align with the principles of open science.
+
+## Best practices for structuring Meta-analysis DataFiles
+
+### Generalities
+
+1.  **Consistent Naming Conventions**: Ensure that file names are clear, consistent, and meaningful.
+    For example, naming columns such as `Study_ID`, `Outcome`, `Intervention`, and `Effect_Size` helps in avoiding confusion during data manipulation.
+    Avoid special characters in column names, and use underscores or camel case for readability (e.g., `StudyName` or `study_name`).
+
+2.  **Comprehensive Metadata**: Metadata should accompany the main data file, providing explanations of each column and the coding used (e.g., what constitutes "intervention type" or "effect size unit").
+    A "Data Dictionary" should always be part of your dataset, explaining variables such as:
+
+    -   `Outcome`: The primary outcome measured in the study.
+    -   `Intervention`: Types of interventions, such as “land-use change” or “management.”
+    -   `Effect_Size`: Numeric or categorical data on effect size (e.g., Hedge's g or Cohen’s d).
+
+3.  **Wide vs. Long Format**: Choose the format that best suits your analysis:
+
+-   *Wide Format*: Used when each row represents a study, with multiple columns for each outcome (e.g., separate columns for effect sizes).
+
+    | Field | Soil pH | Nitrogen Content (%) | Crop Yield (kg/ha) |
+    |-------|---------|----------------------|--------------------|
+    | 1     | 6.5     | 45                   | 3000               |
+    | 2     | 6.8     | 50                   | 3200               |
+    | 3     | 6.2     | 40                   | 2800               |
+
+-   *Long Format*: More suitable for meta-analysis and visualization in R.
+    Each row contains a single observation or a study's outcome, which allows for easier aggregation, filtering, and plotting.
+
+| Field | Variable         | Value |
+|-------|------------------|-------|
+| 1     | Soil pH          | 6.5   |
+| 1     | Nitrogen Content | 45    |
+| 1     | Crop Yield       | 3000  |
+| 2     | Soil pH          | 6.8   |
+| 2     | Nitrogen Content | 50    |
+| 2     | Crop Yield       | 3200  |
+| 3     | Soil pH          | 6.2   |
+| 3     | Nitrogen Content | 40    |
+| 3     | Crop Yield       | 2800  |
+
+4.  **Handling Missing Data**: It’s common to encounter missing data in meta-analyses.
+    Best practices include:
+
+    -   Using a consistent code for missing values, such as `NA`.
+    -   Avoiding empty cells, which can cause issues when importing data into R.
+    -   Documenting missing data in the metadata.
+
+5.  **Version Control**: Ensure version control for your datasets.
+    Tools like Git or a simple versioning system (e.g., `dataset_v1.csv`, `dataset_v2.csv`) can help track changes and maintain the integrity of your data over time.
+
+6.  **Data Cleanliness**: Ensure all numeric data are formatted correctly (e.g., avoid mixing numbers and text in the same column).
+    Double-check for typographical errors, duplicates, and inconsistencies in categorical data.
+    Tools like `dplyr::mutate()` and `tidyr::pivot_longer()` can aid in cleaning and restructuring data for analysis.
+
+### harmonisable classifications of practices and outcome
+
+Meta-analysis and evidence synthesis necessitate consistent and harmonized classifications of interventions, practices, and outcomes to ensure the comparability of findings across studies and geographic contexts.
+In agricultural and ecological research, the diversity of practices, variations in terminology, and the complex relationships between interventions and their impacts on multiple outcomes complicate this classification task.
+This chapter highlights the importance of employing ontologies as a foundational step in developing harmonizable classifications.
+Investing the time to establish clear definitions and boundaries between classes for practices, outcomes, and site descriptions is crucial.
+A well-defined research question can further refine the scope, facilitating the classification process.
+By systematically categorizing agricultural practices and outcomes, researchers can enhance the rigor and relevance of meta-analytical studies, ultimately contributing to more robust evidence synthesis
+
+## Example: Meta-analysis datasets general datasets
+
+To explore and utilize meta-analysis datasets, you can refer to the metadat package in R, which provides a comprehensive collection of datasets tailored for teaching, illustrating meta-analytic methods, and validating published analyses.
+You can install the package from CRAN using:
+
+Once installed, you can browse available datasets by using:
+
+```{r}
+# install metadat package
+#install.packages("metadat")
+
+# load metadat package
+library(metadat)
+
+#List of dataset included
+help(package = metadat)
+
+```
+
+Each dataset is well-documented with metadata, including concept terms such as research field, outcome measures, and analytic models.
+These metadata provide insight into the structure and purpose of each dataset.
+Additionally, the datsearch() function allows you to search for datasets based on specific concept terms or perform a full-text search through their documentation.
+
+The datasets in metadat follow structured formats, typically containing variables related to effect sizes, moderators, and sample information.
+To contribute or explore more in-depth examples, visit the package’s online documentation at metadat GitHub, where you can also view the output of example analyses for each dataset
+
+```{r}
+# load curtis databse
+dat <- dat.curtis1998
+
+# Explore curtis data
+#install.packages("skimr")
+library(skimr)
+head(dat)
+```
+
+### Dataset for Our Exercises
+
+We will be using the dataset titled [A Global Database of Diversified Farming Effects on Biodiversity and Yield](https://www.nature.com/articles/s41597-021-01000-y).
+This comprehensive dataset includes 4,076 comparisons of biodiversity outcomes and 1,214 comparisons of yield in diversified farming systems, contrasting these outcomes with two reference systems.
+
+The dataset encompasses evidence from 48 countries and evaluates the effects of diversified farming systems on species across 33 taxonomic orders, including insects, plants, birds, mammals, eukaryotes, annelids, fungi, and bacteria.
+It specifically addresses systems that produce both annual and perennial crops across 12 commodity groups.
+
+This dataset serves as a valuable resource for researchers and practitioners, facilitating access to critical information regarding the positive contributions of diversified farming systems to both biodiversity and food production outcomes.
+
+### Steps to Access the Dataset
+
+1.  **Load the File from Harvard Dataverse**\
+    Visit the [Harvard Dataverse website](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/XIDI1X).\
+    Download all files and save them in your current working directory.
+
+By following these steps, you will be well-equipped to utilize the dataset for the upcoming exercises in this module.\
+
+```{r}
+#installer le package pour lire des données depuis Excel
+#install.packages("readxl")
+#Charger le package
+library(readxl)
+# charge le fichier
+Meta_Data <- read_excel("data/Dataset 1_sources.xlsx", sheet = "Literature_screened")
+head(Meta_Data)
+# For detailled summary use:
+#skim(Outcome)
+
+Outcome <- read_excel("data/Dataset_2_outcomes.xlsx", sheet = "Data")
+head(Outcome)
+# For detailled summary use:
+#skim(Outcome)
+```
