@@ -1,0 +1,600 @@
+---
+title: "Calculate and combine the effect-sizes"
+output: html_document
+date: "2024-09-28"
+---
+
+# Comparative meta-analytic methods for evidence synthesis
+
+This chapter is designed to provide a comparative exploration of different meta-analytic approaches using the `metafor`, `meta`, and `brms` packages in R. The objective is to understand how the choice of methods (e.g., fixed-effect vs. random-effects models) and different effect size metrics (Standardized Mean Difference, Risk Ratios, etc.) can impact the interpretation of results. We will utilize a variety of datasets to illustrate how these choices influence conclusions, highlighting key interpretative aspects when heterogeneity and study-level variations are present.
+
+By examining multiple datasets and applying different statistical techniques, we will underscore the importance of selecting appropriate methods based on the characteristics of the data, including heterogeneity among studies and the nature of the effect sizes being analyzed.
+
+**Prerequisites**
+
+You should have a basic understanding of meta-analysis concepts and be familiar with R. If you haven't yet installed the necessary R packages, run the following commands:
+
+```{r}
+#install.packages(c("tidyverse", "metafor", "dmetar", "meta", "metadat", "ggplot2", "reactable", "ggstar", "ggpubr"))
+
+```
+
+```{r results='asis', echo=FALSE, include=FALSE,}
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE)
+#formating tables
+suppressMessages(library(metafor))
+suppressMessages(library(metadat))
+
+```
+
+## Equal-Effects Model
+
+### Example Data
+
+Consider the meta-analysis by Molloy et al. (2014), which examines the relationship between conscientiousness and medication adherence. We can compute the r-to-z transformed correlation coefficient and corresponding sampling variances using the `metafor` package:
+
+```{r, message=FALSE, warning=FALSE}
+library(metafor)
+dat <- escalc(measure="ZCOR", ri=ri, ni=ni, data=dat.molloy2014)
+```
+
+The dataset contains the following columns: authors, year, sample size (ni), correlation coefficient (ri), transformed coefficient (yi), and sampling variance (vi).
+
+### Fitting the Equal-Effects Model
+
+We can fit an equal-effects model with `rma()`:
+
+```{r,message=FALSE, warning=FALSE}
+res.ee <- rma(yi, vi, data=dat, method="EE")
+summary(res.ee)
+
+```
+
+This outputs the estimated effect size, heterogeneity statistics (I², H²), and a test for heterogeneity.
+
+Next, we fit the same model using `lm()` by specifying the inverse of the sampling variances as weights:
+
+```{r,message=FALSE, warning=FALSE}
+res.lm <- lm(yi ~ 1, weights = 1/vi, data=dat)
+summary(res.lm)
+
+```
+
+### Comparison of Results
+
+1.  **Coefficient Comparison**: The estimated intercept from `lm()` matches that from `rma()`, although it’s rounded differently.
+
+2.  **Standard Errors**: The standard error from `lm()` differs because `lm()` assumes weights are only known up to a proportionality constant (σ²e). This error can be demonstrated by extracting the estimated error variance from the `lm` object and refitting the model with `rma()`:
+
+```{r,message=FALSE, warning=FALSE}
+rma(yi, vi * sigma(res.lm)^2, data=dat, method="EE")
+
+```
+
+This shows that adjusting the standard errors to account for the estimated error variance results in consistent estimates across both functions.
+
+## Random-Effects Model
+
+### Fitting the Random-Effects Model
+
+We can fit a random-effects model using `rma()` as follows:
+
+```{r,message=FALSE, warning=FALSE}
+res.re <- rma(yi, vi, data=dat)
+summary(res.re)
+
+```
+
+Next, we try fitting the same model with the `lme()` function from the `nlme` package, specifying a variance function for fixed variances:
+
+```{r,message=FALSE, warning=FALSE}
+library(nlme)
+dat$study <- 1:nrow(dat)
+res.lme <- lme(yi ~ 1, random = ~ 1 | study, weights = varFixed(~ vi), data=dat)
+summary(res.lme)
+
+```
+
+Alternatively, we can use the `lmer()` function from the `lme4` package
+
+```{r,message=FALSE, warning=FALSE}
+library(lme4)
+res.lmer <- lmer(yi ~ 1 + (1 | study), weights = 1/vi, data=dat,
+                 control=lmerControl(check.nobs.vs.nlev="ignore", check.nobs.vs.nRE="ignore"))
+summary(res.lmer)
+
+```
+
+### Comparison of Results
+
+1.  **Intercept Differences**: The estimated intercepts from `lme()` and `lmer()` differ from the estimate obtained via `rma()`.
+
+2.  **Standard Errors**: The standard errors, t-values, and p-values also show discrepancies for similar reasons as mentioned earlier—`lme()` and `lmer()` treat sampling variances as unknown beyond a proportionality constant.
+
+To illustrate, we can factor this constant into the sampling variances and refit the model with `rma()`:
+
+```{r,message=FALSE, warning=FALSE}
+rma(yi, vi * sigma(res.lme)^2, data=dat)
+
+```
+
+This yields results consistent with those from `lme()`.
+
+#### Comparison with the `meta` Package
+
+The `meta` package provides a robust alternative for conducting meta-analyses, featuring a range of built-in functions that cater to both fixed-effect and random-effects models. This package streamlines the analysis of various effect sizes, making it accessible for researchers. For example, we can execute a meta-analysis using the `metagen()` function from the `meta` package as follows:
+
+```{r,message=FALSE, warning=FALSE}
+library(meta)
+res.meta <- metagen(TE = yi, seTE = sqrt(vi), data = dat, sm = "SMD")
+summary(res.meta)
+```
+
+One of the key advantages of the `meta` package is its user-friendly syntax, which simplifies the process of conducting meta-analyses. Additionally, it integrates functions for visualizing results, such as forest plots, directly within its framework, enhancing the interpretability of the findings.
+
+#### Bayesian Meta-Analysis
+
+Bayesian meta-analysis presents a flexible framework that accommodates the incorporation of prior distributions and quantifies uncertainty in a comprehensive manner. By employing the `brms` package, we can specify a Bayesian random-effects model as follows:
+
+```{r,message=FALSE, warning=FALSE}
+library(brms)
+
+# Define the response variable and the standard error
+# Replace 'yi' with your actual response variable and 'se' with the appropriate standard error variable
+response_var <- "yi"  # Change this to your response variable name
+se_var <- "sqrt(vi)"  # Calculate the standard error (if vi is the variance)
+
+# Fit the Bayesian random-effects model with specified priors
+bayes_model <- brm(
+  formula = paste0(response_var, " | se(", se_var, ") ~ 1 + (1 | study)"),
+  data = dat,
+  family = gaussian,
+  prior = c(
+    prior(normal(0, 1), class = "Intercept"),   # Prior for the intercept
+    prior(cauchy(0, 1), class = "sd")            # Prior for the standard deviation of the random effect
+  ),
+  iter = 200,
+  warmup = 100,
+  cores = 4,
+  chains = 2,
+  seed = 14
+)
+
+# Summarize the results
+summary(bayes_model)
+
+
+```
+
+This Bayesian approach enables us to derive posterior distributions for the effect sizes, facilitating a more nuanced interpretation of uncertainty compared to traditional frequentist methods. By leveraging Bayesian techniques, researchers can integrate prior knowledge and obtain more robust estimates, especially in cases where sample sizes are limited or when study results exhibit significant variability.
+
+## Conclusion
+
+In summary, while the `lm()`, `lme()`, and `lmer()` functions can fit various linear models, they are not appropriate for meta-analysis due to their assumptions about the error variances. The `rma()` function is specifically designed for meta-analytic contexts, ensuring that known sampling variances are correctly utilized, resulting in reliable estimates and standard errors. Additionally, the `meta` package provides an accessible alternative for meta-analyses, while Bayesian methods using `brms` allow for flexible modeling and uncertainty quantification.
+
+### Example 1:  fixed vs. random Meta-Analysis models
+
+\
+The first dataset explores the impact of two effect size measures: Standardized Mean Difference (SMD) and Log Risk Ratios (lnRR). We apply different models and compare the results to identify variations in interpretations:
+
+-   **Calculation of effect-sizes**
+
+```{r}
+
+dat <- metadat::dat.curtis1998
+
+# Standardized mean differences
+    SMD <- escalc(measure = "SMD", n1i = dat$n1i, n2i = dat$n2i, m1i = dat$m1i, m2i = dat$m2i, sd1i = dat$sd1i, sd2i = dat$sd2i)
+
+    # Ln(RR)
+    
+lnRR <- escalc(measure = "ROM", n1i = dat$n1i, n2i = dat$n2i, m1i = dat$m1i, m2i = dat$m2i, sd1i = dat$sd1i, sd2i = dat$sd2i)
+```
+
+-   **Model Comparison:**
+
+```{r}
+# Fixed-Effect Model (SMD):
+fixed_SMD <- rma(yi = SMD$yi, vi = SMD$vi, method = "FE", data = dat)
+fixed_lnRR <- rma(yi = lnRR$yi, vi = lnRR$vi, method = "FE", data = dat)
+
+# random effect models 
+random_m_SMD <- rma(yi = SMD$yi, vi = SMD$vi, method = "REML", data = dat)
+random_m_lnRR <- rma(yi = lnRR$yi, vi = lnRR$vi, method = "REML", data = dat)
+```
+
+-   **Extraction and comparisons of the results**
+
+```{r}
+# Extract relevant results for comparison
+model_comparison <- data.frame(
+  Model = c("Fixed Effect (SMD)", "Random Effect (SMD)", "Fixed Effect (lnRR)", "Random Effect (lnRR)"),
+  Estimate = c(fixed_SMD$b, random_m_SMD$b, fixed_lnRR$b, random_m_lnRR$b),
+  `95% CI Lower` = c(fixed_SMD$ci.lb, random_m_SMD$ci.lb, fixed_lnRR$ci.lb, random_m_lnRR$ci.lb),
+  `95% CI Upper` = c(fixed_SMD$ci.ub, random_m_SMD$ci.ub, fixed_lnRR$ci.ub, random_m_lnRR$ci.ub),
+  Tau2 = c(NA, random_m_SMD$tau2, NA, random_m_lnRR$tau2),
+  I2 = c(NA, random_m_SMD$I2, NA, random_m_lnRR$I2),
+  p.value = c(fixed_SMD$pval, random_m_SMD$pval, fixed_lnRR$pval, random_m_lnRR$pval)
+)
+
+# Affichage des résultats sous forme de tableau interactif avec reactable
+model_comparison
+```
+
+-   **Interpretation:** The contrast in point estimates and confidence intervals between the SMD and lnRR models underscores the impact of effect size metrics on study-level variability. This comparison reveals how different metrics can shift the weight of certain studies and alter pooled estimates.
+
+**Exercise: Model comparison**
+
+1.  **Task**: Fit three different models (Fixed, Random, and Three-Level) using the dataset.
+
+2.  **Objective**: Compare their tau² estimates and overall pooled effect sizes.
+
+3.  **Guiding questions**:
+
+    -   How does heterogeneity (I²) change across these models?
+
+    -   Does the model choice impact the significance of moderators?
+
+### Example 2: Comparing Heterogeneity across models
+
+Here, we calculate Risk Differences (RD) and explore the impact of between-study variance estimators (`DL`, `REML`) on heterogeneity.
+
+-   **Random-Effects Model Using DerSimonian-Laird (DL)**:
+
+```{r}
+res_dl <- rma(yi = lnRR$yi, vi = lnRR$vi, method = "DL", data = dat)
+```
+
+-   **Random-Effects Model Using REML**:
+
+```{r}
+res_reml <- rma(yi = lnRR$yi, vi = lnRR$vi, method = "REML", data = dat)
+```
+
+-   **Extraction and comparisons of the results**
+
+```{r}
+# Extract relevant results for comparison
+model_comparison2 <- data.frame(
+  Model = c("DL", "REML"),
+  Estimate = c(res_dl$b, res_reml$b),
+  `95% CI Lower` = c(res_dl$ci.lb, res_reml$ci.lb),
+  `95% CI Upper` = c(res_dl$ci.ub, res_reml$ci.ub),
+  Tau2 = c(res_dl$tau2, res_reml$tau2),
+  I2 = c(res_dl$I2, res_reml$I2),
+  p.value = c(res_dl$pval, res_reml$pval)
+)
+
+# Affichage des résultats sous forme de tableau interactif avec reactable
+model_comparison2
+```
+
+**Interpretation:** The DL estimator is more sensitive to small-study effects, potentially overestimating between-study heterogeneity, while the REML tends to yield more conservative estimates, resulting in narrower confidence intervals. This comparison is crucial for understanding when each method might be more appropriate.
+
+**Exercise: Model estimator impact**
+
+1.  **Task**: Apply multiple heterogeneity estimators (`DL`, `HE`, `SJ`, `REML`) to the dataset.
+
+2.  **Objective**: Compare I², tau², and Q-statistics across estimators.
+
+3.  **Guiding Questions**:
+
+    -   Which estimator produces the most conservative tau² estimate?
+
+    -   Does the choice of estimator affect the overall significance?
+
+### Example 3: Multi-Level meta-Analysis with hierarchical Data
+
+In hierarchical data structures, three-level models allow us to account for dependencies within and across clusters (e.g., experiments and individual observations).
+
+-   **Three-Level model setup**:
+
+```{r}
+dat<-cbind(dat, lnRR)
+# Three-level meta-analysis
+three_level_m <- rma.mv(yi = yi, V = vi, random = list(~1 | id, ~1 | paper), data = dat)
+
+# Two level meta-analysis
+two_level_m <- rma.mv(yi = yi, V = vi, random = list(~1 | id), data = dat)
+
+```
+
+1.  Faire le tableau de comparaison de outputs
+2.  AIC pour sélection de modèles
+
+**Interpretation:** The three-level model reveals the extent of within- and between-experiment variance. Visualizing these results with orchard plots helps disentangle which levels contribute most to the observed heterogeneity.
+
+**Exercise: multi-Level meta-Analysis**
+
+1.  **Task**: Fit a series of multi-level models with different group-level random effects.
+
+2.  **Objective**: Determine how accounting for more complex structures impacts model fit and tau² partitioning.
+
+3.  **Guiding Questions**:
+
+    -   How does the inclusion of nested random effects change the intraclass correlation?
+
+    -   Which levels (experiment vs. within-group) contribute most to the variance?
+
+### Model Selection in Meta-Analysis
+
+Choosing the best model in meta-analysis involves comparing multiple competing models using selection criteria like AIC (Akaike Information Criterion), AICc (Corrected AIC), BIC (Bayesian Information Criterion), and other model performance metrics. This helps identify a model that balances goodness-of-fit and model complexity. The following section covers strategies for selecting the most appropriate model, including fixed and random effects, based on theoretical knowledge or statistical tests.
+
+#### **Selection Criteria for Model Comparison**
+
+-   **AIC (Akaike Information Criterion)**: Measures the trade-off between model fit and complexity:
+
+    $$
+    \text{AIC} = 2k - 2\log(\hat{L})
+    $$
+
+    where $k$ is the number of model parameters, and $\hat{L}$ is the maximum likelihood value. A lower AIC indicates a more parsimonious model.
+
+-   **AICc (Corrected AIC)**: Adjusted for small sample sizes to avoid overfitting:
+
+    $$
+    \text{AICc} = \text{AIC} + \frac{2k(k+1)}{n - k - 1}
+    $$
+
+    It should be used when $n/k$ is small (\< 40), where $n$ is the number of observations and $k$ the number of parameters.
+
+-   **BIC (Bayesian Information Criterion)**: Applies a stronger penalty for the number of parameters:
+
+    $$
+    \text{BIC} = k\log(n) - 2\log(\hat{L})
+    $$
+
+    BIC often favors simpler models, making it suitable when working with large sample sizes.
+
+-   **Likelihood Ratio Tests and ANOVA**: To directly compare nested models, likelihood ratio tests or `anova` can be used. This approach quantifies if adding (or removing) parameters significantly improves model fit.
+
+#### **Choosing Between Fixed and Random-Effects Models**
+
+The decision between using a fixed-effect or random-effects model depends on either *theoretical considerations* or *statistical testing*:
+
+-   **Theoretical Justification**: Choose a *fixed-effect model* if you expect a common effect size across all studies (e.g., homogeneous study contexts or interventions). Select a *random-effects model* when heterogeneity among studies is anticipated (e.g., varying contexts, differing methods).
+
+-   **Statistical Testing**:
+
+    -   **Heterogeneity Tests**: Use tests like Cochran’s Q-test or $I^2$ statistics to detect significant variability between studies. High $I^2$ or a significant Q-test indicates that a random-effects model is likely more appropriate.
+    -   **ANOVA for Model Comparison**: When comparing nested models (e.g., fixed-effects vs. random-effects), `anova()` can be used to test whether the inclusion of random effects significantly improves the model fit.
+
+-   
+
+#### **Comparing Models: Fixed and Random Structures**
+
+When fitting mixed-effects models, choosing between different random and fixed structures is a crucial step. Typically, the process involves:
+
+1.  **Start with the Random Structure**:
+
+    -   Define the random effects first to capture variance due to grouping or clustering (e.g., study-level random effects, site-level random effects).
+
+    -   Use the likelihood ratio test (`anova()`) to compare models with and without each random component:
+
+        ```{r}
+        model1 <- rma.mv(yi, vi, random = ~ 1 | paper, data = dat)
+        model2 <- rma.mv(yi, vi, random = ~ 1 | paper/id, data = dat)
+        anova(model1, model2)
+        ```
+
+    This step allows you to determine if additional random components (e.g., study vs. nested study/site effects) are justified.
+
+    Here, `anova()` will test if the more complex model (`model_random`) explains significantly more variance than the simpler one (`model_fixed`).
+
+2.  **Incorporate Fixed Effects**:
+
+    -   After selecting the optimal random structure, test different combinations of fixed effects (e.g., covariates, moderators).
+
+    -   Compare models using AIC, AICc, and BIC. Include one fixed effect at a time and use `anova()` to see if adding predictors improves fit:
+
+        ```{r}
+        model_fixed1 <- rma.mv(yi, vi, mods = ~ species, random= ~ 1 | paper/id, data = dat)
+        model_fixed2 <- rma.mv(yi, vi, mods = ~ species + fungrp,random= ~ 1 | paper/id, data = dat)
+        anova(model_fixed1, model_fixed2)
+        ```
+
+3.  **Test for Interactions**:
+
+    -   After defining main effects, consider adding interaction terms and use AIC or likelihood ratio tests to assess their contribution.
+
+#### **Selecting the Optimal Model: Practical Considerations**
+
+-   **Model Complexity vs. Parsimony**: Start with a simple model and gradually add parameters, using AIC, AICc, and BIC to avoid overfitting.
+-   **Check Model Assumptions**: Ensure that the chosen model meets meta-analytic assumptions (e.g., homogeneity of variance, normality).
+-   **Visual Evaluation**: Use diagnostic plots (e.g., residual plots, forest plots) to visually inspect model fit.
+
+In practice, the ideal strategy involves:
+
+1.  **Define the Random Structure First**:
+    -   Use theoretical and statistical justifications to select between study-level or multi-level random effects.
+    -   Select the most parsimonious random structure using `anova()` and AIC/BIC.
+2.  **Add Fixed Effects Incrementally**:
+    -   Start with primary predictors and gradually include covariates, using `anova()` to compare nested models.
+    -   Check for interactions only after establishing main effects.
+3.  **Assess the Final Model**:
+    -   Compare the best candidate models (fixed vs. random) using AIC, AICc, BIC, and likelihood ratio tests.
+    -   Select the model that balances fit and interpretability.
+
+This structured approach ensures that both theoretical considerations and statistical criteria are employed for robust model selection in meta-analyses.
+
+# Analysing model variability
+
+### Using Parametric and Non-Parametric Bootstrapping to Estimate Confidence Intervals in Meta-Analyses
+
+**Bootstrapping** is a statistical technique used to estimate the sampling distribution of an estimator by repeatedly resampling from the observed data. In meta-analysis, bootstrapping is commonly applied to construct more robust confidence intervals (CIs) for parameters such as the overall effect size (μ\muμ) and the between-study variance (τ2\tau^2τ2). This chapter will demonstrate how to implement both parametric and non-parametric bootstrapping methods using the `boot` package in R, emphasizing best practices for obtaining reliable results.
+
+### Overview
+
+-   **Parametric Bootstrapping**: Assumes a specific distributional form for the data (e.g., normal distribution of residuals). The data are generated based on parameter estimates from the fitted model.
+
+-   **Non-Parametric Bootstrapping**: Does not rely on specific distributional assumptions. The bootstrap samples are created directly by resampling the original data with replacement.
+
+### Parametric Bootstrapping: Step-by-Step Example
+
+In parametric bootstrapping, we generate new datasets by simulating values from a specified distribution using the parameter estimates from the fitted model. This process requires defining two functions:
+
+1.  A function to compute the statistics of interest (e.g., the mean effect size μ\muμ and the between-study variance τ2\tau^2τ2) based on the bootstrap data.
+
+2.  A function to generate the bootstrap datasets.
+
+Let's illustrate this approach with a random-effects model:
+
+**Defining the Function**
+
+The function `boot.func()` calculates the effect size and variance components based on each bootstrap dataset:
+
+```{r}
+# Load necessary libraries
+library(metafor)
+library(boot)
+
+
+# 1. Fit the initial random-effects model
+initial_model <- rma(yi, vi, data=dat)
+
+# Extract estimated parameters for later use
+mu_estimate <- coef(initial_model)
+tau2_estimate <- initial_model$tau2
+
+# 2. Define the Statistic Function for Bootstrapping
+boot.func <- function(data.boot) {
+  # Fit the random-effects model to the bootstrap data
+  res <- try(suppressWarnings(rma(yi, vi, data=data.boot)), silent=TRUE)
+  
+  # Return NA if the model did not converge
+  if (inherits(res, "try-error")) {
+    return(rep(NA, 4))  # Return a vector of NAs
+  } else {
+    # Extract the estimated effect size (mu), its variance, tau², and its variance
+    return(c(coef(res), diag(vcov(res)), res$tau2, res$se.tau2^2))
+  }
+}
+
+# 3. Define the Data Generation Function for Bootstrapping
+data.gen <- function(dat, mle) {
+  # Generate effect sizes based on the estimated mu and tau²
+  data.frame(yi = rnorm(nrow(dat), mle$mu, sqrt(mle$tau2 + dat$vi)), vi = dat$vi)
+}
+
+# 4. Running the Parametric Bootstrap
+set.seed(1234)  # For reproducibility
+res.boot <- boot::boot(dat, 
+                        statistic = boot.func, 
+                        R = 100, 
+                        sim = "parametric", 
+                        ran.gen = data.gen, 
+                        mle = list(mu = mu_estimate, tau2 = tau2_estimate))
+
+# Check results
+print(res.boot)
+
+```
+
+**Extracting Confidence Intervals**
+
+After running the bootstrap, we can calculate the confidence intervals for the mean effect size (μ\muμ) and the between-study variance (τ2\tau^2τ2) using different bootstrap methods (normal, basic, studentized, percentile):
+
+```{r}
+# Confidence intervals for mu
+boot.ci(res.boot, type=c("norm", "basic", "stud", "perc"), index=1:2)
+
+# Confidence intervals for tau²
+boot.ci(res.boot, type=c("norm", "basic", "stud", "perc"), index=3:4)
+
+```
+
+These commands compute CIs based on various bootstrap methods, allowing comparison of the interval estimates.
+
+### Non-Parametric Bootstrapping: Step-by-Step Example
+
+Non-parametric bootstrapping involves generating new datasets by resampling the original data with replacement. We only need to define a single function for this purpose:
+
+**Defining the Function**
+
+```{r}
+# Load necessary libraries
+library(metafor)
+library(boot)
+
+
+# 1. Fit the initial random-effects model
+initial_model <- rma(yi, vi, data=dat)
+
+# Extract estimated parameters for later use
+mu_estimate <- coef(initial_model)
+tau2_estimate <- initial_model$tau2
+
+# 2. Define the Statistic Function for Bootstrapping
+boot.func <- function(data.boot, indices) {
+   # Resample the data based on the given indices
+   sel <- data.boot[indices, ]
+   
+   # Fit the random-effects model to the resampled data
+   res <- try(suppressWarnings(rma(yi, vi, data=sel)), silent=TRUE)
+   
+   # Return NA if the model did not converge
+   if (inherits(res, "try-error")) {
+      return(rep(NA, 4))  # Return a vector of NAs
+   } else {
+      # Extract the estimated effect size (mu), its variance, tau², and its variance
+      return(c(coef(res), diag(vcov(res)), res$tau2, res$se.tau2^2))
+   }
+}
+
+# 3. Define the Data Generation Function for Bootstrapping
+data.gen <- function(dat, mle) {
+   # Generate effect sizes based on the estimated mu and tau²
+   data.frame(yi = rnorm(nrow(dat), mle$mu, sqrt(mle$tau2 + dat$vi)), vi = dat$vi)
+}
+
+# 4. Running the Parametric Bootstrap
+set.seed(1234)  # For reproducibility
+res.boot <- boot::boot(dat, 
+                        statistic = boot.func, 
+                        R = 100, 
+                        sim = "parametric", 
+                        ran.gen = data.gen, 
+                        mle = list(mu = mu_estimate, tau2 = tau2_estimate))
+
+# Check results
+print(res.boot)
+
+```
+
+**Extracting Confidence Intervals**
+
+After running the bootstrap, we can calculate the confidence intervals for the mean effect size (μ\muμ) and the between-study variance (τ2\tau^2τ2) using different bootstrap methods (normal, basic, studentized, percentile):
+
+```{r}
+# Confidence intervals for mu
+boot.ci(res.boot, type=c("norm", "basic", "stud", "perc"), index=1:2)
+
+# Confidence intervals for tau²
+boot.ci(res.boot, type=c("norm", "basic", "stud", "perc"), index=3:4)
+
+```
+
+**Comparing Bootstrap Methods**
+
+The choice between parametric and non-parametric bootstrapping depends on the underlying assumptions and the sample size:
+
+-   **Parametric Bootstrapping** is more appropriate when we have strong assumptions about the distribution of effect sizes.
+
+-   **Non-Parametric Bootstrapping** is recommended when the sample size is relatively small or when we want to avoid making strict assumptions.
+
+**Visualization of Bootstrap Distributions**
+
+To visualize the bootstrap distributions, we can create kernel density plots to inspect the variability and shape of the bootstrap samples:
+
+```{r}
+# Visualize the bootstrap distribution for mu
+plot(density(res.boot$t[,1]), main="Bootstrap Distribution of Mu")
+abline(v=quantile(res.boot$t[,1], probs=c(0.025, 0.975)), col="red")
+
+```
+
+### Conclusion
+
+Bootstrapping provides a flexible and powerful method for estimating confidence intervals in meta-analysis. However, it is important to consider potential issues such as non-convergence of models during the bootstrap process, as well as the assumptions underlying each method. When applying bootstrap methods, carefully evaluate the coverage of different interval types and compare the results to standard methods (e.g., Wald-type CIs or Knapp-Hartung adjustments).
+
+In the next section, we will delve deeper into **prediction intervals**, which provide a complementary measure of uncertainty, reflecting the variability in effect sizes for new studies.

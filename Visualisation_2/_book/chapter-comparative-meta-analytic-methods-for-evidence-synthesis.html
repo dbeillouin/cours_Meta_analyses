@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 2 Chapter: Comparative meta-analytic methods for evidence synthesis | Calculate and combine the effect-sizes</title>
+  <meta name="description" content="<p>This is beta-version of the visualisation exercice.
+set in the _output.yml file.
+The HTML output format for this example is bookdown::gitbook,</p>" />
+  <meta name="generator" content="bookdown 0.40 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 2 Chapter: Comparative meta-analytic methods for evidence synthesis | Calculate and combine the effect-sizes" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="<p>This is beta-version of the visualisation exercice.
+set in the _output.yml file.
+The HTML output format for this example is bookdown::gitbook,</p>" />
+  <meta name="github-repo" content="rstudio/bookdown-demo" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 2 Chapter: Comparative meta-analytic methods for evidence synthesis | Calculate and combine the effect-sizes" />
+  
+  <meta name="twitter:description" content="<p>This is beta-version of the visualisation exercice.
+set in the _output.yml file.
+The HTML output format for this example is bookdown::gitbook,</p>" />
+  
+
+<meta name="author" content="Damien Beillouin" />
+
+
+<meta name="date" content="2024-09-28" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="what-is-an-effect-size.html"/>
+<link rel="next" href="analysing-model-variability.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Meta-analyses</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="what-is-an-effect-size.html"><a href="what-is-an-effect-size.html"><i class="fa fa-check"></i><b>1</b> What is an Effect Size?</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="what-is-an-effect-size.html"><a href="what-is-an-effect-size.html#visual-representation-of-effect-sizes"><i class="fa fa-check"></i><b>1.1</b> Visual representation of effect-sizes</a>
+<ul>
+<li class="chapter" data-level="1.1.1" data-path="what-is-an-effect-size.html"><a href="what-is-an-effect-size.html#different-metrics-for-measuring-effect-sizes"><i class="fa fa-check"></i><b>1.1.1</b> Different Metrics for Measuring Effect Sizes</a></li>
+<li class="chapter" data-level="1.1.2" data-path="what-is-an-effect-size.html"><a href="what-is-an-effect-size.html#how-to-measure-variability"><i class="fa fa-check"></i><b>1.1.2</b> How to Measure Variability</a></li>
+<li class="chapter" data-level="1.1.3" data-path="what-is-an-effect-size.html"><a href="what-is-an-effect-size.html#what-variability-means"><i class="fa fa-check"></i><b>1.1.3</b> What Variability Means</a></li>
+<li class="chapter" data-level="1.1.4" data-path="what-is-an-effect-size.html"><a href="what-is-an-effect-size.html#comparison-of-effect-size-and-p-value"><i class="fa fa-check"></i><b>1.1.4</b> Comparison of Effect Size and p-Value</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html"><i class="fa fa-check"></i><b>2</b> Chapter: Comparative meta-analytic methods for evidence synthesis</a>
+<ul>
+<li class="chapter" data-level="2.0.1" data-path="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#overview"><i class="fa fa-check"></i><b>2.0.1</b> Overview</a></li>
+<li class="chapter" data-level="2.0.2" data-path="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#example-1-meta-analysis-using-different-effect-sizes"><i class="fa fa-check"></i><b>2.0.2</b> Example 1: Meta-Analysis using different effect sizes</a></li>
+<li class="chapter" data-level="2.0.3" data-path="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#example-2-comparing-heterogeneity-across-models"><i class="fa fa-check"></i><b>2.0.3</b> Example 2: Comparing Heterogeneity across models</a></li>
+<li class="chapter" data-level="2.0.4" data-path="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#example-3-multi-level-meta-analysis-with-hierarchical-data"><i class="fa fa-check"></i><b>2.0.4</b> Example 3: Multi-Level meta-Analysis with hierarchical Data</a></li>
+<li class="chapter" data-level="2.0.5" data-path="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#model-selection-in-meta-analysis"><i class="fa fa-check"></i><b>2.0.5</b> Model Selection in Meta-Analysis</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="analysing-model-variability.html"><a href="analysing-model-variability.html"><i class="fa fa-check"></i><b>3</b> Analysing model variability</a>
+<ul>
+<li class="chapter" data-level="3.0.1" data-path="analysing-model-variability.html"><a href="analysing-model-variability.html#using-parametric-and-non-parametric-bootstrapping-to-estimate-confidence-intervals-in-meta-analyses"><i class="fa fa-check"></i><b>3.0.1</b> Using Parametric and Non-Parametric Bootstrapping to Estimate Confidence Intervals in Meta-Analyses</a></li>
+<li class="chapter" data-level="3.0.2" data-path="analysing-model-variability.html"><a href="analysing-model-variability.html#overview-1"><i class="fa fa-check"></i><b>3.0.2</b> Overview</a></li>
+<li class="chapter" data-level="3.0.3" data-path="analysing-model-variability.html"><a href="analysing-model-variability.html#parametric-bootstrapping-step-by-step-example"><i class="fa fa-check"></i><b>3.0.3</b> Parametric Bootstrapping: Step-by-Step Example</a></li>
+<li class="chapter" data-level="3.0.4" data-path="analysing-model-variability.html"><a href="analysing-model-variability.html#non-parametric-bootstrapping-step-by-step-example"><i class="fa fa-check"></i><b>3.0.4</b> Non-Parametric Bootstrapping: Step-by-Step Example</a></li>
+<li class="chapter" data-level="3.0.5" data-path="analysing-model-variability.html"><a href="analysing-model-variability.html#comparing-bootstrap-methods"><i class="fa fa-check"></i><b>3.0.5</b> Comparing Bootstrap Methods</a></li>
+<li class="chapter" data-level="3.0.6" data-path="analysing-model-variability.html"><a href="analysing-model-variability.html#visualization-of-bootstrap-distributions"><i class="fa fa-check"></i><b>3.0.6</b> Visualization of Bootstrap Distributions</a></li>
+<li class="chapter" data-level="3.0.7" data-path="analysing-model-variability.html"><a href="analysing-model-variability.html#conclusion"><i class="fa fa-check"></i><b>3.0.7</b> Conclusion</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="chapter-plotting-meta-analytical-results.html"><a href="chapter-plotting-meta-analytical-results.html"><i class="fa fa-check"></i><b>4</b> Chapter: Plotting meta-analytical results</a>
+<ul>
+<li class="chapter" data-level="4.0.1" data-path="chapter-plotting-meta-analytical-results.html"><a href="chapter-plotting-meta-analytical-results.html#overview-2"><i class="fa fa-check"></i><b>4.0.1</b> Overview</a></li>
+<li class="chapter" data-level="4.0.2" data-path="chapter-plotting-meta-analytical-results.html"><a href="chapter-plotting-meta-analytical-results.html#example-1-forest-plot-with-metafor"><i class="fa fa-check"></i><b>4.0.2</b> Example 1: Forest plot with metafor</a></li>
+<li class="chapter" data-level="4.0.3" data-path="chapter-plotting-meta-analytical-results.html"><a href="chapter-plotting-meta-analytical-results.html#example-2-forest-plot-with-meta"><i class="fa fa-check"></i><b>4.0.3</b> Example 2: Forest plot with meta</a></li>
+<li class="chapter" data-level="4.0.4" data-path="chapter-plotting-meta-analytical-results.html"><a href="chapter-plotting-meta-analytical-results.html#example-3-forest-plot-with-ggplot"><i class="fa fa-check"></i><b>4.0.4</b> Example 3: Forest plot with ggplot</a></li>
+<li class="chapter" data-level="4.0.5" data-path="chapter-plotting-meta-analytical-results.html"><a href="chapter-plotting-meta-analytical-results.html#example-4-orchard-plots"><i class="fa fa-check"></i><b>4.0.5</b> Example 4: Orchard plots</a></li>
+<li class="chapter" data-level="4.0.6" data-path="chapter-plotting-meta-analytical-results.html"><a href="chapter-plotting-meta-analytical-results.html#analyse-and-visualize-publication-bais"><i class="fa fa-check"></i><b>4.0.6</b> Analyse and visualize publication bais</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="trim-and-fill.html"><a href="trim-and-fill.html"><i class="fa fa-check"></i><b>5</b> Trim and fill</a></li>
+<li class="chapter" data-level="6" data-path="funnel-plot.html"><a href="funnel-plot.html"><i class="fa fa-check"></i><b>6</b> funnel plot</a></li>
+<li class="chapter" data-level="7" data-path="egger-test.html"><a href="egger-test.html"><i class="fa fa-check"></i><b>7</b> egger test</a></li>
+<li class="chapter" data-level="8" data-path="robsut-bayesian-ma.html"><a href="robsut-bayesian-ma.html"><i class="fa fa-check"></i><b>8</b> Robsut Bayesian MA</a></li>
+<li class="chapter" data-level="9" data-path="section.html"><a href="section.html"><i class="fa fa-check"></i><b>9</b> </a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Calculate and combine the effect-sizes</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="chapter-comparative-meta-analytic-methods-for-evidence-synthesis" class="section level1 hasAnchor" number="2">
+<h1><span class="header-section-number">Chapter 2</span> Chapter: Comparative meta-analytic methods for evidence synthesis<a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#chapter-comparative-meta-analytic-methods-for-evidence-synthesis" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="overview" class="section level3 hasAnchor" number="2.0.1">
+<h3><span class="header-section-number">2.0.1</span> Overview<a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#overview" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>This chapter is designed to provide a comparative exploration of different meta-analytic approaches using the <code>metafor</code> and <code>meta</code> packages in R. The objective is to understand how the choice of methods (e.g., fixed-effect vs. random-effects models) and different effect size metrics (Standardized Mean Difference, Risk Ratios, etc.) can impact the interpretation of results. We will utilize a variety of datasets to illustrate how these choices influence conclusions, highlighting key interpretative aspects when heterogeneity and study-level variations are present.</p>
+</div>
+<div id="example-1-meta-analysis-using-different-effect-sizes" class="section level3 hasAnchor" number="2.0.2">
+<h3><span class="header-section-number">2.0.2</span> Example 1: Meta-Analysis using different effect sizes<a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#example-1-meta-analysis-using-different-effect-sizes" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><br />
+The first dataset explores the impact of two effect size measures: Standardized Mean Difference (SMD) and Log Risk Ratios (lnRR). We apply different models and compare the results to identify variations in interpretations:</p>
+<p><strong>Prerequisites</strong></p>
+<p>You should have a basic understanding of meta-analysis concepts and be familiar with R. If you haven’t yet installed the necessary R packages, run the following commands:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb1-1" tabindex="-1"></a><span class="co">#install.packages(c(&quot;tidyverse&quot;, &quot;metafor&quot;, &quot;dmetar&quot;, &quot;meta&quot;, &quot;metadat&quot;, &quot;ggplot2&quot;, &quot;reactable&quot;, &quot;ggstar&quot;, &quot;ggpubr&quot;))</span></span></code></pre></div>
+<ul>
+<li><strong>Calculation of effect-sizes</strong></li>
+</ul>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb2-1" tabindex="-1"></a>dat <span class="ot">&lt;-</span> metadat<span class="sc">::</span>dat.curtis1998</span>
+<span id="cb2-2"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb2-2" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb2-3" tabindex="-1"></a><span class="co"># Standardized mean differences</span></span>
+<span id="cb2-4"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb2-4" tabindex="-1"></a>    SMD <span class="ot">&lt;-</span> <span class="fu">escalc</span>(<span class="at">measure =</span> <span class="st">&quot;SMD&quot;</span>, <span class="at">n1i =</span> dat<span class="sc">$</span>n1i, <span class="at">n2i =</span> dat<span class="sc">$</span>n2i, <span class="at">m1i =</span> dat<span class="sc">$</span>m1i, <span class="at">m2i =</span> dat<span class="sc">$</span>m2i, <span class="at">sd1i =</span> dat<span class="sc">$</span>sd1i, <span class="at">sd2i =</span> dat<span class="sc">$</span>sd2i)</span>
+<span id="cb2-5"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb2-5" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb2-6" tabindex="-1"></a>    <span class="co"># Ln(RR)</span></span>
+<span id="cb2-7"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb2-7" tabindex="-1"></a>    </span>
+<span id="cb2-8"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb2-8" tabindex="-1"></a>lnRR <span class="ot">&lt;-</span> <span class="fu">escalc</span>(<span class="at">measure =</span> <span class="st">&quot;ROM&quot;</span>, <span class="at">n1i =</span> dat<span class="sc">$</span>n1i, <span class="at">n2i =</span> dat<span class="sc">$</span>n2i, <span class="at">m1i =</span> dat<span class="sc">$</span>m1i, <span class="at">m2i =</span> dat<span class="sc">$</span>m2i, <span class="at">sd1i =</span> dat<span class="sc">$</span>sd1i, <span class="at">sd2i =</span> dat<span class="sc">$</span>sd2i)</span></code></pre></div>
+<ul>
+<li><strong>Model Comparison:</strong></li>
+</ul>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb3-1" tabindex="-1"></a><span class="co"># Fixed-Effect Model (SMD):</span></span>
+<span id="cb3-2"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb3-2" tabindex="-1"></a>fixed_SMD <span class="ot">&lt;-</span> <span class="fu">rma</span>(<span class="at">yi =</span> SMD<span class="sc">$</span>yi, <span class="at">vi =</span> SMD<span class="sc">$</span>vi, <span class="at">method =</span> <span class="st">&quot;FE&quot;</span>, <span class="at">data =</span> dat)</span>
+<span id="cb3-3"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb3-3" tabindex="-1"></a>fixed_lnRR <span class="ot">&lt;-</span> <span class="fu">rma</span>(<span class="at">yi =</span> lnRR<span class="sc">$</span>yi, <span class="at">vi =</span> lnRR<span class="sc">$</span>vi, <span class="at">method =</span> <span class="st">&quot;FE&quot;</span>, <span class="at">data =</span> dat)</span>
+<span id="cb3-4"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb3-4" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb3-5" tabindex="-1"></a><span class="co"># random effect models </span></span>
+<span id="cb3-6"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb3-6" tabindex="-1"></a>random_m_SMD <span class="ot">&lt;-</span> <span class="fu">rma</span>(<span class="at">yi =</span> SMD<span class="sc">$</span>yi, <span class="at">vi =</span> SMD<span class="sc">$</span>vi, <span class="at">method =</span> <span class="st">&quot;REML&quot;</span>, <span class="at">data =</span> dat)</span>
+<span id="cb3-7"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb3-7" tabindex="-1"></a>random_m_lnRR <span class="ot">&lt;-</span> <span class="fu">rma</span>(<span class="at">yi =</span> lnRR<span class="sc">$</span>yi, <span class="at">vi =</span> lnRR<span class="sc">$</span>vi, <span class="at">method =</span> <span class="st">&quot;REML&quot;</span>, <span class="at">data =</span> dat)</span></code></pre></div>
+<ul>
+<li><strong>Extraction and comparisons of the results</strong></li>
+</ul>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb4-1" tabindex="-1"></a><span class="co"># Extract relevant results for comparison</span></span>
+<span id="cb4-2"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb4-2" tabindex="-1"></a>model_comparison <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb4-3"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb4-3" tabindex="-1"></a>  <span class="at">Model =</span> <span class="fu">c</span>(<span class="st">&quot;Fixed Effect (SMD)&quot;</span>, <span class="st">&quot;Random Effect (SMD)&quot;</span>, <span class="st">&quot;Fixed Effect (lnRR)&quot;</span>, <span class="st">&quot;Random Effect (lnRR)&quot;</span>),</span>
+<span id="cb4-4"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb4-4" tabindex="-1"></a>  <span class="at">Estimate =</span> <span class="fu">c</span>(fixed_SMD<span class="sc">$</span>b, random_m_SMD<span class="sc">$</span>b, fixed_lnRR<span class="sc">$</span>b, random_m_lnRR<span class="sc">$</span>b),</span>
+<span id="cb4-5"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb4-5" tabindex="-1"></a>  <span class="st">`</span><span class="at">95% CI Lower</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">c</span>(fixed_SMD<span class="sc">$</span>ci.lb, random_m_SMD<span class="sc">$</span>ci.lb, fixed_lnRR<span class="sc">$</span>ci.lb, random_m_lnRR<span class="sc">$</span>ci.lb),</span>
+<span id="cb4-6"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb4-6" tabindex="-1"></a>  <span class="st">`</span><span class="at">95% CI Upper</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">c</span>(fixed_SMD<span class="sc">$</span>ci.ub, random_m_SMD<span class="sc">$</span>ci.ub, fixed_lnRR<span class="sc">$</span>ci.ub, random_m_lnRR<span class="sc">$</span>ci.ub),</span>
+<span id="cb4-7"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb4-7" tabindex="-1"></a>  <span class="at">Tau2 =</span> <span class="fu">c</span>(<span class="cn">NA</span>, random_m_SMD<span class="sc">$</span>tau2, <span class="cn">NA</span>, random_m_lnRR<span class="sc">$</span>tau2),</span>
+<span id="cb4-8"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb4-8" tabindex="-1"></a>  <span class="at">I2 =</span> <span class="fu">c</span>(<span class="cn">NA</span>, random_m_SMD<span class="sc">$</span>I2, <span class="cn">NA</span>, random_m_lnRR<span class="sc">$</span>I2),</span>
+<span id="cb4-9"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb4-9" tabindex="-1"></a>  <span class="at">p.value =</span> <span class="fu">c</span>(fixed_SMD<span class="sc">$</span>pval, random_m_SMD<span class="sc">$</span>pval, fixed_lnRR<span class="sc">$</span>pval, random_m_lnRR<span class="sc">$</span>pval)</span>
+<span id="cb4-10"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb4-10" tabindex="-1"></a>)</span>
+<span id="cb4-11"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb4-11" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb4-12" tabindex="-1"></a><span class="co"># Affichage des résultats sous forme de tableau interactif avec reactable</span></span>
+<span id="cb4-13"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb4-13" tabindex="-1"></a>model_comparison</span></code></pre></div>
+<pre><code>##                  Model  Estimate X95..CI.Lower X95..CI.Upper       Tau2
+## 1   Fixed Effect (SMD) 1.0200088     0.9104184      1.129599         NA
+## 2  Random Effect (SMD) 1.2845731     1.0619587      1.507187 0.74922116
+## 3  Fixed Effect (lnRR) 0.2088297     0.1981535      0.219506         NA
+## 4 Random Effect (lnRR) 0.2552978     0.2164785      0.294117 0.02620568
+##         I2      p.value
+## 1       NA 2.382399e-74
+## 2 69.73831 1.173970e-29
+## 3       NA 0.000000e+00
+## 4 88.89735 5.133963e-38</code></pre>
+<ul>
+<li><strong>Interpretation:</strong> The contrast in point estimates and confidence intervals between the SMD and lnRR models underscores the impact of effect size metrics on study-level variability. This comparison reveals how different metrics can shift the weight of certain studies and alter pooled estimates.</li>
+</ul>
+<p><strong>Exercise: Model comparison</strong></p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Task</strong>: Fit three different models (Fixed, Random, and Three-Level) using the dataset.</p></li>
+<li><p><strong>Objective</strong>: Compare their tau² estimates and overall pooled effect sizes.</p></li>
+<li><p><strong>Guiding questions</strong>:</p>
+<ul>
+<li><p>How does heterogeneity (I²) change across these models?</p></li>
+<li><p>Does the model choice impact the significance of moderators?</p></li>
+</ul></li>
+</ol>
+</div>
+<div id="example-2-comparing-heterogeneity-across-models" class="section level3 hasAnchor" number="2.0.3">
+<h3><span class="header-section-number">2.0.3</span> Example 2: Comparing Heterogeneity across models<a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#example-2-comparing-heterogeneity-across-models" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Here, we calculate Risk Differences (RD) and explore the impact of between-study variance estimators (<code>DL</code>, <code>REML</code>) on heterogeneity.</p>
+<ul>
+<li><strong>Random-Effects Model Using DerSimonian-Laird (DL)</strong>:</li>
+</ul>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb6-1" tabindex="-1"></a>res_dl <span class="ot">&lt;-</span> <span class="fu">rma</span>(<span class="at">yi =</span> lnRR<span class="sc">$</span>yi, <span class="at">vi =</span> lnRR<span class="sc">$</span>vi, <span class="at">method =</span> <span class="st">&quot;DL&quot;</span>, <span class="at">data =</span> dat)</span></code></pre></div>
+<p><strong>Random-Effects Model Using REML</strong>:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb7-1" tabindex="-1"></a>res_reml <span class="ot">&lt;-</span> <span class="fu">rma</span>(<span class="at">yi =</span> lnRR<span class="sc">$</span>yi, <span class="at">vi =</span> lnRR<span class="sc">$</span>vi, <span class="at">method =</span> <span class="st">&quot;REML&quot;</span>, <span class="at">data =</span> dat)</span></code></pre></div>
+<ul>
+<li><strong>Extraction and comparisons of the results</strong></li>
+</ul>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb8-1" tabindex="-1"></a><span class="co"># Extract relevant results for comparison</span></span>
+<span id="cb8-2"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb8-2" tabindex="-1"></a>model_comparison2 <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb8-3"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb8-3" tabindex="-1"></a>  <span class="at">Model =</span> <span class="fu">c</span>(<span class="st">&quot;DL&quot;</span>, <span class="st">&quot;REML&quot;</span>),</span>
+<span id="cb8-4"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb8-4" tabindex="-1"></a>  <span class="at">Estimate =</span> <span class="fu">c</span>(res_dl<span class="sc">$</span>b, res_reml<span class="sc">$</span>b),</span>
+<span id="cb8-5"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb8-5" tabindex="-1"></a>  <span class="st">`</span><span class="at">95% CI Lower</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">c</span>(res_dl<span class="sc">$</span>ci.lb, res_reml<span class="sc">$</span>ci.lb),</span>
+<span id="cb8-6"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb8-6" tabindex="-1"></a>  <span class="st">`</span><span class="at">95% CI Upper</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">c</span>(res_dl<span class="sc">$</span>ci.ub, res_reml<span class="sc">$</span>ci.ub),</span>
+<span id="cb8-7"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb8-7" tabindex="-1"></a>  <span class="at">Tau2 =</span> <span class="fu">c</span>(res_dl<span class="sc">$</span>tau2, res_reml<span class="sc">$</span>tau2),</span>
+<span id="cb8-8"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb8-8" tabindex="-1"></a>  <span class="at">I2 =</span> <span class="fu">c</span>(res_dl<span class="sc">$</span>I2, res_reml<span class="sc">$</span>I2),</span>
+<span id="cb8-9"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb8-9" tabindex="-1"></a>  <span class="at">p.value =</span> <span class="fu">c</span>(res_dl<span class="sc">$</span>pval, res_reml<span class="sc">$</span>pval)</span>
+<span id="cb8-10"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb8-10" tabindex="-1"></a>)</span>
+<span id="cb8-11"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb8-11" tabindex="-1"></a></span>
+<span id="cb8-12"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb8-12" tabindex="-1"></a><span class="co"># Affichage des résultats sous forme de tableau interactif avec reactable</span></span>
+<span id="cb8-13"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb8-13" tabindex="-1"></a>model_comparison2</span></code></pre></div>
+<pre><code>##   Model  Estimate X95..CI.Lower X95..CI.Upper       Tau2       I2      p.value
+## 1    DL 0.2530579     0.2168455     0.2892704 0.02164714 86.86638 1.065093e-42
+## 2  REML 0.2552978     0.2164785     0.2941170 0.02620568 88.89735 5.133963e-38</code></pre>
+<p><strong>Interpretation:</strong> The DL estimator is more sensitive to small-study effects, potentially overestimating between-study heterogeneity, while the REML tends to yield more conservative estimates, resulting in narrower confidence intervals. This comparison is crucial for understanding when each method might be more appropriate.</p>
+<p><strong>Exercise: Model estimator impact</strong></p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Task</strong>: Apply multiple heterogeneity estimators (<code>DL</code>, <code>HE</code>, <code>SJ</code>, <code>REML</code>) to the dataset.</p></li>
+<li><p><strong>Objective</strong>: Compare I², tau², and Q-statistics across estimators.</p></li>
+<li><p><strong>Guiding Questions</strong>:</p>
+<ul>
+<li><p>Which estimator produces the most conservative tau² estimate?</p></li>
+<li><p>Does the choice of estimator affect the overall significance?</p></li>
+</ul></li>
+</ol>
+</div>
+<div id="example-3-multi-level-meta-analysis-with-hierarchical-data" class="section level3 hasAnchor" number="2.0.4">
+<h3><span class="header-section-number">2.0.4</span> Example 3: Multi-Level meta-Analysis with hierarchical Data<a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#example-3-multi-level-meta-analysis-with-hierarchical-data" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>In hierarchical data structures, three-level models allow us to account for dependencies within and across clusters (e.g., experiments and individual observations).</p>
+<ul>
+<li><strong>Three-Level model setup</strong>:</li>
+</ul>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb10-1" tabindex="-1"></a>dat<span class="ot">&lt;-</span><span class="fu">cbind</span>(dat, lnRR)</span>
+<span id="cb10-2"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb10-2" tabindex="-1"></a><span class="co"># Three-level meta-analysis</span></span>
+<span id="cb10-3"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb10-3" tabindex="-1"></a>three_level_m <span class="ot">&lt;-</span> <span class="fu">rma.mv</span>(<span class="at">yi =</span> yi, <span class="at">V =</span> vi, <span class="at">random =</span> <span class="fu">list</span>(<span class="sc">~</span><span class="dv">1</span> <span class="sc">|</span> id, <span class="sc">~</span><span class="dv">1</span> <span class="sc">|</span> paper), <span class="at">data =</span> dat)</span>
+<span id="cb10-4"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb10-4" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb10-5" tabindex="-1"></a><span class="co"># Two level meta-analysis</span></span>
+<span id="cb10-6"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb10-6" tabindex="-1"></a>two_level_m <span class="ot">&lt;-</span> <span class="fu">rma.mv</span>(<span class="at">yi =</span> yi, <span class="at">V =</span> vi, <span class="at">random =</span> <span class="fu">list</span>(<span class="sc">~</span><span class="dv">1</span> <span class="sc">|</span> id), <span class="at">data =</span> dat)</span></code></pre></div>
+<ol style="list-style-type: decimal">
+<li>Faire le tableau de comparaison de outputs</li>
+<li>AIC pour sélection de modèles</li>
+</ol>
+<p><strong>Interpretation:</strong> The three-level model reveals the extent of within- and between-experiment variance. Visualizing these results with orchard plots helps disentangle which levels contribute most to the observed heterogeneity.</p>
+<p><strong>Exercise: multi-Level meta-Analysis</strong></p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Task</strong>: Fit a series of multi-level models with different group-level random effects.</p></li>
+<li><p><strong>Objective</strong>: Determine how accounting for more complex structures impacts model fit and tau² partitioning.</p></li>
+<li><p><strong>Guiding Questions</strong>:</p>
+<ul>
+<li><p>How does the inclusion of nested random effects change the intraclass correlation?</p></li>
+<li><p>Which levels (experiment vs. within-group) contribute most to the variance?</p></li>
+</ul></li>
+</ol>
+</div>
+<div id="model-selection-in-meta-analysis" class="section level3 hasAnchor" number="2.0.5">
+<h3><span class="header-section-number">2.0.5</span> Model Selection in Meta-Analysis<a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#model-selection-in-meta-analysis" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Choosing the best model in meta-analysis involves comparing multiple competing models using selection criteria like AIC (Akaike Information Criterion), AICc (Corrected AIC), BIC (Bayesian Information Criterion), and other model performance metrics. This helps identify a model that balances goodness-of-fit and model complexity. The following section covers strategies for selecting the most appropriate model, including fixed and random effects, based on theoretical knowledge or statistical tests.</p>
+<div id="selection-criteria-for-model-comparison" class="section level4 hasAnchor" number="2.0.5.1">
+<h4><span class="header-section-number">2.0.5.1</span> <strong>Selection Criteria for Model Comparison</strong><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#selection-criteria-for-model-comparison" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<ul>
+<li><p><strong>AIC (Akaike Information Criterion)</strong>: Measures the trade-off between model fit and complexity:</p>
+<p><span class="math display">\[
+\text{AIC} = 2k - 2\log(\hat{L})
+\]</span></p>
+<p>where <span class="math inline">\(k\)</span> is the number of model parameters, and <span class="math inline">\(\hat{L}\)</span> is the maximum likelihood value. A lower AIC indicates a more parsimonious model.</p></li>
+<li><p><strong>AICc (Corrected AIC)</strong>: Adjusted for small sample sizes to avoid overfitting:</p>
+<p><span class="math display">\[
+\text{AICc} = \text{AIC} + \frac{2k(k+1)}{n - k - 1}
+\]</span></p>
+<p>It should be used when <span class="math inline">\(n/k\)</span> is small (&lt; 40), where <span class="math inline">\(n\)</span> is the number of observations and <span class="math inline">\(k\)</span> the number of parameters.</p></li>
+<li><p><strong>BIC (Bayesian Information Criterion)</strong>: Applies a stronger penalty for the number of parameters:</p>
+<p><span class="math display">\[
+\text{BIC} = k\log(n) - 2\log(\hat{L})
+\]</span></p>
+<p>BIC often favors simpler models, making it suitable when working with large sample sizes.</p></li>
+<li><p><strong>Likelihood Ratio Tests and ANOVA</strong>: To directly compare nested models, likelihood ratio tests or <code>anova</code> can be used. This approach quantifies if adding (or removing) parameters significantly improves model fit.</p></li>
+</ul>
+</div>
+<div id="choosing-between-fixed-and-random-effects-models" class="section level4 hasAnchor" number="2.0.5.2">
+<h4><span class="header-section-number">2.0.5.2</span> <strong>Choosing Between Fixed and Random-Effects Models</strong><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#choosing-between-fixed-and-random-effects-models" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>The decision between using a fixed-effect or random-effects model depends on either <em>theoretical considerations</em> or <em>statistical testing</em>:</p>
+<ul>
+<li><p><strong>Theoretical Justification</strong>: Choose a <em>fixed-effect model</em> if you expect a common effect size across all studies (e.g., homogeneous study contexts or interventions). Select a <em>random-effects model</em> when heterogeneity among studies is anticipated (e.g., varying contexts, differing methods).</p></li>
+<li><p><strong>Statistical Testing</strong>:</p>
+<ul>
+<li><strong>Heterogeneity Tests</strong>: Use tests like Cochran’s Q-test or <span class="math inline">\(I^2\)</span> statistics to detect significant variability between studies. High <span class="math inline">\(I^2\)</span> or a significant Q-test indicates that a random-effects model is likely more appropriate.</li>
+<li><strong>ANOVA for Model Comparison</strong>: When comparing nested models (e.g., fixed-effects vs. random-effects), <code>anova()</code> can be used to test whether the inclusion of random effects significantly improves the model fit.</li>
+</ul></li>
+<li></li>
+</ul>
+</div>
+<div id="comparing-models-fixed-and-random-structures" class="section level4 hasAnchor" number="2.0.5.3">
+<h4><span class="header-section-number">2.0.5.3</span> <strong>Comparing Models: Fixed and Random Structures</strong><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#comparing-models-fixed-and-random-structures" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>When fitting mixed-effects models, choosing between different random and fixed structures is a crucial step. Typically, the process involves:</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Start with the Random Structure</strong>:</p>
+<ul>
+<li><p>Define the random effects first to capture variance due to grouping or clustering (e.g., study-level random effects, site-level random effects).</p></li>
+<li><p>Use the likelihood ratio test (<code>anova()</code>) to compare models with and without each random component:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb11-1" tabindex="-1"></a>model1 <span class="ot">&lt;-</span> <span class="fu">rma.mv</span>(yi, vi, <span class="at">random =</span> <span class="sc">~</span> <span class="dv">1</span> <span class="sc">|</span> paper, <span class="at">data =</span> dat)</span>
+<span id="cb11-2"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb11-2" tabindex="-1"></a>model2 <span class="ot">&lt;-</span> <span class="fu">rma.mv</span>(yi, vi, <span class="at">random =</span> <span class="sc">~</span> <span class="dv">1</span> <span class="sc">|</span> paper<span class="sc">/</span>id, <span class="at">data =</span> dat)</span>
+<span id="cb11-3"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb11-3" tabindex="-1"></a><span class="fu">anova</span>(model1, model2)</span></code></pre></div>
+<pre><code>## 
+##         df      AIC      BIC     AICc   logLik      LRT   pval       QE 
+## Full     3  -8.2204  -0.3750  -7.9730   7.1102                 769.0185 
+## Reduced  2 104.0570 109.2872 104.1794 -50.0285 114.2774 &lt;.0001 769.0185</code></pre></li>
+</ul>
+<p>This step allows you to determine if additional random components (e.g., study vs. nested study/site effects) are justified.</p>
+<p>Here, <code>anova()</code> will test if the more complex model (<code>model_random</code>) explains significantly more variance than the simpler one (<code>model_fixed</code>).</p></li>
+<li><p><strong>Incorporate Fixed Effects</strong>:</p>
+<ul>
+<li><p>After selecting the optimal random structure, test different combinations of fixed effects (e.g., covariates, moderators).</p></li>
+<li><p>Compare models using AIC, AICc, and BIC. Include one fixed effect at a time and use <code>anova()</code> to see if adding predictors improves fit:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb13-1" tabindex="-1"></a>model_fixed1 <span class="ot">&lt;-</span> <span class="fu">rma.mv</span>(yi, vi, <span class="at">mods =</span> <span class="sc">~</span> species, <span class="at">random=</span> <span class="sc">~</span> <span class="dv">1</span> <span class="sc">|</span> paper<span class="sc">/</span>id, <span class="at">data =</span> dat)</span>
+<span id="cb13-2"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb13-2" tabindex="-1"></a>model_fixed2 <span class="ot">&lt;-</span> <span class="fu">rma.mv</span>(yi, vi, <span class="at">mods =</span> <span class="sc">~</span> species <span class="sc">+</span> fungrp,<span class="at">random=</span> <span class="sc">~</span> <span class="dv">1</span> <span class="sc">|</span> paper<span class="sc">/</span>id, <span class="at">data =</span> dat)</span>
+<span id="cb13-3"><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#cb13-3" tabindex="-1"></a><span class="fu">anova</span>(model_fixed1, model_fixed2)</span></code></pre></div>
+<pre><code>## 
+##         df     AIC      BIC     AICc logLik    LRT   pval       QE 
+## Full    38 73.7811 156.9879 183.5588 1.1095               334.3528 
+## Reduced 37 71.3274 152.9011 168.2930 1.3363 0.0000 1.0000 334.9388</code></pre></li>
+</ul></li>
+<li><p><strong>Test for Interactions</strong>:</p>
+<ul>
+<li>After defining main effects, consider adding interaction terms and use AIC or likelihood ratio tests to assess their contribution.</li>
+</ul></li>
+</ol>
+</div>
+<div id="selecting-the-optimal-model-practical-considerations" class="section level4 hasAnchor" number="2.0.5.4">
+<h4><span class="header-section-number">2.0.5.4</span> <strong>Selecting the Optimal Model: Practical Considerations</strong><a href="chapter-comparative-meta-analytic-methods-for-evidence-synthesis.html#selecting-the-optimal-model-practical-considerations" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<ul>
+<li><strong>Model Complexity vs. Parsimony</strong>: Start with a simple model and gradually add parameters, using AIC, AICc, and BIC to avoid overfitting.</li>
+<li><strong>Check Model Assumptions</strong>: Ensure that the chosen model meets meta-analytic assumptions (e.g., homogeneity of variance, normality).</li>
+<li><strong>Visual Evaluation</strong>: Use diagnostic plots (e.g., residual plots, forest plots) to visually inspect model fit.</li>
+</ul>
+<p>In practice, the ideal strategy involves:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Define the Random Structure First</strong>:
+<ul>
+<li>Use theoretical and statistical justifications to select between study-level or multi-level random effects.</li>
+<li>Select the most parsimonious random structure using <code>anova()</code> and AIC/BIC.</li>
+</ul></li>
+<li><strong>Add Fixed Effects Incrementally</strong>:
+<ul>
+<li>Start with primary predictors and gradually include covariates, using <code>anova()</code> to compare nested models.</li>
+<li>Check for interactions only after establishing main effects.</li>
+</ul></li>
+<li><strong>Assess the Final Model</strong>:
+<ul>
+<li>Compare the best candidate models (fixed vs. random) using AIC, AICc, BIC, and likelihood ratio tests.</li>
+<li>Select the model that balances fit and interpretability.</li>
+</ul></li>
+</ol>
+<p>This structured approach ensures that both theoretical considerations and statistical criteria are employed for robust model selection in meta-analyses.</p>
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="what-is-an-effect-size.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="analysing-model-variability.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/USERNAME/REPO/edit/BRANCH/05_fit_models.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["_main.pdf", "_main.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

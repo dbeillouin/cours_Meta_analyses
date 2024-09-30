@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 4 Chapter: Plotting meta-analytical results | Calculate and combine the effect-sizes</title>
+  <meta name="description" content="<p>This is beta-version of the visualisation exercice.
+set in the _output.yml file.
+The HTML output format for this example is bookdown::gitbook,</p>" />
+  <meta name="generator" content="bookdown 0.40 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 4 Chapter: Plotting meta-analytical results | Calculate and combine the effect-sizes" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="<p>This is beta-version of the visualisation exercice.
+set in the _output.yml file.
+The HTML output format for this example is bookdown::gitbook,</p>" />
+  <meta name="github-repo" content="rstudio/bookdown-demo" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 4 Chapter: Plotting meta-analytical results | Calculate and combine the effect-sizes" />
+  
+  <meta name="twitter:description" content="<p>This is beta-version of the visualisation exercice.
+set in the _output.yml file.
+The HTML output format for this example is bookdown::gitbook,</p>" />
+  
+
+<meta name="author" content="Damien Beillouin" />
+
+
+<meta name="date" content="2024-09-28" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="analysing-model-variability.html"/>
+
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Meta-analyses</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="what-is-an-effect-size.html"><a href="what-is-an-effect-size.html"><i class="fa fa-check"></i><b>1</b> What is an Effect Size?</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="what-is-an-effect-size.html"><a href="what-is-an-effect-size.html#visual-representation-of-effect-sizes"><i class="fa fa-check"></i><b>1.1</b> Visual representation of effect-sizes</a>
+<ul>
+<li class="chapter" data-level="1.1.1" data-path="what-is-an-effect-size.html"><a href="what-is-an-effect-size.html#different-metrics-for-measuring-effect-sizes"><i class="fa fa-check"></i><b>1.1.1</b> Different Metrics for Measuring Effect Sizes</a></li>
+<li class="chapter" data-level="1.1.2" data-path="what-is-an-effect-size.html"><a href="what-is-an-effect-size.html#how-to-measure-variability"><i class="fa fa-check"></i><b>1.1.2</b> How to Measure Variability</a></li>
+<li class="chapter" data-level="1.1.3" data-path="what-is-an-effect-size.html"><a href="what-is-an-effect-size.html#what-variability-means"><i class="fa fa-check"></i><b>1.1.3</b> What Variability Means</a></li>
+<li class="chapter" data-level="1.1.4" data-path="what-is-an-effect-size.html"><a href="what-is-an-effect-size.html#comparison-of-effect-size-and-p-value"><i class="fa fa-check"></i><b>1.1.4</b> Comparison of Effect Size and p-Value</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html"><i class="fa fa-check"></i><b>2</b> Comparative meta-analytic methods for evidence synthesis</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html#equal-effects-model"><i class="fa fa-check"></i><b>2.1</b> Equal-Effects Model</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html#example-data"><i class="fa fa-check"></i><b>2.1.1</b> Example Data</a></li>
+<li class="chapter" data-level="2.1.2" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html#fitting-the-equal-effects-model"><i class="fa fa-check"></i><b>2.1.2</b> Fitting the Equal-Effects Model</a></li>
+<li class="chapter" data-level="2.1.3" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html#comparison-of-results"><i class="fa fa-check"></i><b>2.1.3</b> Comparison of Results</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html#random-effects-model"><i class="fa fa-check"></i><b>2.2</b> Random-Effects Model</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html#fitting-the-random-effects-model"><i class="fa fa-check"></i><b>2.2.1</b> Fitting the Random-Effects Model</a></li>
+<li class="chapter" data-level="2.2.2" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html#comparison-of-results-1"><i class="fa fa-check"></i><b>2.2.2</b> Comparison of Results</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html#conclusion"><i class="fa fa-check"></i><b>2.3</b> Conclusion</a>
+<ul>
+<li class="chapter" data-level="2.3.1" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html#example-1-fixed-vs.-random-meta-analysis-models"><i class="fa fa-check"></i><b>2.3.1</b> Example 1: fixed vs. random Meta-Analysis models</a></li>
+<li class="chapter" data-level="2.3.2" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html#example-2-comparing-heterogeneity-across-models"><i class="fa fa-check"></i><b>2.3.2</b> Example 2: Comparing Heterogeneity across models</a></li>
+<li class="chapter" data-level="2.3.3" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html#example-3-multi-level-meta-analysis-with-hierarchical-data"><i class="fa fa-check"></i><b>2.3.3</b> Example 3: Multi-Level meta-Analysis with hierarchical Data</a></li>
+<li class="chapter" data-level="2.3.4" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html#model-selection-in-meta-analysis"><i class="fa fa-check"></i><b>2.3.4</b> Model Selection in Meta-Analysis</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="analysing-model-variability.html"><a href="analysing-model-variability.html"><i class="fa fa-check"></i><b>3</b> Analysing model variability</a>
+<ul>
+<li class="chapter" data-level="3.0.1" data-path="analysing-model-variability.html"><a href="analysing-model-variability.html#using-parametric-and-non-parametric-bootstrapping-to-estimate-confidence-intervals-in-meta-analyses"><i class="fa fa-check"></i><b>3.0.1</b> Using Parametric and Non-Parametric Bootstrapping to Estimate Confidence Intervals in Meta-Analyses</a></li>
+<li class="chapter" data-level="3.0.2" data-path="analysing-model-variability.html"><a href="analysing-model-variability.html#overview"><i class="fa fa-check"></i><b>3.0.2</b> Overview</a></li>
+<li class="chapter" data-level="3.0.3" data-path="analysing-model-variability.html"><a href="analysing-model-variability.html#parametric-bootstrapping-step-by-step-example"><i class="fa fa-check"></i><b>3.0.3</b> Parametric Bootstrapping: Step-by-Step Example</a></li>
+<li class="chapter" data-level="3.0.4" data-path="analysing-model-variability.html"><a href="analysing-model-variability.html#non-parametric-bootstrapping-step-by-step-example"><i class="fa fa-check"></i><b>3.0.4</b> Non-Parametric Bootstrapping: Step-by-Step Example</a></li>
+<li class="chapter" data-level="3.0.5" data-path="analysing-model-variability.html"><a href="analysing-model-variability.html#conclusion-1"><i class="fa fa-check"></i><b>3.0.5</b> Conclusion</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="chapter-plotting-meta-analytical-results.html"><a href="chapter-plotting-meta-analytical-results.html"><i class="fa fa-check"></i><b>4</b> Chapter: Plotting meta-analytical results</a>
+<ul>
+<li class="chapter" data-level="4.0.1" data-path="chapter-plotting-meta-analytical-results.html"><a href="chapter-plotting-meta-analytical-results.html#overview-1"><i class="fa fa-check"></i><b>4.0.1</b> Overview</a></li>
+<li class="chapter" data-level="4.0.2" data-path="chapter-plotting-meta-analytical-results.html"><a href="chapter-plotting-meta-analytical-results.html#example-1-forest-plot-with-metafor"><i class="fa fa-check"></i><b>4.0.2</b> Example 1: Forest plot with metafor</a></li>
+<li class="chapter" data-level="4.0.3" data-path="chapter-plotting-meta-analytical-results.html"><a href="chapter-plotting-meta-analytical-results.html#example-2-forest-plot-with-meta"><i class="fa fa-check"></i><b>4.0.3</b> Example 2: Forest plot with meta</a></li>
+<li class="chapter" data-level="4.0.4" data-path="chapter-plotting-meta-analytical-results.html"><a href="chapter-plotting-meta-analytical-results.html#example-3-forest-plot-with-ggplot"><i class="fa fa-check"></i><b>4.0.4</b> Example 3: Forest plot with ggplot</a></li>
+<li class="chapter" data-level="4.0.5" data-path="chapter-plotting-meta-analytical-results.html"><a href="chapter-plotting-meta-analytical-results.html#example-4-orchard-plots"><i class="fa fa-check"></i><b>4.0.5</b> Example 4: Orchard plots</a></li>
+<li class="chapter" data-level="4.1" data-path="chapter-plotting-meta-analytical-results.html"><a href="chapter-plotting-meta-analytical-results.html#analysis-and-visualization-of-publication-bias"><i class="fa fa-check"></i><b>4.1</b> Analysis and Visualization of Publication Bias</a>
+<ul>
+<li class="chapter" data-level="4.1.1" data-path="chapter-plotting-meta-analytical-results.html"><a href="chapter-plotting-meta-analytical-results.html#funnel-plots"><i class="fa fa-check"></i><b>4.1.1</b> Funnel Plots</a></li>
+<li class="chapter" data-level="4.1.2" data-path="chapter-plotting-meta-analytical-results.html"><a href="chapter-plotting-meta-analytical-results.html#reasons-for-asymmetry"><i class="fa fa-check"></i><b>4.1.2</b> Reasons for Asymmetry</a></li>
+<li class="chapter" data-level="4.1.3" data-path="chapter-plotting-meta-analytical-results.html"><a href="chapter-plotting-meta-analytical-results.html#trim-and-fill-method"><i class="fa fa-check"></i><b>4.1.3</b> Trim and Fill Method</a></li>
+<li class="chapter" data-level="4.1.4" data-path="chapter-plotting-meta-analytical-results.html"><a href="chapter-plotting-meta-analytical-results.html#duval-and-tweedies-trim-and-fill"><i class="fa fa-check"></i><b>4.1.4</b> Duval and Tweedie’s Trim and Fill</a></li>
+<li class="chapter" data-level="4.1.5" data-path="chapter-plotting-meta-analytical-results.html"><a href="chapter-plotting-meta-analytical-results.html#egger-test"><i class="fa fa-check"></i><b>4.1.5</b> 3. Egger Test</a></li>
+<li class="chapter" data-level="4.1.6" data-path="chapter-plotting-meta-analytical-results.html"><a href="chapter-plotting-meta-analytical-results.html#rosenthals-fail-safe-n"><i class="fa fa-check"></i><b>4.1.6</b> Rosenthal’s Fail-Safe N</a></li>
+</ul></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Calculate and combine the effect-sizes</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="chapter-plotting-meta-analytical-results" class="section level1 hasAnchor" number="4">
+<h1><span class="header-section-number">Chapter 4</span> Chapter: Plotting meta-analytical results<a href="chapter-plotting-meta-analytical-results.html#chapter-plotting-meta-analytical-results" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="overview-1" class="section level3 hasAnchor" number="4.0.1">
+<h3><span class="header-section-number">4.0.1</span> Overview<a href="chapter-plotting-meta-analytical-results.html#overview-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>This chapter focuses on the visualization of meta-analytical results, which is crucial for effectively communicating findings and insights drawn from aggregated data. Visualization techniques help researchers and stakeholders quickly grasp complex relationships and patterns within the data. In this chapter, we will cover various plotting methods, including forest plots, funnel plots, and advanced visualizations using R packages such as <code>ggplot2</code>, <code>metafor</code>, and <code>dmetar</code>.</p>
+</div>
+<div id="example-1-forest-plot-with-metafor" class="section level3 hasAnchor" number="4.0.2">
+<h3><span class="header-section-number">4.0.2</span> Example 1: Forest plot with metafor<a href="chapter-plotting-meta-analytical-results.html#example-1-forest-plot-with-metafor" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="chapter-plotting-meta-analytical-results.html#cb49-1" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">author =</span> <span class="fu">c</span>(<span class="st">&quot;Dyson&quot;</span>, <span class="st">&quot;Jönsson&quot;</span>, <span class="st">&quot;Morris&quot;</span>, <span class="st">&quot;Saslow&quot;</span>, <span class="st">&quot;Saslow&quot;</span>, <span class="st">&quot;Sato&quot;</span>, <span class="st">&quot;Tay&quot;</span>, <span class="st">&quot;Yamada&quot;</span>),</span>
+<span id="cb49-2"><a href="chapter-plotting-meta-analytical-results.html#cb49-2" tabindex="-1"></a>                  <span class="at">year   =</span> <span class="fu">c</span>(<span class="dv">2010</span>, <span class="dv">2009</span>, <span class="dv">2019</span>, <span class="dv">2014</span>, <span class="dv">2017</span>, <span class="dv">2017</span>, <span class="dv">2014</span>, <span class="dv">2014</span>),</span>
+<span id="cb49-3"><a href="chapter-plotting-meta-analytical-results.html#cb49-3" tabindex="-1"></a>                  <span class="at">ai     =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">6</span>, <span class="dv">11</span>, <span class="dv">8</span>, <span class="dv">6</span>, <span class="dv">4</span>, <span class="dv">36</span>, <span class="dv">2</span>), <span class="do">##Nb event experimental group</span></span>
+<span id="cb49-4"><a href="chapter-plotting-meta-analytical-results.html#cb49-4" tabindex="-1"></a>                  <span class="at">n1i    =</span> <span class="fu">c</span>(<span class="dv">6</span>, <span class="dv">6</span>, <span class="dv">21</span>, <span class="dv">9</span>, <span class="dv">11</span>, <span class="dv">22</span>, <span class="dv">46</span>, <span class="dv">12</span>), <span class="do">## Total experimental group</span></span>
+<span id="cb49-5"><a href="chapter-plotting-meta-analytical-results.html#cb49-5" tabindex="-1"></a>                  <span class="at">ci     =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">30</span>, <span class="dv">2</span>),  <span class="do">## Nb events control group</span></span>
+<span id="cb49-6"><a href="chapter-plotting-meta-analytical-results.html#cb49-6" tabindex="-1"></a>                  <span class="at">n2i    =</span> <span class="fu">c</span>(<span class="dv">6</span>, <span class="dv">6</span>, <span class="dv">12</span>, <span class="dv">13</span>, <span class="dv">8</span>, <span class="dv">27</span>, <span class="dv">47</span>, <span class="dv">12</span>))  <span class="do">## Total control group</span></span>
+<span id="cb49-7"><a href="chapter-plotting-meta-analytical-results.html#cb49-7" tabindex="-1"></a></span>
+<span id="cb49-8"><a href="chapter-plotting-meta-analytical-results.html#cb49-8" tabindex="-1"></a><span class="do">### calculate risk differences and corresponding sampling variances (and use</span></span>
+<span id="cb49-9"><a href="chapter-plotting-meta-analytical-results.html#cb49-9" tabindex="-1"></a><span class="do">### the &#39;slab&#39; argument to store study labels as part of the data frame)</span></span>
+<span id="cb49-10"><a href="chapter-plotting-meta-analytical-results.html#cb49-10" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">escalc</span>(<span class="at">measure =</span> <span class="st">&quot;RD&quot;</span>, <span class="at">ai =</span> ai, <span class="at">n1i =</span> n1i, <span class="at">ci =</span> ci, <span class="at">n2i =</span> n2i, <span class="at">data =</span> dat,</span>
+<span id="cb49-11"><a href="chapter-plotting-meta-analytical-results.html#cb49-11" tabindex="-1"></a>              <span class="at">slab =</span> <span class="fu">paste</span>(<span class="st">&quot; &quot;</span>, author, year), <span class="at">addyi =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb49-12"><a href="chapter-plotting-meta-analytical-results.html#cb49-12" tabindex="-1"></a></span>
+<span id="cb49-13"><a href="chapter-plotting-meta-analytical-results.html#cb49-13" tabindex="-1"></a><span class="do">### fit random-effects model (using the DL estimator)</span></span>
+<span id="cb49-14"><a href="chapter-plotting-meta-analytical-results.html#cb49-14" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">rma</span>(yi, vi, <span class="at">data =</span> dat, <span class="at">method =</span> <span class="st">&quot;DL&quot;</span>)</span>
+<span id="cb49-15"><a href="chapter-plotting-meta-analytical-results.html#cb49-15" tabindex="-1"></a></span>
+<span id="cb49-16"><a href="chapter-plotting-meta-analytical-results.html#cb49-16" tabindex="-1"></a><span class="do">### colors to be used in the plot</span></span>
+<span id="cb49-17"><a href="chapter-plotting-meta-analytical-results.html#cb49-17" tabindex="-1"></a>colp <span class="ot">&lt;-</span> <span class="st">&quot;#6b58a6&quot;</span></span>
+<span id="cb49-18"><a href="chapter-plotting-meta-analytical-results.html#cb49-18" tabindex="-1"></a>coll <span class="ot">&lt;-</span> <span class="st">&quot;#a7a9ac&quot;</span></span>
+<span id="cb49-19"><a href="chapter-plotting-meta-analytical-results.html#cb49-19" tabindex="-1"></a></span>
+<span id="cb49-20"><a href="chapter-plotting-meta-analytical-results.html#cb49-20" tabindex="-1"></a><span class="do">### total number of studies</span></span>
+<span id="cb49-21"><a href="chapter-plotting-meta-analytical-results.html#cb49-21" tabindex="-1"></a>k <span class="ot">&lt;-</span> <span class="fu">nrow</span>(dat)</span>
+<span id="cb49-22"><a href="chapter-plotting-meta-analytical-results.html#cb49-22" tabindex="-1"></a></span>
+<span id="cb49-23"><a href="chapter-plotting-meta-analytical-results.html#cb49-23" tabindex="-1"></a><span class="do">### generate point sizes</span></span>
+<span id="cb49-24"><a href="chapter-plotting-meta-analytical-results.html#cb49-24" tabindex="-1"></a>psize <span class="ot">&lt;-</span> <span class="fu">weights</span>(res)</span>
+<span id="cb49-25"><a href="chapter-plotting-meta-analytical-results.html#cb49-25" tabindex="-1"></a>psize <span class="ot">&lt;-</span> <span class="fl">1.2</span> <span class="sc">+</span> (psize <span class="sc">-</span> <span class="fu">min</span>(psize)) <span class="sc">/</span> (<span class="fu">max</span>(psize) <span class="sc">-</span> <span class="fu">min</span>(psize))</span>
+<span id="cb49-26"><a href="chapter-plotting-meta-analytical-results.html#cb49-26" tabindex="-1"></a></span>
+<span id="cb49-27"><a href="chapter-plotting-meta-analytical-results.html#cb49-27" tabindex="-1"></a><span class="do">### get the weights and format them as will be used in the forest plot</span></span>
+<span id="cb49-28"><a href="chapter-plotting-meta-analytical-results.html#cb49-28" tabindex="-1"></a>weights <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">weights</span>(res), <span class="dv">1</span>)</span>
+<span id="cb49-29"><a href="chapter-plotting-meta-analytical-results.html#cb49-29" tabindex="-1"></a></span>
+<span id="cb49-30"><a href="chapter-plotting-meta-analytical-results.html#cb49-30" tabindex="-1"></a><span class="do">### adjust the margins</span></span>
+<span id="cb49-31"><a href="chapter-plotting-meta-analytical-results.html#cb49-31" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="fl">2.7</span>, <span class="fl">3.2</span>, <span class="fl">2.3</span>, <span class="fl">1.3</span>), <span class="at">mgp =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">0</span>, <span class="dv">0</span>), <span class="at">tcl =</span> <span class="fl">0.15</span>)</span>
+<span id="cb49-32"><a href="chapter-plotting-meta-analytical-results.html#cb49-32" tabindex="-1"></a></span>
+<span id="cb49-33"><a href="chapter-plotting-meta-analytical-results.html#cb49-33" tabindex="-1"></a><span class="do">### forest plot with extra annotations</span></span>
+<span id="cb49-34"><a href="chapter-plotting-meta-analytical-results.html#cb49-34" tabindex="-1"></a>sav <span class="ot">&lt;-</span> <span class="fu">forest</span>(dat<span class="sc">$</span>yi, dat<span class="sc">$</span>vi, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">3.4</span>, <span class="fl">2.1</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.5</span>, k <span class="sc">+</span> <span class="dv">3</span>), <span class="at">alim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>), <span class="at">cex =</span> <span class="fl">0.88</span>,</span>
+<span id="cb49-35"><a href="chapter-plotting-meta-analytical-results.html#cb49-35" tabindex="-1"></a>              <span class="at">pch =</span> <span class="dv">18</span>, <span class="at">psize =</span> psize, <span class="at">efac =</span> <span class="dv">0</span>, <span class="at">refline =</span> <span class="cn">NA</span>, <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>), <span class="at">xlab =</span> <span class="st">&quot;&quot;</span>,</span>
+<span id="cb49-36"><a href="chapter-plotting-meta-analytical-results.html#cb49-36" tabindex="-1"></a>              <span class="at">ilab =</span> <span class="fu">cbind</span>(<span class="fu">paste</span>(dat<span class="sc">$</span>ai, <span class="st">&quot;/&quot;</span>, dat<span class="sc">$</span>n1i), <span class="fu">paste</span>(dat<span class="sc">$</span>ci, <span class="st">&quot;/&quot;</span>, dat<span class="sc">$</span>n2i), weights),</span>
+<span id="cb49-37"><a href="chapter-plotting-meta-analytical-results.html#cb49-37" tabindex="-1"></a>              <span class="at">ilab.xpos =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">1.9</span>, <span class="sc">-</span><span class="fl">1.3</span>, <span class="fl">1.2</span>), <span class="at">annosym =</span> <span class="fu">c</span>(<span class="st">&quot; (&quot;</span>, <span class="st">&quot; to &quot;</span>, <span class="st">&quot;)&quot;</span>),</span>
+<span id="cb49-38"><a href="chapter-plotting-meta-analytical-results.html#cb49-38" tabindex="-1"></a>              <span class="at">rowadj =</span> <span class="sc">-</span><span class="fl">0.07</span>)</span>
+<span id="cb49-39"><a href="chapter-plotting-meta-analytical-results.html#cb49-39" tabindex="-1"></a></span>
+<span id="cb49-40"><a href="chapter-plotting-meta-analytical-results.html#cb49-40" tabindex="-1"></a><span class="do">### add the vertical reference line at 0</span></span>
+<span id="cb49-41"><a href="chapter-plotting-meta-analytical-results.html#cb49-41" tabindex="-1"></a><span class="fu">segments</span>(<span class="dv">0</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">0</span>, k <span class="sc">+</span> <span class="fl">1.6</span>, <span class="at">col =</span> coll)</span>
+<span id="cb49-42"><a href="chapter-plotting-meta-analytical-results.html#cb49-42" tabindex="-1"></a></span>
+<span id="cb49-43"><a href="chapter-plotting-meta-analytical-results.html#cb49-43" tabindex="-1"></a><span class="do">### add the vertical reference line at the pooled estimate</span></span>
+<span id="cb49-44"><a href="chapter-plotting-meta-analytical-results.html#cb49-44" tabindex="-1"></a><span class="fu">segments</span>(<span class="fu">coef</span>(res), <span class="dv">0</span>, <span class="fu">coef</span>(res), k, <span class="at">col =</span> colp, <span class="at">lty =</span> <span class="st">&quot;33&quot;</span>, <span class="at">lwd =</span> <span class="fl">0.8</span>)</span>
+<span id="cb49-45"><a href="chapter-plotting-meta-analytical-results.html#cb49-45" tabindex="-1"></a></span>
+<span id="cb49-46"><a href="chapter-plotting-meta-analytical-results.html#cb49-46" tabindex="-1"></a><span class="do">### redraw the CI lines and points in the chosen color</span></span>
+<span id="cb49-47"><a href="chapter-plotting-meta-analytical-results.html#cb49-47" tabindex="-1"></a><span class="fu">segments</span>(<span class="fu">summary</span>(dat)<span class="sc">$</span>ci.lb, k<span class="sc">:</span><span class="dv">1</span>, <span class="fu">summary</span>(dat)<span class="sc">$</span>ci.ub, k<span class="sc">:</span><span class="dv">1</span>, <span class="at">col =</span> colp, <span class="at">lwd =</span> <span class="fl">1.5</span>)</span>
+<span id="cb49-48"><a href="chapter-plotting-meta-analytical-results.html#cb49-48" tabindex="-1"></a><span class="fu">points</span>(dat<span class="sc">$</span>yi, k<span class="sc">:</span><span class="dv">1</span>, <span class="at">pch =</span> <span class="dv">18</span>, <span class="at">cex =</span> psize <span class="sc">*</span> <span class="fl">1.15</span>, <span class="at">col =</span> <span class="st">&quot;white&quot;</span>)</span>
+<span id="cb49-49"><a href="chapter-plotting-meta-analytical-results.html#cb49-49" tabindex="-1"></a><span class="fu">points</span>(dat<span class="sc">$</span>yi, k<span class="sc">:</span><span class="dv">1</span>, <span class="at">pch =</span> <span class="dv">18</span>, <span class="at">cex =</span> psize, <span class="at">col =</span> colp)</span>
+<span id="cb49-50"><a href="chapter-plotting-meta-analytical-results.html#cb49-50" tabindex="-1"></a></span>
+<span id="cb49-51"><a href="chapter-plotting-meta-analytical-results.html#cb49-51" tabindex="-1"></a><span class="do">### add the summary polygon</span></span>
+<span id="cb49-52"><a href="chapter-plotting-meta-analytical-results.html#cb49-52" tabindex="-1"></a><span class="fu">addpoly</span>(res, <span class="at">row =</span> <span class="dv">0</span>, <span class="at">mlab =</span> <span class="st">&quot;Total (95% CI)&quot;</span>, <span class="at">efac =</span> <span class="dv">2</span>, <span class="at">col =</span> colp, <span class="at">border =</span> colp)</span>
+<span id="cb49-53"><a href="chapter-plotting-meta-analytical-results.html#cb49-53" tabindex="-1"></a></span>
+<span id="cb49-54"><a href="chapter-plotting-meta-analytical-results.html#cb49-54" tabindex="-1"></a><span class="do">### add the horizontal line at the top</span></span>
+<span id="cb49-55"><a href="chapter-plotting-meta-analytical-results.html#cb49-55" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> k <span class="sc">+</span> <span class="fl">1.6</span>, <span class="at">col =</span> coll)</span>
+<span id="cb49-56"><a href="chapter-plotting-meta-analytical-results.html#cb49-56" tabindex="-1"></a></span>
+<span id="cb49-57"><a href="chapter-plotting-meta-analytical-results.html#cb49-57" tabindex="-1"></a><span class="do">### redraw the x-axis in the chosen color</span></span>
+<span id="cb49-58"><a href="chapter-plotting-meta-analytical-results.html#cb49-58" tabindex="-1"></a><span class="fu">axis</span>(<span class="at">side =</span> <span class="dv">1</span>, <span class="at">at =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="at">by =</span> <span class="fl">0.5</span>), <span class="at">col =</span> coll, <span class="at">labels =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb49-59"><a href="chapter-plotting-meta-analytical-results.html#cb49-59" tabindex="-1"></a></span>
+<span id="cb49-60"><a href="chapter-plotting-meta-analytical-results.html#cb49-60" tabindex="-1"></a><span class="do">### now we add a bunch of text; since some of the text falls outside of the</span></span>
+<span id="cb49-61"><a href="chapter-plotting-meta-analytical-results.html#cb49-61" tabindex="-1"></a><span class="do">### plot region, we set xpd=NA so nothing gets clipped</span></span>
+<span id="cb49-62"><a href="chapter-plotting-meta-analytical-results.html#cb49-62" tabindex="-1"></a><span class="fu">par</span>(<span class="at">xpd =</span> <span class="cn">NA</span>)</span>
+<span id="cb49-63"><a href="chapter-plotting-meta-analytical-results.html#cb49-63" tabindex="-1"></a></span>
+<span id="cb49-64"><a href="chapter-plotting-meta-analytical-results.html#cb49-64" tabindex="-1"></a><span class="do">### adjust cex as used in the forest plot and use a bold font</span></span>
+<span id="cb49-65"><a href="chapter-plotting-meta-analytical-results.html#cb49-65" tabindex="-1"></a><span class="fu">par</span>(<span class="at">cex =</span> sav<span class="sc">$</span>cex, <span class="at">font =</span> <span class="dv">2</span>)</span>
+<span id="cb49-66"><a href="chapter-plotting-meta-analytical-results.html#cb49-66" tabindex="-1"></a></span>
+<span id="cb49-67"><a href="chapter-plotting-meta-analytical-results.html#cb49-67" tabindex="-1"></a><span class="do">### add headings</span></span>
+<span id="cb49-68"><a href="chapter-plotting-meta-analytical-results.html#cb49-68" tabindex="-1"></a><span class="fu">text</span>(sav<span class="sc">$</span>xlim[<span class="dv">1</span>], k <span class="sc">+</span> <span class="fl">2.5</span>, <span class="at">pos =</span> <span class="dv">4</span>, <span class="st">&quot;Study or</span><span class="sc">\n</span><span class="st">subgroup&quot;</span>)</span>
+<span id="cb49-69"><a href="chapter-plotting-meta-analytical-results.html#cb49-69" tabindex="-1"></a><span class="fu">text</span>(<span class="fu">mean</span>(sav<span class="sc">$</span>ilab.xpos[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]), k <span class="sc">+</span> <span class="fl">3.4</span>, <span class="st">&quot;No of events / total&quot;</span>)</span>
+<span id="cb49-70"><a href="chapter-plotting-meta-analytical-results.html#cb49-70" tabindex="-1"></a><span class="fu">text</span>(<span class="dv">0</span>, k <span class="sc">+</span> <span class="fl">2.7</span>, <span class="st">&quot;Risk difference, IV,</span><span class="sc">\n</span><span class="st">random (95% CI)&quot;</span>)</span>
+<span id="cb49-71"><a href="chapter-plotting-meta-analytical-results.html#cb49-71" tabindex="-1"></a><span class="fu">text</span>(<span class="fu">c</span>(sav<span class="sc">$</span>ilab.xpos[<span class="dv">3</span>], sav<span class="sc">$</span>xlim[<span class="dv">2</span>] <span class="sc">-</span> <span class="fl">0.35</span>), k <span class="sc">+</span> <span class="fl">2.7</span>, <span class="fu">c</span>(<span class="st">&quot;Weight</span><span class="sc">\n</span><span class="st">(%)&quot;</span>, <span class="st">&quot;Risk difference, IV,</span><span class="sc">\n</span><span class="st">random (95% CI)&quot;</span>))</span>
+<span id="cb49-72"><a href="chapter-plotting-meta-analytical-results.html#cb49-72" tabindex="-1"></a></span>
+<span id="cb49-73"><a href="chapter-plotting-meta-analytical-results.html#cb49-73" tabindex="-1"></a><span class="do">### add &#39;Favours control&#39;/&#39;Favours experimental&#39; text below the x-axis</span></span>
+<span id="cb49-74"><a href="chapter-plotting-meta-analytical-results.html#cb49-74" tabindex="-1"></a><span class="fu">text</span>(<span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>), <span class="sc">-</span><span class="fl">2.5</span>, <span class="fu">c</span>(<span class="st">&quot;Favors control&quot;</span>, <span class="st">&quot;Favors experimental&quot;</span>), <span class="at">pos =</span> <span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">2</span>), <span class="at">offset =</span> <span class="sc">-</span><span class="fl">0.3</span>)</span>
+<span id="cb49-75"><a href="chapter-plotting-meta-analytical-results.html#cb49-75" tabindex="-1"></a></span>
+<span id="cb49-76"><a href="chapter-plotting-meta-analytical-results.html#cb49-76" tabindex="-1"></a><span class="do">### use a non-bold font for the rest of the text</span></span>
+<span id="cb49-77"><a href="chapter-plotting-meta-analytical-results.html#cb49-77" tabindex="-1"></a><span class="fu">par</span>(<span class="at">cex =</span> sav<span class="sc">$</span>cex, <span class="at">font =</span> <span class="dv">1</span>)</span>
+<span id="cb49-78"><a href="chapter-plotting-meta-analytical-results.html#cb49-78" tabindex="-1"></a></span>
+<span id="cb49-79"><a href="chapter-plotting-meta-analytical-results.html#cb49-79" tabindex="-1"></a><span class="do">### add text with heterogeneity statistics</span></span>
+<span id="cb49-80"><a href="chapter-plotting-meta-analytical-results.html#cb49-80" tabindex="-1"></a><span class="fu">text</span>(sav<span class="sc">$</span>xlim[<span class="dv">1</span>], <span class="sc">-</span><span class="dv">1</span>, <span class="at">pos =</span> <span class="dv">4</span>, <span class="fu">bquote</span>(<span class="fu">paste</span>(<span class="st">&quot;Test for heterogeneity: &quot;</span>,</span>
+<span id="cb49-81"><a href="chapter-plotting-meta-analytical-results.html#cb49-81" tabindex="-1"></a>                                          tau<span class="sc">^</span><span class="dv">2</span>, <span class="st">&quot;=&quot;</span>, .(<span class="fu">round</span>(res<span class="sc">$</span>tau2, <span class="at">digits =</span> <span class="dv">2</span>)), <span class="st">&quot;; &quot;</span>,</span>
+<span id="cb49-82"><a href="chapter-plotting-meta-analytical-results.html#cb49-82" tabindex="-1"></a>                                          I<span class="sc">^</span><span class="dv">2</span>, <span class="st">&quot;=&quot;</span>, .(<span class="fu">round</span>(res<span class="sc">$</span>I2, <span class="at">digits =</span> <span class="dv">2</span>)), <span class="st">&quot;%&quot;</span>)))</span>
+<span id="cb49-83"><a href="chapter-plotting-meta-analytical-results.html#cb49-83" tabindex="-1"></a></span>
+<span id="cb49-84"><a href="chapter-plotting-meta-analytical-results.html#cb49-84" tabindex="-1"></a><span class="do">### add text with overall estimate</span></span>
+<span id="cb49-85"><a href="chapter-plotting-meta-analytical-results.html#cb49-85" tabindex="-1"></a><span class="fu">text</span>(sav<span class="sc">$</span>xlim[<span class="dv">1</span>], <span class="sc">-</span><span class="fl">2.5</span>, <span class="at">pos =</span> <span class="dv">4</span>, <span class="fu">bquote</span>(<span class="fu">paste</span>(<span class="st">&quot;Overall effect: &quot;</span>,</span>
+<span id="cb49-86"><a href="chapter-plotting-meta-analytical-results.html#cb49-86" tabindex="-1"></a>                                              riskdiff <span class="sc">==</span> .(<span class="fu">round</span>(<span class="fu">coef</span>(res), <span class="at">digits =</span> <span class="dv">2</span>)))))</span>
+<span id="cb49-87"><a href="chapter-plotting-meta-analytical-results.html#cb49-87" tabindex="-1"></a></span>
+<span id="cb49-88"><a href="chapter-plotting-meta-analytical-results.html#cb49-88" tabindex="-1"></a><span class="do">### add titles</span></span>
+<span id="cb49-89"><a href="chapter-plotting-meta-analytical-results.html#cb49-89" tabindex="-1"></a><span class="fu">text</span>(sav<span class="sc">$</span>xlim[<span class="dv">1</span>], k <span class="sc">+</span> <span class="fl">4.5</span>, <span class="at">pos =</span> <span class="dv">4</span>, <span class="st">&quot;Risk difference between low and very low carbohydrate diets&quot;</span>)</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-28-1.png" width="672" /></p>
+</div>
+<div id="example-2-forest-plot-with-meta" class="section level3 hasAnchor" number="4.0.3">
+<h3><span class="header-section-number">4.0.3</span> Example 2: Forest plot with meta<a href="chapter-plotting-meta-analytical-results.html#example-2-forest-plot-with-meta" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="chapter-plotting-meta-analytical-results.html#cb50-1" tabindex="-1"></a><span class="fu">library</span>(meta)</span>
+<span id="cb50-2"><a href="chapter-plotting-meta-analytical-results.html#cb50-2" tabindex="-1"></a><span class="co"># Perform meta-analysis using the metagen function from `meta`</span></span>
+<span id="cb50-3"><a href="chapter-plotting-meta-analytical-results.html#cb50-3" tabindex="-1"></a><span class="co"># Perform meta-analysis using the metagen function from `meta`</span></span>
+<span id="cb50-4"><a href="chapter-plotting-meta-analytical-results.html#cb50-4" tabindex="-1"></a>meta_analysis <span class="ot">&lt;-</span> <span class="fu">metagen</span>(</span>
+<span id="cb50-5"><a href="chapter-plotting-meta-analytical-results.html#cb50-5" tabindex="-1"></a>  <span class="at">TE =</span> dat<span class="sc">$</span>yi,  <span class="co"># Use the calculated effect sizes</span></span>
+<span id="cb50-6"><a href="chapter-plotting-meta-analytical-results.html#cb50-6" tabindex="-1"></a>  <span class="at">seTE =</span> <span class="fu">sqrt</span>(dat<span class="sc">$</span>vi),  <span class="co"># Standard errors</span></span>
+<span id="cb50-7"><a href="chapter-plotting-meta-analytical-results.html#cb50-7" tabindex="-1"></a>  <span class="at">studlab =</span> <span class="fu">paste</span>(dat<span class="sc">$</span>author, dat<span class="sc">$</span>year),</span>
+<span id="cb50-8"><a href="chapter-plotting-meta-analytical-results.html#cb50-8" tabindex="-1"></a>  <span class="at">data =</span> dat,</span>
+<span id="cb50-9"><a href="chapter-plotting-meta-analytical-results.html#cb50-9" tabindex="-1"></a>  <span class="at">sm =</span> <span class="st">&quot;RD&quot;</span>,  <span class="co"># Risk Difference as the summary measure</span></span>
+<span id="cb50-10"><a href="chapter-plotting-meta-analytical-results.html#cb50-10" tabindex="-1"></a>  <span class="at">fixed =</span> <span class="cn">FALSE</span>,  <span class="co"># Using a random-effects model</span></span>
+<span id="cb50-11"><a href="chapter-plotting-meta-analytical-results.html#cb50-11" tabindex="-1"></a>  <span class="at">random =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb50-12"><a href="chapter-plotting-meta-analytical-results.html#cb50-12" tabindex="-1"></a>  <span class="at">method.tau =</span> <span class="st">&quot;REML&quot;</span>,  <span class="co"># Restricted maximum likelihood estimator</span></span>
+<span id="cb50-13"><a href="chapter-plotting-meta-analytical-results.html#cb50-13" tabindex="-1"></a>  <span class="at">hakn =</span> <span class="cn">TRUE</span>,  <span class="co"># Knapp-Hartung adjustment</span></span>
+<span id="cb50-14"><a href="chapter-plotting-meta-analytical-results.html#cb50-14" tabindex="-1"></a>  <span class="at">title =</span> <span class="st">&quot;Risk Difference between Diet Groups&quot;</span></span>
+<span id="cb50-15"><a href="chapter-plotting-meta-analytical-results.html#cb50-15" tabindex="-1"></a>)</span>
+<span id="cb50-16"><a href="chapter-plotting-meta-analytical-results.html#cb50-16" tabindex="-1"></a></span>
+<span id="cb50-17"><a href="chapter-plotting-meta-analytical-results.html#cb50-17" tabindex="-1"></a><span class="co"># Create a forest plot with custom options and store the output</span></span>
+<span id="cb50-18"><a href="chapter-plotting-meta-analytical-results.html#cb50-18" tabindex="-1"></a>forest_plot <span class="ot">&lt;-</span> meta<span class="sc">::</span><span class="fu">forest</span>(</span>
+<span id="cb50-19"><a href="chapter-plotting-meta-analytical-results.html#cb50-19" tabindex="-1"></a>  meta_analysis,</span>
+<span id="cb50-20"><a href="chapter-plotting-meta-analytical-results.html#cb50-20" tabindex="-1"></a>  <span class="at">prediction =</span> <span class="cn">TRUE</span>,  <span class="co"># Add a prediction interval</span></span>
+<span id="cb50-21"><a href="chapter-plotting-meta-analytical-results.html#cb50-21" tabindex="-1"></a>  <span class="at">print.tau2 =</span> <span class="cn">TRUE</span>,  <span class="co"># Print the tau-squared statistic in the plot</span></span>
+<span id="cb50-22"><a href="chapter-plotting-meta-analytical-results.html#cb50-22" tabindex="-1"></a>  <span class="at">leftlabs =</span> <span class="fu">c</span>(<span class="st">&quot;Study&quot;</span>, <span class="st">&quot;Risk Diff&quot;</span>, <span class="st">&quot;Std. Error&quot;</span>),  <span class="co"># Custom labels</span></span>
+<span id="cb50-23"><a href="chapter-plotting-meta-analytical-results.html#cb50-23" tabindex="-1"></a>  <span class="at">lab.e =</span> <span class="st">&quot;Favours Low Carb&quot;</span>,  <span class="co"># Label for experimental group</span></span>
+<span id="cb50-24"><a href="chapter-plotting-meta-analytical-results.html#cb50-24" tabindex="-1"></a>  <span class="at">lab.c =</span> <span class="st">&quot;Favours Control&quot;</span>,  <span class="co"># Label for control group</span></span>
+<span id="cb50-25"><a href="chapter-plotting-meta-analytical-results.html#cb50-25" tabindex="-1"></a>  <span class="at">col.study =</span> <span class="st">&quot;#6b58a6&quot;</span>,  <span class="co"># Study point color</span></span>
+<span id="cb50-26"><a href="chapter-plotting-meta-analytical-results.html#cb50-26" tabindex="-1"></a>  <span class="at">col.diamond =</span> <span class="st">&quot;#5e84c0&quot;</span>,  <span class="co"># Color of the summary diamond</span></span>
+<span id="cb50-27"><a href="chapter-plotting-meta-analytical-results.html#cb50-27" tabindex="-1"></a>  <span class="at">col.square =</span> <span class="st">&quot;white&quot;</span>  <span class="co"># Color for individual study estimates</span></span>
+<span id="cb50-28"><a href="chapter-plotting-meta-analytical-results.html#cb50-28" tabindex="-1"></a>)</span>
+<span id="cb50-29"><a href="chapter-plotting-meta-analytical-results.html#cb50-29" tabindex="-1"></a></span>
+<span id="cb50-30"><a href="chapter-plotting-meta-analytical-results.html#cb50-30" tabindex="-1"></a><span class="fu">library</span>(grid)</span>
+<span id="cb50-31"><a href="chapter-plotting-meta-analytical-results.html#cb50-31" tabindex="-1"></a><span class="fu">grid.text</span>(<span class="st">&quot;Meta-analysis of Risk Differences in Diet Studies&quot;</span>, </span>
+<span id="cb50-32"><a href="chapter-plotting-meta-analytical-results.html#cb50-32" tabindex="-1"></a>          <span class="at">x =</span> <span class="fl">0.5</span>, <span class="at">y =</span> <span class="fu">unit</span>(<span class="fl">0.95</span>, <span class="st">&quot;npc&quot;</span>), </span>
+<span id="cb50-33"><a href="chapter-plotting-meta-analytical-results.html#cb50-33" tabindex="-1"></a>          <span class="at">gp =</span> <span class="fu">gpar</span>(<span class="at">fontsize =</span> <span class="dv">14</span>, <span class="at">fontface =</span> <span class="st">&quot;bold&quot;</span>))</span>
+<span id="cb50-34"><a href="chapter-plotting-meta-analytical-results.html#cb50-34" tabindex="-1"></a><span class="fu">grid.text</span>(<span class="st">&quot;Random-effects model with Knapp-Hartung adjustments&quot;</span>, </span>
+<span id="cb50-35"><a href="chapter-plotting-meta-analytical-results.html#cb50-35" tabindex="-1"></a>          <span class="at">x =</span> <span class="fl">0.5</span>, <span class="at">y =</span> <span class="fu">unit</span>(<span class="fl">0.93</span>, <span class="st">&quot;npc&quot;</span>), </span>
+<span id="cb50-36"><a href="chapter-plotting-meta-analytical-results.html#cb50-36" tabindex="-1"></a>          <span class="at">gp =</span> <span class="fu">gpar</span>(<span class="at">fontsize =</span> <span class="dv">12</span>))</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-29-1.png" width="672" /></p>
+</div>
+<div id="example-3-forest-plot-with-ggplot" class="section level3 hasAnchor" number="4.0.4">
+<h3><span class="header-section-number">4.0.4</span> Example 3: Forest plot with ggplot<a href="chapter-plotting-meta-analytical-results.html#example-3-forest-plot-with-ggplot" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="chapter-plotting-meta-analytical-results.html#cb51-1" tabindex="-1"></a><span class="co"># Load necessary libraries</span></span>
+<span id="cb51-2"><a href="chapter-plotting-meta-analytical-results.html#cb51-2" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb51-3"><a href="chapter-plotting-meta-analytical-results.html#cb51-3" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb51-4"><a href="chapter-plotting-meta-analytical-results.html#cb51-4" tabindex="-1"></a><span class="fu">library</span>(ggpubr)</span></code></pre></div>
+<pre><code>## 
+## Attaching package: &#39;ggpubr&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:cowplot&#39;:
+## 
+##     get_legend</code></pre>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="chapter-plotting-meta-analytical-results.html#cb54-1" tabindex="-1"></a><span class="fu">library</span>(ggstar)</span>
+<span id="cb54-2"><a href="chapter-plotting-meta-analytical-results.html#cb54-2" tabindex="-1"></a></span>
+<span id="cb54-3"><a href="chapter-plotting-meta-analytical-results.html#cb54-3" tabindex="-1"></a><span class="co"># Prepare the data: Calculate estimates, confidence intervals, and other metrics</span></span>
+<span id="cb54-4"><a href="chapter-plotting-meta-analytical-results.html#cb54-4" tabindex="-1"></a>dat <span class="ot">&lt;-</span> dat <span class="sc">%&gt;%</span></span>
+<span id="cb54-5"><a href="chapter-plotting-meta-analytical-results.html#cb54-5" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb54-6"><a href="chapter-plotting-meta-analytical-results.html#cb54-6" tabindex="-1"></a>    <span class="at">estimate =</span> yi,  <span class="co"># Estimated effect size</span></span>
+<span id="cb54-7"><a href="chapter-plotting-meta-analytical-results.html#cb54-7" tabindex="-1"></a>    <span class="at">conf.low =</span> yi <span class="sc">-</span> <span class="fl">1.96</span> <span class="sc">*</span> <span class="fu">sqrt</span>(vi),  <span class="co"># Lower bound of the confidence interval</span></span>
+<span id="cb54-8"><a href="chapter-plotting-meta-analytical-results.html#cb54-8" tabindex="-1"></a>    <span class="at">conf.high =</span> yi <span class="sc">+</span> <span class="fl">1.96</span> <span class="sc">*</span> <span class="fu">sqrt</span>(vi),  <span class="co"># Upper bound of the confidence interval</span></span>
+<span id="cb54-9"><a href="chapter-plotting-meta-analytical-results.html#cb54-9" tabindex="-1"></a>    <span class="at">Sub_Cat_intervention =</span> <span class="fu">paste</span>(author, year)  <span class="co"># Combine author and year for labels</span></span>
+<span id="cb54-10"><a href="chapter-plotting-meta-analytical-results.html#cb54-10" tabindex="-1"></a>  )</span>
+<span id="cb54-11"><a href="chapter-plotting-meta-analytical-results.html#cb54-11" tabindex="-1"></a></span>
+<span id="cb54-12"><a href="chapter-plotting-meta-analytical-results.html#cb54-12" tabindex="-1"></a><span class="co"># Create a ggplot forest plot</span></span>
+<span id="cb54-13"><a href="chapter-plotting-meta-analytical-results.html#cb54-13" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(dat, <span class="fu">aes</span>(estimate, <span class="fu">reorder</span>(Sub_Cat_intervention, estimate))) <span class="sc">+</span></span>
+<span id="cb54-14"><a href="chapter-plotting-meta-analytical-results.html#cb54-14" tabindex="-1"></a>  <span class="co"># Add stars for effect sizes</span></span>
+<span id="cb54-15"><a href="chapter-plotting-meta-analytical-results.html#cb54-15" tabindex="-1"></a>  <span class="fu">geom_star</span>(<span class="at">starshape =</span> <span class="dv">12</span>, <span class="at">size =</span> <span class="dv">4</span>, <span class="at">starstroke =</span> <span class="fl">1.1</span>, <span class="at">color =</span> <span class="st">&quot;#6b58a6&quot;</span>) <span class="sc">+</span></span>
+<span id="cb54-16"><a href="chapter-plotting-meta-analytical-results.html#cb54-16" tabindex="-1"></a>  <span class="co"># Add points for individual study estimates</span></span>
+<span id="cb54-17"><a href="chapter-plotting-meta-analytical-results.html#cb54-17" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">size =</span> n1i), <span class="at">shape =</span> <span class="dv">21</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>, <span class="at">fill =</span> <span class="st">&quot;#ff9d02&quot;</span>,</span>
+<span id="cb54-18"><a href="chapter-plotting-meta-analytical-results.html#cb54-18" tabindex="-1"></a>             <span class="at">position =</span> <span class="fu">position_dodge</span>(<span class="at">width =</span> <span class="fl">0.6</span>)) <span class="sc">+</span></span>
+<span id="cb54-19"><a href="chapter-plotting-meta-analytical-results.html#cb54-19" tabindex="-1"></a>  <span class="co"># Add error bars using confidence intervals</span></span>
+<span id="cb54-20"><a href="chapter-plotting-meta-analytical-results.html#cb54-20" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">xmin =</span> conf.low, <span class="at">xmax =</span> conf.high), <span class="at">color =</span> <span class="st">&quot;black&quot;</span>,</span>
+<span id="cb54-21"><a href="chapter-plotting-meta-analytical-results.html#cb54-21" tabindex="-1"></a>                <span class="at">size =</span> <span class="fl">0.2</span>, <span class="at">width =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
+<span id="cb54-22"><a href="chapter-plotting-meta-analytical-results.html#cb54-22" tabindex="-1"></a>  <span class="co"># Add a vertical line at x = 0</span></span>
+<span id="cb54-23"><a href="chapter-plotting-meta-analytical-results.html#cb54-23" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="dv">2</span>, <span class="at">color =</span> <span class="st">&quot;gray&quot;</span>) <span class="sc">+</span></span>
+<span id="cb54-24"><a href="chapter-plotting-meta-analytical-results.html#cb54-24" tabindex="-1"></a>  <span class="co"># Apply ggpubr theme</span></span>
+<span id="cb54-25"><a href="chapter-plotting-meta-analytical-results.html#cb54-25" tabindex="-1"></a>  <span class="fu">theme_pubr</span>() <span class="sc">+</span></span>
+<span id="cb54-26"><a href="chapter-plotting-meta-analytical-results.html#cb54-26" tabindex="-1"></a>  <span class="co"># Set x-axis limits</span></span>
+<span id="cb54-27"><a href="chapter-plotting-meta-analytical-results.html#cb54-27" tabindex="-1"></a>  <span class="fu">xlim</span>(<span class="fu">c</span>(<span class="sc">-</span><span class="fl">3.5</span>, <span class="fl">3.5</span>)) <span class="sc">+</span>  <span class="co"># Adjust limits based on your data</span></span>
+<span id="cb54-28"><a href="chapter-plotting-meta-analytical-results.html#cb54-28" tabindex="-1"></a>  <span class="co"># Remove legend</span></span>
+<span id="cb54-29"><a href="chapter-plotting-meta-analytical-results.html#cb54-29" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>) <span class="sc">+</span></span>
+<span id="cb54-30"><a href="chapter-plotting-meta-analytical-results.html#cb54-30" tabindex="-1"></a>  <span class="co"># Set axis labels</span></span>
+<span id="cb54-31"><a href="chapter-plotting-meta-analytical-results.html#cb54-31" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">&quot;&quot;</span>, <span class="at">x =</span> <span class="st">&quot;Risk Difference (RD)&quot;</span>)</span>
+<span id="cb54-32"><a href="chapter-plotting-meta-analytical-results.html#cb54-32" tabindex="-1"></a></span>
+<span id="cb54-33"><a href="chapter-plotting-meta-analytical-results.html#cb54-33" tabindex="-1"></a><span class="co"># Display the plot</span></span>
+<span id="cb54-34"><a href="chapter-plotting-meta-analytical-results.html#cb54-34" tabindex="-1"></a><span class="fu">print</span>(p)</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-30-1.png" width="672" /></p>
+</div>
+<div id="example-4-orchard-plots" class="section level3 hasAnchor" number="4.0.5">
+<h3><span class="header-section-number">4.0.5</span> Example 4: Orchard plots<a href="chapter-plotting-meta-analytical-results.html#example-4-orchard-plots" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="chapter-plotting-meta-analytical-results.html#cb55-1" tabindex="-1"></a><span class="co"># Load required libraries</span></span>
+<span id="cb55-2"><a href="chapter-plotting-meta-analytical-results.html#cb55-2" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb55-3"><a href="chapter-plotting-meta-analytical-results.html#cb55-3" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb55-4"><a href="chapter-plotting-meta-analytical-results.html#cb55-4" tabindex="-1"></a><span class="fu">library</span>(metafor)</span>
+<span id="cb55-5"><a href="chapter-plotting-meta-analytical-results.html#cb55-5" tabindex="-1"></a><span class="fu">library</span>(ggbeeswarm)</span>
+<span id="cb55-6"><a href="chapter-plotting-meta-analytical-results.html#cb55-6" tabindex="-1"></a></span>
+<span id="cb55-7"><a href="chapter-plotting-meta-analytical-results.html#cb55-7" tabindex="-1"></a><span class="co"># Create a larger randomized dataset with valid constraints</span></span>
+<span id="cb55-8"><a href="chapter-plotting-meta-analytical-results.html#cb55-8" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)  <span class="co"># For reproducibility</span></span>
+<span id="cb55-9"><a href="chapter-plotting-meta-analytical-results.html#cb55-9" tabindex="-1"></a>n_studies <span class="ot">&lt;-</span> <span class="dv">30</span>  <span class="co"># Total number of studies</span></span>
+<span id="cb55-10"><a href="chapter-plotting-meta-analytical-results.html#cb55-10" tabindex="-1"></a></span>
+<span id="cb55-11"><a href="chapter-plotting-meta-analytical-results.html#cb55-11" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb55-12"><a href="chapter-plotting-meta-analytical-results.html#cb55-12" tabindex="-1"></a>  <span class="at">author =</span> <span class="fu">paste</span>(<span class="st">&quot;Study&quot;</span>, <span class="dv">1</span><span class="sc">:</span>n_studies),</span>
+<span id="cb55-13"><a href="chapter-plotting-meta-analytical-results.html#cb55-13" tabindex="-1"></a>  <span class="at">year =</span> <span class="fu">sample</span>(<span class="dv">2000</span><span class="sc">:</span><span class="dv">2020</span>, n_studies, <span class="at">replace =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb55-14"><a href="chapter-plotting-meta-analytical-results.html#cb55-14" tabindex="-1"></a>  <span class="at">n1i =</span> <span class="fu">sample</span>(<span class="dv">10</span><span class="sc">:</span><span class="dv">100</span>, n_studies, <span class="at">replace =</span> <span class="cn">TRUE</span>),  <span class="co"># Total in experimental group</span></span>
+<span id="cb55-15"><a href="chapter-plotting-meta-analytical-results.html#cb55-15" tabindex="-1"></a>  <span class="at">n2i =</span> <span class="fu">sample</span>(<span class="dv">10</span><span class="sc">:</span><span class="dv">100</span>, n_studies, <span class="at">replace =</span> <span class="cn">TRUE</span>)   <span class="co"># Total in control group</span></span>
+<span id="cb55-16"><a href="chapter-plotting-meta-analytical-results.html#cb55-16" tabindex="-1"></a>)</span>
+<span id="cb55-17"><a href="chapter-plotting-meta-analytical-results.html#cb55-17" tabindex="-1"></a></span>
+<span id="cb55-18"><a href="chapter-plotting-meta-analytical-results.html#cb55-18" tabindex="-1"></a><span class="co"># Randomly generate events ensuring that events do not exceed group sizes</span></span>
+<span id="cb55-19"><a href="chapter-plotting-meta-analytical-results.html#cb55-19" tabindex="-1"></a>dat<span class="sc">$</span>ai <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="dv">1</span><span class="sc">:</span>n_studies, <span class="cf">function</span>(i) <span class="fu">sample</span>(<span class="dv">0</span><span class="sc">:</span>dat<span class="sc">$</span>n1i[i], <span class="dv">1</span>))  <span class="co"># Events in experimental group</span></span>
+<span id="cb55-20"><a href="chapter-plotting-meta-analytical-results.html#cb55-20" tabindex="-1"></a>dat<span class="sc">$</span>ci <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="dv">1</span><span class="sc">:</span>n_studies, <span class="cf">function</span>(i) <span class="fu">sample</span>(<span class="dv">0</span><span class="sc">:</span>dat<span class="sc">$</span>n2i[i], <span class="dv">1</span>))  <span class="co"># Events in control group</span></span>
+<span id="cb55-21"><a href="chapter-plotting-meta-analytical-results.html#cb55-21" tabindex="-1"></a></span>
+<span id="cb55-22"><a href="chapter-plotting-meta-analytical-results.html#cb55-22" tabindex="-1"></a><span class="co"># Calculate risk differences</span></span>
+<span id="cb55-23"><a href="chapter-plotting-meta-analytical-results.html#cb55-23" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">escalc</span>(<span class="at">measure =</span> <span class="st">&quot;RD&quot;</span>, <span class="at">ai =</span> ai, <span class="at">n1i =</span> n1i, <span class="at">ci =</span> ci, <span class="at">n2i =</span> n2i, <span class="at">data =</span> dat)</span>
+<span id="cb55-24"><a href="chapter-plotting-meta-analytical-results.html#cb55-24" tabindex="-1"></a></span>
+<span id="cb55-25"><a href="chapter-plotting-meta-analytical-results.html#cb55-25" tabindex="-1"></a><span class="co"># Fit a random-effects model and create a subgroup variable</span></span>
+<span id="cb55-26"><a href="chapter-plotting-meta-analytical-results.html#cb55-26" tabindex="-1"></a>dat<span class="sc">$</span>subgroup <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">c</span>(<span class="st">&quot;Group A&quot;</span>, <span class="st">&quot;Group B&quot;</span>, <span class="st">&quot;Group C&quot;</span>), n_studies, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb55-27"><a href="chapter-plotting-meta-analytical-results.html#cb55-27" tabindex="-1"></a></span>
+<span id="cb55-28"><a href="chapter-plotting-meta-analytical-results.html#cb55-28" tabindex="-1"></a><span class="co"># Create an empty plot list to store individual subgroup plots</span></span>
+<span id="cb55-29"><a href="chapter-plotting-meta-analytical-results.html#cb55-29" tabindex="-1"></a>plot_list <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb55-30"><a href="chapter-plotting-meta-analytical-results.html#cb55-30" tabindex="-1"></a></span>
+<span id="cb55-31"><a href="chapter-plotting-meta-analytical-results.html#cb55-31" tabindex="-1"></a><span class="co"># Loop over each subgroup to create the overall mean for each</span></span>
+<span id="cb55-32"><a href="chapter-plotting-meta-analytical-results.html#cb55-32" tabindex="-1"></a><span class="cf">for</span> (group <span class="cf">in</span> <span class="fu">unique</span>(dat<span class="sc">$</span>subgroup)) {</span>
+<span id="cb55-33"><a href="chapter-plotting-meta-analytical-results.html#cb55-33" tabindex="-1"></a>  subgroup_data <span class="ot">&lt;-</span> dat[dat<span class="sc">$</span>subgroup <span class="sc">==</span> group, ]</span>
+<span id="cb55-34"><a href="chapter-plotting-meta-analytical-results.html#cb55-34" tabindex="-1"></a>  res <span class="ot">&lt;-</span> <span class="fu">rma</span>(yi, vi, <span class="at">data =</span> subgroup_data, <span class="at">method =</span> <span class="st">&quot;DL&quot;</span>)  <span class="co"># Fit model for subgroup</span></span>
+<span id="cb55-35"><a href="chapter-plotting-meta-analytical-results.html#cb55-35" tabindex="-1"></a></span>
+<span id="cb55-36"><a href="chapter-plotting-meta-analytical-results.html#cb55-36" tabindex="-1"></a>  <span class="co"># Create the orchard plot for each subgroup</span></span>
+<span id="cb55-37"><a href="chapter-plotting-meta-analytical-results.html#cb55-37" tabindex="-1"></a>  p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(subgroup_data, <span class="fu">aes</span>(<span class="at">x =</span> yi, <span class="at">y =</span> <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb55-38"><a href="chapter-plotting-meta-analytical-results.html#cb55-38" tabindex="-1"></a>    <span class="fu">geom_violin</span>(<span class="at">fill =</span> <span class="st">&quot;lightgray&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb55-39"><a href="chapter-plotting-meta-analytical-results.html#cb55-39" tabindex="-1"></a>    <span class="fu">geom_quasirandom</span>(<span class="fu">aes</span>(<span class="at">size =</span> <span class="dv">1</span><span class="sc">/</span><span class="fu">sqrt</span>(vi)), <span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span>  <span class="co"># Use inverse of SE for size</span></span>
+<span id="cb55-40"><a href="chapter-plotting-meta-analytical-results.html#cb55-40" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> res<span class="sc">$</span>b, <span class="at">y =</span> <span class="dv">1</span>, <span class="at">color =</span> <span class="st">&quot;Overall Mean&quot;</span>), <span class="at">size =</span> <span class="dv">5</span>, <span class="at">shape =</span> <span class="dv">18</span>) <span class="sc">+</span></span>
+<span id="cb55-41"><a href="chapter-plotting-meta-analytical-results.html#cb55-41" tabindex="-1"></a>    <span class="fu">geom_errorbarh</span>(<span class="fu">aes</span>(<span class="at">xmin =</span> res<span class="sc">$</span>ci.lb, <span class="at">xmax =</span> res<span class="sc">$</span>ci.ub, <span class="at">y =</span> <span class="dv">1</span>), <span class="at">height =</span> <span class="fl">0.1</span>, <span class="at">color =</span> <span class="st">&quot;red&quot;</span>) <span class="sc">+</span></span>
+<span id="cb55-42"><a href="chapter-plotting-meta-analytical-results.html#cb55-42" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Risk Difference&quot;</span>, <span class="at">y =</span> <span class="st">&quot;&quot;</span>, <span class="at">title =</span> <span class="fu">paste</span>(<span class="st">&quot;Orchard Plot for&quot;</span>, group)) <span class="sc">+</span></span>
+<span id="cb55-43"><a href="chapter-plotting-meta-analytical-results.html#cb55-43" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">name =</span> <span class="st">&quot;&quot;</span>, <span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;Overall Mean&quot;</span> <span class="ot">=</span> <span class="st">&quot;red&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb55-44"><a href="chapter-plotting-meta-analytical-results.html#cb55-44" tabindex="-1"></a>    <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb55-45"><a href="chapter-plotting-meta-analytical-results.html#cb55-45" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">axis.text.y =</span> <span class="fu">element_blank</span>(), <span class="at">axis.ticks.y =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span></span>
+<span id="cb55-46"><a href="chapter-plotting-meta-analytical-results.html#cb55-46" tabindex="-1"></a>    <span class="fu">xlim</span>(<span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb55-47"><a href="chapter-plotting-meta-analytical-results.html#cb55-47" tabindex="-1"></a>    <span class="fu">scale_size</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">5</span>), <span class="at">name =</span> <span class="st">&quot;Precision&quot;</span>) </span>
+<span id="cb55-48"><a href="chapter-plotting-meta-analytical-results.html#cb55-48" tabindex="-1"></a></span>
+<span id="cb55-49"><a href="chapter-plotting-meta-analytical-results.html#cb55-49" tabindex="-1"></a>  <span class="co"># Store the plot in the list</span></span>
+<span id="cb55-50"><a href="chapter-plotting-meta-analytical-results.html#cb55-50" tabindex="-1"></a>  plot_list[[group]] <span class="ot">&lt;-</span> p</span>
+<span id="cb55-51"><a href="chapter-plotting-meta-analytical-results.html#cb55-51" tabindex="-1"></a>}</span>
+<span id="cb55-52"><a href="chapter-plotting-meta-analytical-results.html#cb55-52" tabindex="-1"></a></span>
+<span id="cb55-53"><a href="chapter-plotting-meta-analytical-results.html#cb55-53" tabindex="-1"></a><span class="co"># Display all orchard plots for each subgroup</span></span>
+<span id="cb55-54"><a href="chapter-plotting-meta-analytical-results.html#cb55-54" tabindex="-1"></a><span class="fu">library</span>(gridExtra)</span>
+<span id="cb55-55"><a href="chapter-plotting-meta-analytical-results.html#cb55-55" tabindex="-1"></a><span class="fu">do.call</span>(grid.arrange, <span class="fu">c</span>(plot_list, <span class="at">ncol =</span> <span class="dv">1</span>))  <span class="co"># Arrange plots in a single column</span></span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
+</div>
+<div id="analysis-and-visualization-of-publication-bias" class="section level2 hasAnchor" number="4.1">
+<h2><span class="header-section-number">4.1</span> Analysis and Visualization of Publication Bias<a href="chapter-plotting-meta-analytical-results.html#analysis-and-visualization-of-publication-bias" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Publication bias is a significant concern in meta-analysis, as it can distort the overall effect estimate and lead to misleading conclusions. In this section, we will discuss various methods for detecting and visualizing publication bias, including funnel plots, the <em>trim and fill</em> method, the Egger test, and Robust Bayesian Meta-Analysis.</p>
+<div id="funnel-plots" class="section level3 hasAnchor" number="4.1.1">
+<h3><span class="header-section-number">4.1.1</span> Funnel Plots<a href="chapter-plotting-meta-analytical-results.html#funnel-plots" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>A funnel plot is a scatter plot that helps visualize the relationship between the effect size and the precision of individual studies in a meta-analysis. It is an essential tool for identifying potential publication bias.</p>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="chapter-plotting-meta-analytical-results.html#cb56-1" tabindex="-1"></a><span class="co"># Load necessary libraries</span></span>
+<span id="cb56-2"><a href="chapter-plotting-meta-analytical-results.html#cb56-2" tabindex="-1"></a><span class="fu">library</span>(metafor)</span>
+<span id="cb56-3"><a href="chapter-plotting-meta-analytical-results.html#cb56-3" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb56-4"><a href="chapter-plotting-meta-analytical-results.html#cb56-4" tabindex="-1"></a></span>
+<span id="cb56-5"><a href="chapter-plotting-meta-analytical-results.html#cb56-5" tabindex="-1"></a><span class="co"># Create a data frame with example data</span></span>
+<span id="cb56-6"><a href="chapter-plotting-meta-analytical-results.html#cb56-6" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb56-7"><a href="chapter-plotting-meta-analytical-results.html#cb56-7" tabindex="-1"></a>  <span class="at">study =</span> <span class="fu">c</span>(<span class="st">&quot;Study1&quot;</span>, <span class="st">&quot;Study2&quot;</span>, <span class="st">&quot;Study3&quot;</span>, <span class="st">&quot;Study4&quot;</span>, <span class="st">&quot;Study5&quot;</span>),</span>
+<span id="cb56-8"><a href="chapter-plotting-meta-analytical-results.html#cb56-8" tabindex="-1"></a>  <span class="at">smd =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">0.8</span>, <span class="fl">0.3</span>, <span class="fl">1.0</span>, <span class="fl">0.9</span>),</span>
+<span id="cb56-9"><a href="chapter-plotting-meta-analytical-results.html#cb56-9" tabindex="-1"></a>  <span class="at">var_smd =</span> <span class="fu">c</span>(<span class="fl">0.1</span>, <span class="fl">0.15</span>, <span class="fl">0.2</span>, <span class="fl">0.05</span>, <span class="fl">0.12</span>)</span>
+<span id="cb56-10"><a href="chapter-plotting-meta-analytical-results.html#cb56-10" tabindex="-1"></a>)</span>
+<span id="cb56-11"><a href="chapter-plotting-meta-analytical-results.html#cb56-11" tabindex="-1"></a></span>
+<span id="cb56-12"><a href="chapter-plotting-meta-analytical-results.html#cb56-12" tabindex="-1"></a><span class="co"># Conduct a random-effects meta-analysis</span></span>
+<span id="cb56-13"><a href="chapter-plotting-meta-analytical-results.html#cb56-13" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">rma</span>(<span class="at">yi =</span> smd, <span class="at">vi =</span> var_smd, <span class="at">data =</span> data)</span>
+<span id="cb56-14"><a href="chapter-plotting-meta-analytical-results.html#cb56-14" tabindex="-1"></a></span>
+<span id="cb56-15"><a href="chapter-plotting-meta-analytical-results.html#cb56-15" tabindex="-1"></a>estimate <span class="ot">&lt;-</span> res<span class="sc">$</span>b  <span class="co"># Replace with your meta-analytic estimate if needed</span></span>
+<span id="cb56-16"><a href="chapter-plotting-meta-analytical-results.html#cb56-16" tabindex="-1"></a>se <span class="ot">&lt;-</span> res<span class="sc">$</span>se        <span class="co"># Replace with your standard error if needed</span></span>
+<span id="cb56-17"><a href="chapter-plotting-meta-analytical-results.html#cb56-17" tabindex="-1"></a></span>
+<span id="cb56-18"><a href="chapter-plotting-meta-analytical-results.html#cb56-18" tabindex="-1"></a><span class="co"># Define a sequence for standard errors (SE) to create CI regions</span></span>
+<span id="cb56-19"><a href="chapter-plotting-meta-analytical-results.html#cb56-19" tabindex="-1"></a>se.seq <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="fu">max</span>(data<span class="sc">$</span>var_smd), <span class="fl">0.001</span>)</span>
+<span id="cb56-20"><a href="chapter-plotting-meta-analytical-results.html#cb56-20" tabindex="-1"></a></span>
+<span id="cb56-21"><a href="chapter-plotting-meta-analytical-results.html#cb56-21" tabindex="-1"></a><span class="co"># Calculate 95% and 99% confidence intervals for the region</span></span>
+<span id="cb56-22"><a href="chapter-plotting-meta-analytical-results.html#cb56-22" tabindex="-1"></a>ll95 <span class="ot">&lt;-</span> estimate <span class="sc">-</span> (<span class="fl">1.96</span> <span class="sc">*</span> se.seq)</span>
+<span id="cb56-23"><a href="chapter-plotting-meta-analytical-results.html#cb56-23" tabindex="-1"></a>ul95 <span class="ot">&lt;-</span> estimate <span class="sc">+</span> (<span class="fl">1.96</span> <span class="sc">*</span> se.seq)</span>
+<span id="cb56-24"><a href="chapter-plotting-meta-analytical-results.html#cb56-24" tabindex="-1"></a>ll99 <span class="ot">&lt;-</span> estimate <span class="sc">-</span> (<span class="fl">3.29</span> <span class="sc">*</span> se.seq)</span>
+<span id="cb56-25"><a href="chapter-plotting-meta-analytical-results.html#cb56-25" tabindex="-1"></a>ul99 <span class="ot">&lt;-</span> estimate <span class="sc">+</span> (<span class="fl">3.29</span> <span class="sc">*</span> se.seq)</span>
+<span id="cb56-26"><a href="chapter-plotting-meta-analytical-results.html#cb56-26" tabindex="-1"></a></span>
+<span id="cb56-27"><a href="chapter-plotting-meta-analytical-results.html#cb56-27" tabindex="-1"></a><span class="co"># Compute confidence intervals for the mean meta-analytic estimate</span></span>
+<span id="cb56-28"><a href="chapter-plotting-meta-analytical-results.html#cb56-28" tabindex="-1"></a>meanll95 <span class="ot">&lt;-</span> estimate <span class="sc">-</span> (<span class="fl">1.96</span> <span class="sc">*</span> se)</span>
+<span id="cb56-29"><a href="chapter-plotting-meta-analytical-results.html#cb56-29" tabindex="-1"></a>meanul95 <span class="ot">&lt;-</span> estimate <span class="sc">+</span> (<span class="fl">1.96</span> <span class="sc">*</span> se)</span>
+<span id="cb56-30"><a href="chapter-plotting-meta-analytical-results.html#cb56-30" tabindex="-1"></a></span>
+<span id="cb56-31"><a href="chapter-plotting-meta-analytical-results.html#cb56-31" tabindex="-1"></a><span class="co"># Store all calculated values in a single data frame for easy plotting</span></span>
+<span id="cb56-32"><a href="chapter-plotting-meta-analytical-results.html#cb56-32" tabindex="-1"></a>dfCI <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(ll95, ul95, ll99, ul99, se.seq, estimate, meanll95, meanul95)</span>
+<span id="cb56-33"><a href="chapter-plotting-meta-analytical-results.html#cb56-33" tabindex="-1"></a></span>
+<span id="cb56-34"><a href="chapter-plotting-meta-analytical-results.html#cb56-34" tabindex="-1"></a></span>
+<span id="cb56-35"><a href="chapter-plotting-meta-analytical-results.html#cb56-35" tabindex="-1"></a><span class="co"># Draw the enhanced funnel plot with shaded CI regions and lines</span></span>
+<span id="cb56-36"><a href="chapter-plotting-meta-analytical-results.html#cb56-36" tabindex="-1"></a>funnel_plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> var_smd, <span class="at">y =</span> smd), <span class="at">data =</span> data)<span class="sc">+</span></span>
+<span id="cb56-37"><a href="chapter-plotting-meta-analytical-results.html#cb56-37" tabindex="-1"></a>  <span class="co"># Add shaded areas for 95% and 99% CI regions</span></span>
+<span id="cb56-38"><a href="chapter-plotting-meta-analytical-results.html#cb56-38" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">shape =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb56-39"><a href="chapter-plotting-meta-analytical-results.html#cb56-39" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">&#39;Standard Error&#39;</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">&#39;smd&#39;</span>)<span class="sc">+</span></span>
+<span id="cb56-40"><a href="chapter-plotting-meta-analytical-results.html#cb56-40" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> se.seq, <span class="at">y =</span> ll95), <span class="at">linetype =</span> <span class="st">&#39;dotted&#39;</span>, <span class="at">data =</span> dfCI) <span class="sc">+</span></span>
+<span id="cb56-41"><a href="chapter-plotting-meta-analytical-results.html#cb56-41" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> se.seq, <span class="at">y =</span> ul95), <span class="at">linetype =</span> <span class="st">&#39;dotted&#39;</span>, <span class="at">data =</span> dfCI) <span class="sc">+</span></span>
+<span id="cb56-42"><a href="chapter-plotting-meta-analytical-results.html#cb56-42" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> se.seq, <span class="at">y =</span> ll99), <span class="at">linetype =</span> <span class="st">&#39;dashed&#39;</span>, <span class="at">data =</span> dfCI) <span class="sc">+</span></span>
+<span id="cb56-43"><a href="chapter-plotting-meta-analytical-results.html#cb56-43" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> se.seq, <span class="at">y =</span> ul99), <span class="at">linetype =</span> <span class="st">&#39;dashed&#39;</span>, <span class="at">data =</span> dfCI) <span class="sc">+</span></span>
+<span id="cb56-44"><a href="chapter-plotting-meta-analytical-results.html#cb56-44" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">min</span>(se.seq), <span class="at">y =</span> meanll95, <span class="at">xend =</span> <span class="fu">max</span>(se.seq), <span class="at">yend =</span> meanll95), <span class="at">linetype=</span><span class="st">&#39;dotted&#39;</span>, <span class="at">data=</span>dfCI) <span class="sc">+</span></span>
+<span id="cb56-45"><a href="chapter-plotting-meta-analytical-results.html#cb56-45" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">min</span>(se.seq), <span class="at">y =</span> meanul95, <span class="at">xend =</span> <span class="fu">max</span>(se.seq), <span class="at">yend =</span> meanul95), <span class="at">linetype=</span><span class="st">&#39;dotted&#39;</span>, <span class="at">data=</span>dfCI) <span class="sc">+</span></span>
+<span id="cb56-46"><a href="chapter-plotting-meta-analytical-results.html#cb56-46" tabindex="-1"></a>  <span class="fu">scale_x_reverse</span>()<span class="sc">+</span></span>
+<span id="cb56-47"><a href="chapter-plotting-meta-analytical-results.html#cb56-47" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">breaks=</span><span class="fu">seq</span>(<span class="sc">-</span><span class="fl">1.25</span>,<span class="dv">2</span>,<span class="fl">0.25</span>))<span class="sc">+</span></span>
+<span id="cb56-48"><a href="chapter-plotting-meta-analytical-results.html#cb56-48" tabindex="-1"></a>  <span class="fu">coord_flip</span>()<span class="sc">+</span></span>
+<span id="cb56-49"><a href="chapter-plotting-meta-analytical-results.html#cb56-49" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span>
+<span id="cb56-50"><a href="chapter-plotting-meta-analytical-results.html#cb56-50" tabindex="-1"></a></span>
+<span id="cb56-51"><a href="chapter-plotting-meta-analytical-results.html#cb56-51" tabindex="-1"></a><span class="co"># Display the enhanced funnel plot</span></span>
+<span id="cb56-52"><a href="chapter-plotting-meta-analytical-results.html#cb56-52" tabindex="-1"></a>funnel_plot</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p>
+<div id="understanding-funnel-plots" class="section level4 hasAnchor" number="4.1.1.1">
+<h4><span class="header-section-number">4.1.1.1</span> Understanding Funnel Plots<a href="chapter-plotting-meta-analytical-results.html#understanding-funnel-plots" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<ul>
+<li><p><strong>Structure</strong>: In an ideal scenario, a funnel plot resembles an inverted funnel or a pyramid. This shape reflects that larger studies tend to be more precise (higher up on the plot), while smaller studies have more variability (scattered at the bottom).</p></li>
+<li><p><strong>Axes</strong>:</p>
+<ul>
+<li><p>The <strong>x-axis</strong> represents the estimated effect size for each study (e.g., risk ratios, odds ratios plotted on a logarithmic scale, or mean differences).</p></li>
+<li><p>The <strong>y-axis</strong> indicates the study precision, often measured by the standard error. Larger studies with greater precision are displayed at the top.</p></li>
+</ul></li>
+</ul>
+<p>In a bias-free scenario, 95% of studies would be expected to lie within the dashed lines representing the 95% confidence interval.</p>
+</div>
+<div id="interpreting-funnel-plots" class="section level4 hasAnchor" number="4.1.1.2">
+<h4><span class="header-section-number">4.1.1.2</span> Interpreting Funnel Plots<a href="chapter-plotting-meta-analytical-results.html#interpreting-funnel-plots" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>When analyzing a funnel plot, look for symmetry. A symmetrical plot suggests that publication bias is unlikely, while an asymmetrical plot may indicate bias. <strong>Image B</strong> illustrates an asymmetrical funnel, where points predominantly cluster on one side, suggesting that the summary estimate may overstate the effect.</p>
+</div>
+</div>
+<div id="reasons-for-asymmetry" class="section level3 hasAnchor" number="4.1.2">
+<h3><span class="header-section-number">4.1.2</span> Reasons for Asymmetry<a href="chapter-plotting-meta-analytical-results.html#reasons-for-asymmetry" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Asymmetry in a funnel plot can arise from several factors:</p>
+<ul>
+<li><p><strong>Non-reporting Bias</strong>: Studies with non-significant results may be less likely to be published.</p></li>
+<li><p><strong>Methodological Quality</strong>: Studies with poor design may report exaggerated effect sizes.</p></li>
+<li><p><strong>True Heterogeneity</strong>: Variability in patient populations can lead to biased estimates, especially in smaller studies.</p></li>
+<li><p><strong>Artefactual Correlation</strong>: Correlations between effect estimates and their standard errors can create false asymmetry.</p></li>
+<li><p><strong>Chance</strong>: Random variation is more likely in analyses with fewer studies.</p></li>
+</ul>
+</div>
+<div id="trim-and-fill-method" class="section level3 hasAnchor" number="4.1.3">
+<h3><span class="header-section-number">4.1.3</span> Trim and Fill Method<a href="chapter-plotting-meta-analytical-results.html#trim-and-fill-method" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The <em>trim and fill</em> method adjusts for publication bias by estimating the number of studies that would need to be added to achieve symmetry. This method imputes missing studies to provide a more accurate effect size.</p>
+<div id="example-of-using-trim-and-fill" class="section level4 hasAnchor" number="4.1.3.1">
+<h4><span class="header-section-number">4.1.3.1</span> Example of Using Trim and Fill<a href="chapter-plotting-meta-analytical-results.html#example-of-using-trim-and-fill" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="chapter-plotting-meta-analytical-results.html#cb57-1" tabindex="-1"></a><span class="co"># Perform trim and fill analysis</span></span>
+<span id="cb57-2"><a href="chapter-plotting-meta-analytical-results.html#cb57-2" tabindex="-1"></a>trimmed_res <span class="ot">&lt;-</span> <span class="fu">trimfill</span>(res)</span>
+<span id="cb57-3"><a href="chapter-plotting-meta-analytical-results.html#cb57-3" tabindex="-1"></a></span>
+<span id="cb57-4"><a href="chapter-plotting-meta-analytical-results.html#cb57-4" tabindex="-1"></a><span class="co"># Summary of the results</span></span>
+<span id="cb57-5"><a href="chapter-plotting-meta-analytical-results.html#cb57-5" tabindex="-1"></a><span class="fu">summary</span>(trimmed_res)</span></code></pre></div>
+<pre><code>## 
+## Estimated number of missing studies on the right side: 1 (SE = 1.7009)
+## 
+## Random-Effects Model (k = 6; tau^2 estimator: REML)
+## 
+##   logLik  deviance       AIC       BIC      AICc   
+##  -1.7515    3.5031    7.5031    6.7219   13.5031   
+## 
+## tau^2 (estimated amount of total heterogeneity): 0.0000 (SE = 0.0673)
+## tau (square root of estimated tau^2 value):      0.0022
+## I^2 (total heterogeneity / total variability):   0.00%
+## H^2 (total variability / sampling variability):  1.00
+## 
+## Test for Heterogeneity:
+## Q(df = 5) = 4.6326, p-val = 0.4623
+## 
+## Model Results:
+## 
+## estimate      se    zval    pval   ci.lb   ci.ub      
+##   0.8407  0.1348  6.2349  &lt;.0001  0.5764  1.1050  *** 
+## 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="chapter-plotting-meta-analytical-results.html#cb59-1" tabindex="-1"></a><span class="co"># Create a funnel plot with imputed studies</span></span>
+<span id="cb59-2"><a href="chapter-plotting-meta-analytical-results.html#cb59-2" tabindex="-1"></a><span class="fu">funnel</span>(trimmed_res, <span class="at">main =</span> <span class="st">&quot;Funnel Plot with Trim and Fill&quot;</span>)</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-33-1.png" width="672" /></p>
+<p>In this example, the <code>trimfill</code> function from the <code>metafor</code> package adjusts the meta-analysis results for publication bias.</p>
+</div>
+</div>
+<div id="duval-and-tweedies-trim-and-fill" class="section level3 hasAnchor" number="4.1.4">
+<h3><span class="header-section-number">4.1.4</span> Duval and Tweedie’s Trim and Fill<a href="chapter-plotting-meta-analytical-results.html#duval-and-tweedies-trim-and-fill" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>An alternative to the traditional <em>trim and fill</em>, Duval and Tweedie’s method provides an updated approach to adjust for publication bias, offering more robust imputation of missing studies.</p>
+<div id="example-of-using-duval-and-tweedies-method" class="section level4 hasAnchor" number="4.1.4.1">
+<h4><span class="header-section-number">4.1.4.1</span> Example of Using Duval and Tweedie’s Method<a href="chapter-plotting-meta-analytical-results.html#example-of-using-duval-and-tweedies-method" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="chapter-plotting-meta-analytical-results.html#cb60-1" tabindex="-1"></a><span class="co"># Perform Duval and Tweedie&#39;s trim and fill</span></span>
+<span id="cb60-2"><a href="chapter-plotting-meta-analytical-results.html#cb60-2" tabindex="-1"></a>duval_tweedie_res <span class="ot">&lt;-</span> <span class="fu">trimfill</span>(res, <span class="at">direction =</span> <span class="st">&quot;both&quot;</span>)</span>
+<span id="cb60-3"><a href="chapter-plotting-meta-analytical-results.html#cb60-3" tabindex="-1"></a></span>
+<span id="cb60-4"><a href="chapter-plotting-meta-analytical-results.html#cb60-4" tabindex="-1"></a><span class="co"># Create a funnel plot with Duval and Tweedie’s imputation</span></span>
+<span id="cb60-5"><a href="chapter-plotting-meta-analytical-results.html#cb60-5" tabindex="-1"></a><span class="fu">funnel</span>(duval_tweedie_res, <span class="at">main =</span> <span class="st">&quot;Funnel Plot with Duval and Tweedie&#39;s Trim and Fill&quot;</span>)</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-34-1.png" width="672" /></p>
+</div>
+</div>
+<div id="egger-test" class="section level3 hasAnchor" number="4.1.5">
+<h3><span class="header-section-number">4.1.5</span> 3. Egger Test<a href="chapter-plotting-meta-analytical-results.html#egger-test" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The Egger test statistically assesses funnel plot asymmetry. A significant result indicates potential publication bias.</p>
+<div id="conducting-the-egger-test" class="section level4 hasAnchor" number="4.1.5.1">
+<h4><span class="header-section-number">4.1.5.1</span> Conducting the Egger Test<a href="chapter-plotting-meta-analytical-results.html#conducting-the-egger-test" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="chapter-plotting-meta-analytical-results.html#cb61-1" tabindex="-1"></a><span class="co"># Conduct the Egger test</span></span>
+<span id="cb61-2"><a href="chapter-plotting-meta-analytical-results.html#cb61-2" tabindex="-1"></a>egger_test <span class="ot">&lt;-</span> <span class="fu">regtest</span>(res)</span>
+<span id="cb61-3"><a href="chapter-plotting-meta-analytical-results.html#cb61-3" tabindex="-1"></a></span>
+<span id="cb61-4"><a href="chapter-plotting-meta-analytical-results.html#cb61-4" tabindex="-1"></a><span class="co"># Display the test results</span></span>
+<span id="cb61-5"><a href="chapter-plotting-meta-analytical-results.html#cb61-5" tabindex="-1"></a><span class="fu">print</span>(egger_test)</span></code></pre></div>
+<pre><code>## 
+## Regression Test for Funnel Plot Asymmetry
+## 
+## Model:     mixed-effects meta-regression model
+## Predictor: standard error
+## 
+## Test for Funnel Plot Asymmetry: z = -1.2521, p = 0.2105
+## Limit Estimate (as sei -&gt; 0):   b =  1.4949 (CI: 0.3521, 2.6376)</code></pre>
+</div>
+</div>
+<div id="rosenthals-fail-safe-n" class="section level3 hasAnchor" number="4.1.6">
+<h3><span class="header-section-number">4.1.6</span> Rosenthal’s Fail-Safe N<a href="chapter-plotting-meta-analytical-results.html#rosenthals-fail-safe-n" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Rosenthal’s Fail-Safe N calculates the number of unpublished studies with null results needed to invalidate the overall effect. A high Fail-Safe N suggests that publication bias is unlikely to significantly impact the findings.</p>
+<div id="example-of-calculating-fail-safe-n" class="section level4 hasAnchor" number="4.1.6.1">
+<h4><span class="header-section-number">4.1.6.1</span> Example of Calculating Fail-Safe N<a href="chapter-plotting-meta-analytical-results.html#example-of-calculating-fail-safe-n" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="chapter-plotting-meta-analytical-results.html#cb63-1" tabindex="-1"></a><span class="co"># Calculate the Fail-Safe N</span></span>
+<span id="cb63-2"><a href="chapter-plotting-meta-analytical-results.html#cb63-2" tabindex="-1"></a>failsafe_n <span class="ot">&lt;-</span> <span class="fu">fsn</span>(res)</span>
+<span id="cb63-3"><a href="chapter-plotting-meta-analytical-results.html#cb63-3" tabindex="-1"></a><span class="fu">print</span>(failsafe_n)</span></code></pre></div>
+<pre><code>## 
+## Fail-safe N Calculation Using the General Approach
+## 
+## Average Effect Size:         0.7867 (with file drawer: 0.2950)
+## Amount of Heterogeneity:     0.0000 (with file drawer: 0.1641)
+## Observed Significance Level: &lt;.0001 (with file drawer: 0.0493)
+## Target Significance Level:   0.05
+## 
+## Fail-safe N: 8</code></pre>
+</div>
+<div id="robust-bayesian-meta-analysis-robma" class="section level4 hasAnchor" number="4.1.6.2">
+<h4><span class="header-section-number">4.1.6.2</span> Robust Bayesian Meta-Analysis (RoBMA)<a href="chapter-plotting-meta-analytical-results.html#robust-bayesian-meta-analysis-robma" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p><strong>Robust Bayesian Meta-Analysis (RoBMA)</strong> is an advanced method designed to address the limitations of traditional meta-analysis by incorporating information on publication bias, heterogeneity, and effect sizes in a single model. It relies on Bayesian principles to estimate the probability of the presence of a real effect while considering the potential for biases and study variability. RoBMA extends the traditional meta-analytic framework by integrating multiple models that account for different sources of uncertainty. It not only provides point estimates of effect sizes but also outputs the probability that publication bias and heterogeneity are influencing the results. This allows for a more transparent and reliable evaluation of the evidence base. Specifically, RoBMA offers:</p>
+<ul>
+<li><p><strong>Probabilistic conclusions</strong>: Instead of simple yes/no results, RoBMA provides probabilities for the presence of effects, heterogeneity, and bias.</p></li>
+<li><p><strong>Robust model averaging</strong>: It combines estimates across different models, reducing sensitivity to outliers and small study effects.</p></li>
+<li><p><strong>Enhanced diagnostics</strong>: RoBMA provides visual tools to detect and correct for bias, making it easier to understand and communicate findings.</p></li>
+</ul>
+</div>
+<div id="setting-up-and-running-a-robma-model-in-r" class="section level4 hasAnchor" number="4.1.6.3">
+<h4><span class="header-section-number">4.1.6.3</span> Setting Up and Running a RoBMA Model in R<a href="chapter-plotting-meta-analytical-results.html#setting-up-and-running-a-robma-model-in-r" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>The implementation of RoBMA in R is straightforward using the <code>RoBMA</code> package. Below is a basic example using simulated effect sizes (<code>d</code>) and standard errors (<code>se</code>):</p>
+<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="chapter-plotting-meta-analytical-results.html#cb65-1" tabindex="-1"></a><span class="co"># Load the necessary libraries</span></span>
+<span id="cb65-2"><a href="chapter-plotting-meta-analytical-results.html#cb65-2" tabindex="-1"></a><span class="fu">library</span>(RoBMA)</span></code></pre></div>
+<pre><code>## Loading required namespace: runjags</code></pre>
+<pre><code>## 
+## Attaching package: &#39;RoBMA&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:brms&#39;:
+## 
+##     prior</code></pre>
+<pre><code>## The following object is masked from &#39;package:meta&#39;:
+## 
+##     forest</code></pre>
+<pre><code>## The following object is masked from &#39;package:metafor&#39;:
+## 
+##     forest</code></pre>
+<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb71-1"><a href="chapter-plotting-meta-analytical-results.html#cb71-1" tabindex="-1"></a><span class="co"># Ensure your dataset &#39;dat&#39; is structured correctly</span></span>
+<span id="cb71-2"><a href="chapter-plotting-meta-analytical-results.html#cb71-2" tabindex="-1"></a><span class="co"># Use the yi and vi columns from &#39;dat&#39;</span></span>
+<span id="cb71-3"><a href="chapter-plotting-meta-analytical-results.html#cb71-3" tabindex="-1"></a><span class="co"># Fit the Bayesian meta-analysis model</span></span>
+<span id="cb71-4"><a href="chapter-plotting-meta-analytical-results.html#cb71-4" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">RoBMA</span>(</span>
+<span id="cb71-5"><a href="chapter-plotting-meta-analytical-results.html#cb71-5" tabindex="-1"></a>  <span class="at">d =</span> dat<span class="sc">$</span>yi,                     <span class="co"># Effect sizes</span></span>
+<span id="cb71-6"><a href="chapter-plotting-meta-analytical-results.html#cb71-6" tabindex="-1"></a>  <span class="at">se =</span> <span class="fu">sqrt</span>(dat<span class="sc">$</span>vi),              <span class="co"># Standard errors from variances</span></span>
+<span id="cb71-7"><a href="chapter-plotting-meta-analytical-results.html#cb71-7" tabindex="-1"></a>  <span class="at">study_names =</span> <span class="fu">as.character</span>(dat<span class="sc">$</span>paper),        <span class="co"># Unique study identifiers</span></span>
+<span id="cb71-8"><a href="chapter-plotting-meta-analytical-results.html#cb71-8" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">1</span>,                        <span class="co"># Seed for reproducibility</span></span>
+<span id="cb71-9"><a href="chapter-plotting-meta-analytical-results.html#cb71-9" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">2</span>,</span>
+<span id="cb71-10"><a href="chapter-plotting-meta-analytical-results.html#cb71-10" tabindex="-1"></a>  <span class="at">sample =</span> <span class="dv">500</span>,</span>
+<span id="cb71-11"><a href="chapter-plotting-meta-analytical-results.html#cb71-11" tabindex="-1"></a>  <span class="at">burnin =</span> <span class="dv">200</span>,<span class="at">parallel =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb71-12"><a href="chapter-plotting-meta-analytical-results.html#cb71-12" tabindex="-1"></a></span>
+<span id="cb71-13"><a href="chapter-plotting-meta-analytical-results.html#cb71-13" tabindex="-1"></a><span class="co"># Summarize the results</span></span>
+<span id="cb71-14"><a href="chapter-plotting-meta-analytical-results.html#cb71-14" tabindex="-1"></a><span class="fu">summary</span>(fit)</span></code></pre></div>
+<pre><code>## Call:
+## RoBMA(d = dat$yi, se = sqrt(dat$vi), study_names = as.character(dat$paper), 
+##     chains = 2, sample = 500, burnin = 200, parallel = TRUE, 
+##     seed = 1)
+## 
+## Robust Bayesian meta-analysis
+## Components summary:
+##               Models Prior prob. Post. prob. Inclusion BF
+## Effect         18/36       0.500       0.171        0.206
+## Heterogeneity  18/36       0.500       1.000          Inf
+## Bias           32/36       0.500       0.359        0.560
+## 
+## Model-averaged estimates:
+##                    Mean Median 0.025 0.975
+## mu                0.018  0.000 0.000 0.204
+## tau               0.479  0.472 0.373 0.628
+## omega[0,0.025]    1.000  1.000 1.000 1.000
+## omega[0.025,0.05] 0.992  1.000 0.873 1.000
+## omega[0.05,0.5]   0.969  1.000 0.572 1.000
+## omega[0.5,0.95]   0.965  1.000 0.529 1.000
+## omega[0.95,0.975] 0.967  1.000 0.541 1.000
+## omega[0.975,1]    0.969  1.000 0.541 1.000
+## PET               0.099  0.000 0.000 1.183
+## PEESE             0.500  0.000 0.000 6.212
+## The estimates are summarized on the Cohen&#39;s d scale (priors were specified on the Cohen&#39;s d scale).
+## (Estimated publication weights omega correspond to one-sided p-values.)</code></pre>
+<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb73-1"><a href="chapter-plotting-meta-analytical-results.html#cb73-1" tabindex="-1"></a><span class="co"># Plot the results for the parameter of interest</span></span>
+<span id="cb73-2"><a href="chapter-plotting-meta-analytical-results.html#cb73-2" tabindex="-1"></a><span class="fu">plot</span>(fit, <span class="at">parameter =</span> <span class="st">&quot;mu&quot;</span>, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.5</span>, <span class="fl">0.5</span>))  <span class="co"># Adjust xlim as necessary</span></span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-37-1.png" width="672" /></p>
+</div>
+<div id="key-outputs-and-interpretation" class="section level4 hasAnchor" number="4.1.6.4">
+<h4><span class="header-section-number">4.1.6.4</span> Key Outputs and Interpretation<a href="chapter-plotting-meta-analytical-results.html#key-outputs-and-interpretation" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<ol style="list-style-type: decimal">
+<li><p><strong>Model Components and Inclusion Probabilities</strong>:</p>
+<p>RoBMA assesses three primary components: Effect, Heterogeneity, and Bias. The <em>Inclusion Probability</em> indicates how likely each component is part of the model:</p>
+<ul>
+<li><p><strong>Effect</strong>: Probability that a true non-zero effect exists.</p></li>
+<li><p><strong>Heterogeneity</strong>: Probability that effect sizes vary significantly between studies.</p></li>
+<li><p><strong>Bias</strong>: Probability that results are influenced by publication bias.</p></li>
+</ul>
+<p>For example, if <code>Bias = 98%</code>, this suggests a very high likelihood that publication bias is present and impacting the results.</p></li>
+<li><p><strong>Model-Averaged Estimates</strong>:</p>
+<p>RoBMA reports <em>model-averaged</em> estimates for the average effect size (<code>mu</code>), between-study variance (<code>tau</code>), and other model parameters. This averaging reduces the impact of individual extreme results by incorporating information from all candidate models.</p>
+<ul>
+<li><p><code>mu</code>: The central tendency of the effect size (e.g., Cohen’s <em>d</em>).</p></li>
+<li><p><code>tau</code>: The estimated heterogeneity, reflecting how much the effect sizes vary between studies.</p></li>
+<li><p><strong>Bias Weights (<code>omega</code>)</strong>: These weights correspond to the probability of study inclusion based on their p-values, directly indicating the severity of publication bias.</p></li>
+</ul></li>
+<li><p><strong>Posterior Model Probabilities</strong>:</p>
+<p>Each model in RoBMA has a posterior probability, which tells you how well that specific combination of effect, heterogeneity, and bias explains the observed data. This helps in identifying the most plausible scenarios.</p></li>
+</ol>
+</div>
+<div id="visualizing-publication-bias-with-robma" class="section level4 hasAnchor" number="4.1.6.5">
+<h4><span class="header-section-number">4.1.6.5</span> Visualizing Publication Bias with RoBMA<a href="chapter-plotting-meta-analytical-results.html#visualizing-publication-bias-with-robma" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>RoBMA provides tools to visually inspect and diagnose publication bias using enhanced funnel plots. To generate a funnel plot that shows bias-corrected effects, you can use:</p>
+<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb74-1"><a href="chapter-plotting-meta-analytical-results.html#cb74-1" tabindex="-1"></a><span class="co"># Create an enhanced funnel plot with bias adjustment</span></span>
+<span id="cb74-2"><a href="chapter-plotting-meta-analytical-results.html#cb74-2" tabindex="-1"></a><span class="fu">plot</span>(fit, <span class="at">type =</span> <span class="st">&quot;funnel&quot;</span>, <span class="at">show_legend =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-38-1.png" width="672" /></p>
+<p>The enhanced funnel plot compares the original effect sizes with those adjusted for potential biases. Asymmetry or clustering patterns in the plot indicate possible biases, while the adjusted estimates provide a more accurate picture of the underlying effect.</p>
+</div>
+<div id="advantages-of-using-robma" class="section level4 hasAnchor" number="4.1.6.6">
+<h4><span class="header-section-number">4.1.6.6</span> Advantages of Using RoBMA<a href="chapter-plotting-meta-analytical-results.html#advantages-of-using-robma" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<ul>
+<li><p><strong>Comprehensive Bias Assessment</strong>: RoBMA integrates several models to check for the presence and impact of publication bias.</p></li>
+<li><p><strong>Flexible Prior Specification</strong>: Allows for the use of both informative and non-informative priors, adapting to various research scenarios.</p></li>
+<li><p><strong>Model-Averaging for Stability</strong>: By combining different models, RoBMA reduces the chance of overfitting and provides more robust conclusions.</p></li>
+</ul>
+</div>
+<div id="limitations-to-consider" class="section level4 hasAnchor" number="4.1.6.7">
+<h4><span class="header-section-number">4.1.6.7</span> Limitations to Consider<a href="chapter-plotting-meta-analytical-results.html#limitations-to-consider" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<ul>
+<li><p><strong>Computational Complexity</strong>: Running RoBMA with large datasets or complex prior structures can be resource-intensive.</p></li>
+<li><p><strong>Advanced Interpretation</strong>: Understanding and explaining RoBMA results may require familiarity with Bayesian concepts and model averaging.</p></li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="analysing-model-variability.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/USERNAME/REPO/edit/BRANCH/06_plot.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["_main.pdf", "_main.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

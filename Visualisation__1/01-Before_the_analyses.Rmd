@@ -158,7 +158,7 @@ Key Components of a Data Paper:
 In evidence mapping and meta-analyses, the publication of Data Papers ensures that large datasets, which could be difficult to interpret otherwise, are accompanied by clear, accessible documentation.
 This reduces barriers to data reuse and promotes collaboration across research communities.
 
-Journals Publishing Data Papers
+**Journals Publishing Data Papers**
 
 Several specialized journals focus on publishing Data Papers, promoting high-quality data curation and sharing.
 [Scientific Data](https://www.nature.com/sdata/)(by Nature Research) and [Data in Brief](https://www.sciencedirect.com/journal/data-in-brief) (by Elsevier) are prominent examples, offering platforms for data-specific publications.
@@ -166,7 +166,7 @@ These journals often require the dataset to be archived in an open-access reposi
 For example, [Biodiversity Data Journal](https://bdj.pensoft.net/) also publish data papers focused on biodiversity and ecological datasets.
 This ensures that the data shared is of high quality, reusable, and follows best practices for transparency and openness.
 
-Example of a Data Paper:
+**Example of Data Papers:**
 
 -   Beillouin, Damien, Marc Corbeels, Julien Demenois, David Berre, Annie Boyer, Abigail Fallot, Frédéric Feder, and Rémi Cardinael.
     "A global meta-analysis of soil organic carbon in the Anthropocene." *Nature Communications* 14, no. 1 (2023): 3700.
@@ -257,7 +257,7 @@ Investing the time to establish clear definitions and boundaries between classes
 A well-defined research question can further refine the scope, facilitating the classification process.
 By systematically categorizing agricultural practices and outcomes, researchers can enhance the rigor and relevance of meta-analytical studies, ultimately contributing to more robust evidence synthesis
 
-## Example: Meta-analysis datasets general datasets
+## Example: Meta-analysis datasets 
 
 To explore and utilize meta-analysis datasets, you can refer to the metadat package in R, which provides a comprehensive collection of datasets tailored for teaching, illustrating meta-analytic methods, and validating published analyses.
 You can install the package from CRAN using:

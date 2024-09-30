@@ -146,7 +146,7 @@ source: [Gurevitch et al., 2018](https://www.nature.com/articles/nature25753)
 
 ![](images/Predicts_exam.png){fig-align="center"}
 
-## Results: Increase in meta-analyses
+## Results: Increase in # meta-analyses
 
 ![](images/MA_increase.png){fig-align="center"}
 
@@ -164,7 +164,7 @@ more info: [shinyApp](https://cropdiversification.shinyapps.io/Crop_diversificat
 -   meta-analyses
 -   ....
 
-## A typology of methods
+## A (rapid) typology of methods
 
 ![](images/typology%20methods.png){fig-align="center"}
 
@@ -184,11 +184,11 @@ more info: [shinyApp](https://cropdiversification.shinyapps.io/Crop_diversificat
 
  
 
-#### 1.Visual representation of the knowledge accumulated/gaps
+#### 1. Visual representation of the knowledge accumulated/gaps
 
 *(i.e. no need to read hundreds of primary studies!)*
 
-#### 2.Typology/categorization of the research
+#### 2. Typology/categorization of the research
 
 *(often term and definition varies a lot to represent a same phenomena/practice )*
 
@@ -202,11 +202,11 @@ more info: [shinyApp](https://cropdiversification.shinyapps.io/Crop_diversificat
 
  
 
-#### 1.Only descriptive - no analyses
+#### 1. Only descriptive - no analyses
 
 *(i.e. do not inform on the effectiveness of the interventions)*
 
-#### 2.The results could be presented in meta-analyses
+#### 2. The results could be presented in meta-analyses
 
 *(sometimes)*
 
@@ -220,11 +220,11 @@ more info: [shinyApp](https://cropdiversification.shinyapps.io/Crop_diversificat
 
  
 
-#### 1.See the forest for the trees
+#### 1. See the forest for the trees
 
 *(i.e. see effect/relationships that might not be visible in individual studies!)*
 
-#### 2.Synthesize knowledge on controversial issues
+#### 2. Synthesize knowledge on controversial issues
 
 *(find average effect while trying to minimize bias)*
 
@@ -240,11 +240,11 @@ more info: [shinyApp](https://cropdiversification.shinyapps.io/Crop_diversificat
 
  
 
-#### 1.See the forest for the trees
+#### 1. See the forest for the trees
 
 *(i.e. mask specific pattern/local effect?)*
 
-#### 2.Can not overcome bias
+#### 2. Can not overcome bias
 
 *(fe.g. publication bias)*
 

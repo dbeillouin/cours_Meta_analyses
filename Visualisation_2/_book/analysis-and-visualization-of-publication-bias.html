@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 5 Analysis and Visualization of Publication Bias | Calculate and combine the effect-sizes</title>
+  <meta name="description" content="<p>This is beta-version of the visualisation exercice.
+set in the _output.yml file.
+The HTML output format for this example is bookdown::gitbook,</p>" />
+  <meta name="generator" content="bookdown 0.40 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 5 Analysis and Visualization of Publication Bias | Calculate and combine the effect-sizes" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="<p>This is beta-version of the visualisation exercice.
+set in the _output.yml file.
+The HTML output format for this example is bookdown::gitbook,</p>" />
+  <meta name="github-repo" content="rstudio/bookdown-demo" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 5 Analysis and Visualization of Publication Bias | Calculate and combine the effect-sizes" />
+  
+  <meta name="twitter:description" content="<p>This is beta-version of the visualisation exercice.
+set in the _output.yml file.
+The HTML output format for this example is bookdown::gitbook,</p>" />
+  
+
+<meta name="author" content="Damien Beillouin" />
+
+
+<meta name="date" content="2024-09-28" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="plotting-meta-analytical-results.html"/>
+
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Meta-analyses</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="what-is-an-effect-size.html"><a href="what-is-an-effect-size.html"><i class="fa fa-check"></i><b>1</b> What is an Effect Size?</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="what-is-an-effect-size.html"><a href="what-is-an-effect-size.html#visual-representation-of-effect-sizes"><i class="fa fa-check"></i><b>1.1</b> Visual representation of effect-sizes</a>
+<ul>
+<li class="chapter" data-level="1.1.1" data-path="what-is-an-effect-size.html"><a href="what-is-an-effect-size.html#different-metrics-for-measuring-effect-sizes"><i class="fa fa-check"></i><b>1.1.1</b> Different Metrics for Measuring Effect Sizes</a></li>
+<li class="chapter" data-level="1.1.2" data-path="what-is-an-effect-size.html"><a href="what-is-an-effect-size.html#how-to-measure-variability"><i class="fa fa-check"></i><b>1.1.2</b> How to Measure Variability</a></li>
+<li class="chapter" data-level="1.1.3" data-path="what-is-an-effect-size.html"><a href="what-is-an-effect-size.html#what-variability-means"><i class="fa fa-check"></i><b>1.1.3</b> What Variability Means</a></li>
+<li class="chapter" data-level="1.1.4" data-path="what-is-an-effect-size.html"><a href="what-is-an-effect-size.html#comparison-of-effect-size-and-p-value"><i class="fa fa-check"></i><b>1.1.4</b> Comparison of Effect Size and p-Value</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html"><i class="fa fa-check"></i><b>2</b> Comparative meta-analytic methods for evidence synthesis</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html#equal-effects-model"><i class="fa fa-check"></i><b>2.1</b> Equal-Effects Model</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html#example-data"><i class="fa fa-check"></i><b>2.1.1</b> Example Data</a></li>
+<li class="chapter" data-level="2.1.2" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html#fitting-the-equal-effects-model"><i class="fa fa-check"></i><b>2.1.2</b> Fitting the Equal-Effects Model</a></li>
+<li class="chapter" data-level="2.1.3" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html#comparison-of-results"><i class="fa fa-check"></i><b>2.1.3</b> Comparison of Results</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html#random-effects-model"><i class="fa fa-check"></i><b>2.2</b> Random-Effects Model</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html#fitting-the-random-effects-model"><i class="fa fa-check"></i><b>2.2.1</b> Fitting the Random-Effects Model</a></li>
+<li class="chapter" data-level="2.2.2" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html#comparison-of-results-1"><i class="fa fa-check"></i><b>2.2.2</b> Comparison of Results</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html#conclusion"><i class="fa fa-check"></i><b>2.3</b> Conclusion</a>
+<ul>
+<li class="chapter" data-level="2.3.1" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html#example-1-fixed-vs.-random-meta-analysis-models"><i class="fa fa-check"></i><b>2.3.1</b> Example 1: fixed vs. random Meta-Analysis models</a></li>
+<li class="chapter" data-level="2.3.2" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html#example-2-comparing-heterogeneity-across-models"><i class="fa fa-check"></i><b>2.3.2</b> Example 2: Comparing Heterogeneity across models</a></li>
+<li class="chapter" data-level="2.3.3" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html#example-3-multi-level-meta-analysis-with-hierarchical-data"><i class="fa fa-check"></i><b>2.3.3</b> Example 3: Multi-Level meta-Analysis with hierarchical Data</a></li>
+<li class="chapter" data-level="2.3.4" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html#model-selection-in-meta-analysis"><i class="fa fa-check"></i><b>2.3.4</b> Model Selection in Meta-Analysis</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="analysing-model-variability.html"><a href="analysing-model-variability.html"><i class="fa fa-check"></i><b>3</b> Analysing model variability</a>
+<ul>
+<li class="chapter" data-level="3.0.1" data-path="analysing-model-variability.html"><a href="analysing-model-variability.html#using-parametric-and-non-parametric-bootstrapping-to-estimate-confidence-intervals-in-meta-analyses"><i class="fa fa-check"></i><b>3.0.1</b> Using Parametric and Non-Parametric Bootstrapping to Estimate Confidence Intervals in Meta-Analyses</a></li>
+<li class="chapter" data-level="3.0.2" data-path="analysing-model-variability.html"><a href="analysing-model-variability.html#overview"><i class="fa fa-check"></i><b>3.0.2</b> Overview</a></li>
+<li class="chapter" data-level="3.0.3" data-path="analysing-model-variability.html"><a href="analysing-model-variability.html#parametric-bootstrapping-step-by-step-example"><i class="fa fa-check"></i><b>3.0.3</b> Parametric Bootstrapping: Step-by-Step Example</a></li>
+<li class="chapter" data-level="3.0.4" data-path="analysing-model-variability.html"><a href="analysing-model-variability.html#non-parametric-bootstrapping-step-by-step-example"><i class="fa fa-check"></i><b>3.0.4</b> Non-Parametric Bootstrapping: Step-by-Step Example</a></li>
+<li class="chapter" data-level="3.0.5" data-path="analysing-model-variability.html"><a href="analysing-model-variability.html#conclusion-1"><i class="fa fa-check"></i><b>3.0.5</b> Conclusion</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="plotting-meta-analytical-results.html"><a href="plotting-meta-analytical-results.html"><i class="fa fa-check"></i><b>4</b> Plotting meta-analytical results</a>
+<ul>
+<li class="chapter" data-level="4.0.1" data-path="plotting-meta-analytical-results.html"><a href="plotting-meta-analytical-results.html#overview-1"><i class="fa fa-check"></i><b>4.0.1</b> Overview</a></li>
+<li class="chapter" data-level="4.0.2" data-path="plotting-meta-analytical-results.html"><a href="plotting-meta-analytical-results.html#example-1-forest-plot-with-metafor"><i class="fa fa-check"></i><b>4.0.2</b> Example 1: Forest plot with metafor</a></li>
+<li class="chapter" data-level="4.0.3" data-path="plotting-meta-analytical-results.html"><a href="plotting-meta-analytical-results.html#example-2-forest-plot-with-meta"><i class="fa fa-check"></i><b>4.0.3</b> Example 2: Forest plot with meta</a></li>
+<li class="chapter" data-level="4.0.4" data-path="plotting-meta-analytical-results.html"><a href="plotting-meta-analytical-results.html#example-3-forest-plot-with-ggplot"><i class="fa fa-check"></i><b>4.0.4</b> Example 3: Forest plot with ggplot</a></li>
+<li class="chapter" data-level="4.0.5" data-path="plotting-meta-analytical-results.html"><a href="plotting-meta-analytical-results.html#example-4-orchard-plots"><i class="fa fa-check"></i><b>4.0.5</b> Example 4: Orchard plots</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="analysis-and-visualization-of-publication-bias.html"><a href="analysis-and-visualization-of-publication-bias.html"><i class="fa fa-check"></i><b>5</b> Analysis and Visualization of Publication Bias</a>
+<ul>
+<li class="chapter" data-level="5.0.1" data-path="analysis-and-visualization-of-publication-bias.html"><a href="analysis-and-visualization-of-publication-bias.html#funnel-plots"><i class="fa fa-check"></i><b>5.0.1</b> Funnel Plots</a></li>
+<li class="chapter" data-level="5.0.2" data-path="analysis-and-visualization-of-publication-bias.html"><a href="analysis-and-visualization-of-publication-bias.html#reasons-for-asymmetry"><i class="fa fa-check"></i><b>5.0.2</b> Reasons for Asymmetry</a></li>
+<li class="chapter" data-level="5.0.3" data-path="analysis-and-visualization-of-publication-bias.html"><a href="analysis-and-visualization-of-publication-bias.html#trim-and-fill-method"><i class="fa fa-check"></i><b>5.0.3</b> Trim and Fill Method</a></li>
+<li class="chapter" data-level="5.0.4" data-path="analysis-and-visualization-of-publication-bias.html"><a href="analysis-and-visualization-of-publication-bias.html#duval-and-tweedies-trim-and-fill"><i class="fa fa-check"></i><b>5.0.4</b> Duval and Tweedie’s Trim and Fill</a></li>
+<li class="chapter" data-level="5.0.5" data-path="analysis-and-visualization-of-publication-bias.html"><a href="analysis-and-visualization-of-publication-bias.html#egger-test"><i class="fa fa-check"></i><b>5.0.5</b> 3. Egger Test</a></li>
+<li class="chapter" data-level="5.0.6" data-path="analysis-and-visualization-of-publication-bias.html"><a href="analysis-and-visualization-of-publication-bias.html#rosenthals-fail-safe-n"><i class="fa fa-check"></i><b>5.0.6</b> Rosenthal’s Fail-Safe N</a></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Calculate and combine the effect-sizes</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="analysis-and-visualization-of-publication-bias" class="section level1 hasAnchor" number="5">
+<h1><span class="header-section-number">Chapter 5</span> Analysis and Visualization of Publication Bias<a href="analysis-and-visualization-of-publication-bias.html#analysis-and-visualization-of-publication-bias" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>Publication bias is a significant concern in meta-analysis, as it can distort the overall effect estimate and lead to misleading conclusions. In this section, we will discuss various methods for detecting and visualizing publication bias, including funnel plots, the <em>trim and fill</em> method, the Egger test, and Robust Bayesian Meta-Analysis.</p>
+<div id="funnel-plots" class="section level3 hasAnchor" number="5.0.1">
+<h3><span class="header-section-number">5.0.1</span> Funnel Plots<a href="analysis-and-visualization-of-publication-bias.html#funnel-plots" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>A funnel plot is a scatter plot that helps visualize the relationship between the effect size and the precision of individual studies in a meta-analysis. It is an essential tool for identifying potential publication bias.</p>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="analysis-and-visualization-of-publication-bias.html#cb56-1" tabindex="-1"></a><span class="co"># Load necessary libraries</span></span>
+<span id="cb56-2"><a href="analysis-and-visualization-of-publication-bias.html#cb56-2" tabindex="-1"></a><span class="fu">library</span>(metafor)</span>
+<span id="cb56-3"><a href="analysis-and-visualization-of-publication-bias.html#cb56-3" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb56-4"><a href="analysis-and-visualization-of-publication-bias.html#cb56-4" tabindex="-1"></a></span>
+<span id="cb56-5"><a href="analysis-and-visualization-of-publication-bias.html#cb56-5" tabindex="-1"></a><span class="co"># Create a data frame with example data</span></span>
+<span id="cb56-6"><a href="analysis-and-visualization-of-publication-bias.html#cb56-6" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb56-7"><a href="analysis-and-visualization-of-publication-bias.html#cb56-7" tabindex="-1"></a>  <span class="at">study =</span> <span class="fu">c</span>(<span class="st">&quot;Study1&quot;</span>, <span class="st">&quot;Study2&quot;</span>, <span class="st">&quot;Study3&quot;</span>, <span class="st">&quot;Study4&quot;</span>, <span class="st">&quot;Study5&quot;</span>),</span>
+<span id="cb56-8"><a href="analysis-and-visualization-of-publication-bias.html#cb56-8" tabindex="-1"></a>  <span class="at">smd =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">0.8</span>, <span class="fl">0.3</span>, <span class="fl">1.0</span>, <span class="fl">0.9</span>),</span>
+<span id="cb56-9"><a href="analysis-and-visualization-of-publication-bias.html#cb56-9" tabindex="-1"></a>  <span class="at">var_smd =</span> <span class="fu">c</span>(<span class="fl">0.1</span>, <span class="fl">0.15</span>, <span class="fl">0.2</span>, <span class="fl">0.05</span>, <span class="fl">0.12</span>)</span>
+<span id="cb56-10"><a href="analysis-and-visualization-of-publication-bias.html#cb56-10" tabindex="-1"></a>)</span>
+<span id="cb56-11"><a href="analysis-and-visualization-of-publication-bias.html#cb56-11" tabindex="-1"></a></span>
+<span id="cb56-12"><a href="analysis-and-visualization-of-publication-bias.html#cb56-12" tabindex="-1"></a><span class="co"># Conduct a random-effects meta-analysis</span></span>
+<span id="cb56-13"><a href="analysis-and-visualization-of-publication-bias.html#cb56-13" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">rma</span>(<span class="at">yi =</span> smd, <span class="at">vi =</span> var_smd, <span class="at">data =</span> data)</span>
+<span id="cb56-14"><a href="analysis-and-visualization-of-publication-bias.html#cb56-14" tabindex="-1"></a></span>
+<span id="cb56-15"><a href="analysis-and-visualization-of-publication-bias.html#cb56-15" tabindex="-1"></a>estimate <span class="ot">&lt;-</span> res<span class="sc">$</span>b  <span class="co"># Replace with your meta-analytic estimate if needed</span></span>
+<span id="cb56-16"><a href="analysis-and-visualization-of-publication-bias.html#cb56-16" tabindex="-1"></a>se <span class="ot">&lt;-</span> res<span class="sc">$</span>se        <span class="co"># Replace with your standard error if needed</span></span>
+<span id="cb56-17"><a href="analysis-and-visualization-of-publication-bias.html#cb56-17" tabindex="-1"></a></span>
+<span id="cb56-18"><a href="analysis-and-visualization-of-publication-bias.html#cb56-18" tabindex="-1"></a><span class="co"># Define a sequence for standard errors (SE) to create CI regions</span></span>
+<span id="cb56-19"><a href="analysis-and-visualization-of-publication-bias.html#cb56-19" tabindex="-1"></a>se.seq <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="fu">max</span>(data<span class="sc">$</span>var_smd), <span class="fl">0.001</span>)</span>
+<span id="cb56-20"><a href="analysis-and-visualization-of-publication-bias.html#cb56-20" tabindex="-1"></a></span>
+<span id="cb56-21"><a href="analysis-and-visualization-of-publication-bias.html#cb56-21" tabindex="-1"></a><span class="co"># Calculate 95% and 99% confidence intervals for the region</span></span>
+<span id="cb56-22"><a href="analysis-and-visualization-of-publication-bias.html#cb56-22" tabindex="-1"></a>ll95 <span class="ot">&lt;-</span> estimate <span class="sc">-</span> (<span class="fl">1.96</span> <span class="sc">*</span> se.seq)</span>
+<span id="cb56-23"><a href="analysis-and-visualization-of-publication-bias.html#cb56-23" tabindex="-1"></a>ul95 <span class="ot">&lt;-</span> estimate <span class="sc">+</span> (<span class="fl">1.96</span> <span class="sc">*</span> se.seq)</span>
+<span id="cb56-24"><a href="analysis-and-visualization-of-publication-bias.html#cb56-24" tabindex="-1"></a>ll99 <span class="ot">&lt;-</span> estimate <span class="sc">-</span> (<span class="fl">3.29</span> <span class="sc">*</span> se.seq)</span>
+<span id="cb56-25"><a href="analysis-and-visualization-of-publication-bias.html#cb56-25" tabindex="-1"></a>ul99 <span class="ot">&lt;-</span> estimate <span class="sc">+</span> (<span class="fl">3.29</span> <span class="sc">*</span> se.seq)</span>
+<span id="cb56-26"><a href="analysis-and-visualization-of-publication-bias.html#cb56-26" tabindex="-1"></a></span>
+<span id="cb56-27"><a href="analysis-and-visualization-of-publication-bias.html#cb56-27" tabindex="-1"></a><span class="co"># Compute confidence intervals for the mean meta-analytic estimate</span></span>
+<span id="cb56-28"><a href="analysis-and-visualization-of-publication-bias.html#cb56-28" tabindex="-1"></a>meanll95 <span class="ot">&lt;-</span> estimate <span class="sc">-</span> (<span class="fl">1.96</span> <span class="sc">*</span> se)</span>
+<span id="cb56-29"><a href="analysis-and-visualization-of-publication-bias.html#cb56-29" tabindex="-1"></a>meanul95 <span class="ot">&lt;-</span> estimate <span class="sc">+</span> (<span class="fl">1.96</span> <span class="sc">*</span> se)</span>
+<span id="cb56-30"><a href="analysis-and-visualization-of-publication-bias.html#cb56-30" tabindex="-1"></a></span>
+<span id="cb56-31"><a href="analysis-and-visualization-of-publication-bias.html#cb56-31" tabindex="-1"></a><span class="co"># Store all calculated values in a single data frame for easy plotting</span></span>
+<span id="cb56-32"><a href="analysis-and-visualization-of-publication-bias.html#cb56-32" tabindex="-1"></a>dfCI <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(ll95, ul95, ll99, ul99, se.seq, estimate, meanll95, meanul95)</span>
+<span id="cb56-33"><a href="analysis-and-visualization-of-publication-bias.html#cb56-33" tabindex="-1"></a></span>
+<span id="cb56-34"><a href="analysis-and-visualization-of-publication-bias.html#cb56-34" tabindex="-1"></a></span>
+<span id="cb56-35"><a href="analysis-and-visualization-of-publication-bias.html#cb56-35" tabindex="-1"></a><span class="co"># Draw the enhanced funnel plot with shaded CI regions and lines</span></span>
+<span id="cb56-36"><a href="analysis-and-visualization-of-publication-bias.html#cb56-36" tabindex="-1"></a>funnel_plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> var_smd, <span class="at">y =</span> smd), <span class="at">data =</span> data)<span class="sc">+</span></span>
+<span id="cb56-37"><a href="analysis-and-visualization-of-publication-bias.html#cb56-37" tabindex="-1"></a>  <span class="co"># Add shaded areas for 95% and 99% CI regions</span></span>
+<span id="cb56-38"><a href="analysis-and-visualization-of-publication-bias.html#cb56-38" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">shape =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb56-39"><a href="analysis-and-visualization-of-publication-bias.html#cb56-39" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">&#39;Standard Error&#39;</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">&#39;smd&#39;</span>)<span class="sc">+</span></span>
+<span id="cb56-40"><a href="analysis-and-visualization-of-publication-bias.html#cb56-40" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> se.seq, <span class="at">y =</span> ll95), <span class="at">linetype =</span> <span class="st">&#39;dotted&#39;</span>, <span class="at">data =</span> dfCI) <span class="sc">+</span></span>
+<span id="cb56-41"><a href="analysis-and-visualization-of-publication-bias.html#cb56-41" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> se.seq, <span class="at">y =</span> ul95), <span class="at">linetype =</span> <span class="st">&#39;dotted&#39;</span>, <span class="at">data =</span> dfCI) <span class="sc">+</span></span>
+<span id="cb56-42"><a href="analysis-and-visualization-of-publication-bias.html#cb56-42" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> se.seq, <span class="at">y =</span> ll99), <span class="at">linetype =</span> <span class="st">&#39;dashed&#39;</span>, <span class="at">data =</span> dfCI) <span class="sc">+</span></span>
+<span id="cb56-43"><a href="analysis-and-visualization-of-publication-bias.html#cb56-43" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> se.seq, <span class="at">y =</span> ul99), <span class="at">linetype =</span> <span class="st">&#39;dashed&#39;</span>, <span class="at">data =</span> dfCI) <span class="sc">+</span></span>
+<span id="cb56-44"><a href="analysis-and-visualization-of-publication-bias.html#cb56-44" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">min</span>(se.seq), <span class="at">y =</span> meanll95, <span class="at">xend =</span> <span class="fu">max</span>(se.seq), <span class="at">yend =</span> meanll95), <span class="at">linetype=</span><span class="st">&#39;dotted&#39;</span>, <span class="at">data=</span>dfCI) <span class="sc">+</span></span>
+<span id="cb56-45"><a href="analysis-and-visualization-of-publication-bias.html#cb56-45" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">min</span>(se.seq), <span class="at">y =</span> meanul95, <span class="at">xend =</span> <span class="fu">max</span>(se.seq), <span class="at">yend =</span> meanul95), <span class="at">linetype=</span><span class="st">&#39;dotted&#39;</span>, <span class="at">data=</span>dfCI) <span class="sc">+</span></span>
+<span id="cb56-46"><a href="analysis-and-visualization-of-publication-bias.html#cb56-46" tabindex="-1"></a>  <span class="fu">scale_x_reverse</span>()<span class="sc">+</span></span>
+<span id="cb56-47"><a href="analysis-and-visualization-of-publication-bias.html#cb56-47" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">breaks=</span><span class="fu">seq</span>(<span class="sc">-</span><span class="fl">1.25</span>,<span class="dv">2</span>,<span class="fl">0.25</span>))<span class="sc">+</span></span>
+<span id="cb56-48"><a href="analysis-and-visualization-of-publication-bias.html#cb56-48" tabindex="-1"></a>  <span class="fu">coord_flip</span>()<span class="sc">+</span></span>
+<span id="cb56-49"><a href="analysis-and-visualization-of-publication-bias.html#cb56-49" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span>
+<span id="cb56-50"><a href="analysis-and-visualization-of-publication-bias.html#cb56-50" tabindex="-1"></a></span>
+<span id="cb56-51"><a href="analysis-and-visualization-of-publication-bias.html#cb56-51" tabindex="-1"></a><span class="co"># Display the enhanced funnel plot</span></span>
+<span id="cb56-52"><a href="analysis-and-visualization-of-publication-bias.html#cb56-52" tabindex="-1"></a>funnel_plot</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p>
+<div id="understanding-funnel-plots" class="section level4 hasAnchor" number="5.0.1.1">
+<h4><span class="header-section-number">5.0.1.1</span> Understanding Funnel Plots<a href="analysis-and-visualization-of-publication-bias.html#understanding-funnel-plots" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<ul>
+<li><p><strong>Structure</strong>: In an ideal scenario, a funnel plot resembles an inverted funnel or a pyramid. This shape reflects that larger studies tend to be more precise (higher up on the plot), while smaller studies have more variability (scattered at the bottom).</p></li>
+<li><p><strong>Axes</strong>:</p>
+<ul>
+<li><p>The <strong>x-axis</strong> represents the estimated effect size for each study (e.g., risk ratios, odds ratios plotted on a logarithmic scale, or mean differences).</p></li>
+<li><p>The <strong>y-axis</strong> indicates the study precision, often measured by the standard error. Larger studies with greater precision are displayed at the top.</p></li>
+</ul></li>
+</ul>
+<p>In a bias-free scenario, 95% of studies would be expected to lie within the dashed lines representing the 95% confidence interval.</p>
+</div>
+<div id="interpreting-funnel-plots" class="section level4 hasAnchor" number="5.0.1.2">
+<h4><span class="header-section-number">5.0.1.2</span> Interpreting Funnel Plots<a href="analysis-and-visualization-of-publication-bias.html#interpreting-funnel-plots" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>When analyzing a funnel plot, look for symmetry. A symmetrical plot suggests that publication bias is unlikely, while an asymmetrical plot may indicate bias. <strong>Image B</strong> illustrates an asymmetrical funnel, where points predominantly cluster on one side, suggesting that the summary estimate may overstate the effect.</p>
+</div>
+</div>
+<div id="reasons-for-asymmetry" class="section level3 hasAnchor" number="5.0.2">
+<h3><span class="header-section-number">5.0.2</span> Reasons for Asymmetry<a href="analysis-and-visualization-of-publication-bias.html#reasons-for-asymmetry" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Asymmetry in a funnel plot can arise from several factors:</p>
+<ul>
+<li><p><strong>Non-reporting Bias</strong>: Studies with non-significant results may be less likely to be published.</p></li>
+<li><p><strong>Methodological Quality</strong>: Studies with poor design may report exaggerated effect sizes.</p></li>
+<li><p><strong>True Heterogeneity</strong>: Variability in patient populations can lead to biased estimates, especially in smaller studies.</p></li>
+<li><p><strong>Artefactual Correlation</strong>: Correlations between effect estimates and their standard errors can create false asymmetry.</p></li>
+<li><p><strong>Chance</strong>: Random variation is more likely in analyses with fewer studies.</p></li>
+</ul>
+</div>
+<div id="trim-and-fill-method" class="section level3 hasAnchor" number="5.0.3">
+<h3><span class="header-section-number">5.0.3</span> Trim and Fill Method<a href="analysis-and-visualization-of-publication-bias.html#trim-and-fill-method" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The <em>trim and fill</em> method adjusts for publication bias by estimating the number of studies that would need to be added to achieve symmetry. This method imputes missing studies to provide a more accurate effect size.</p>
+<div id="example-of-using-trim-and-fill" class="section level4 hasAnchor" number="5.0.3.1">
+<h4><span class="header-section-number">5.0.3.1</span> Example of Using Trim and Fill<a href="analysis-and-visualization-of-publication-bias.html#example-of-using-trim-and-fill" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="analysis-and-visualization-of-publication-bias.html#cb57-1" tabindex="-1"></a><span class="co"># Perform trim and fill analysis</span></span>
+<span id="cb57-2"><a href="analysis-and-visualization-of-publication-bias.html#cb57-2" tabindex="-1"></a>trimmed_res <span class="ot">&lt;-</span> <span class="fu">trimfill</span>(res)</span>
+<span id="cb57-3"><a href="analysis-and-visualization-of-publication-bias.html#cb57-3" tabindex="-1"></a></span>
+<span id="cb57-4"><a href="analysis-and-visualization-of-publication-bias.html#cb57-4" tabindex="-1"></a><span class="co"># Summary of the results</span></span>
+<span id="cb57-5"><a href="analysis-and-visualization-of-publication-bias.html#cb57-5" tabindex="-1"></a><span class="fu">summary</span>(trimmed_res)</span></code></pre></div>
+<pre><code>## 
+## Estimated number of missing studies on the right side: 1 (SE = 1.7009)
+## 
+## Random-Effects Model (k = 6; tau^2 estimator: REML)
+## 
+##   logLik  deviance       AIC       BIC      AICc   
+##  -1.7515    3.5031    7.5031    6.7219   13.5031   
+## 
+## tau^2 (estimated amount of total heterogeneity): 0.0000 (SE = 0.0673)
+## tau (square root of estimated tau^2 value):      0.0022
+## I^2 (total heterogeneity / total variability):   0.00%
+## H^2 (total variability / sampling variability):  1.00
+## 
+## Test for Heterogeneity:
+## Q(df = 5) = 4.6326, p-val = 0.4623
+## 
+## Model Results:
+## 
+## estimate      se    zval    pval   ci.lb   ci.ub      
+##   0.8407  0.1348  6.2349  &lt;.0001  0.5764  1.1050  *** 
+## 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="analysis-and-visualization-of-publication-bias.html#cb59-1" tabindex="-1"></a><span class="co"># Create a funnel plot with imputed studies</span></span>
+<span id="cb59-2"><a href="analysis-and-visualization-of-publication-bias.html#cb59-2" tabindex="-1"></a><span class="fu">funnel</span>(trimmed_res, <span class="at">main =</span> <span class="st">&quot;Funnel Plot with Trim and Fill&quot;</span>)</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-33-1.png" width="672" /></p>
+<p>In this example, the <code>trimfill</code> function from the <code>metafor</code> package adjusts the meta-analysis results for publication bias.</p>
+</div>
+</div>
+<div id="duval-and-tweedies-trim-and-fill" class="section level3 hasAnchor" number="5.0.4">
+<h3><span class="header-section-number">5.0.4</span> Duval and Tweedie’s Trim and Fill<a href="analysis-and-visualization-of-publication-bias.html#duval-and-tweedies-trim-and-fill" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>An alternative to the traditional <em>trim and fill</em>, Duval and Tweedie’s method provides an updated approach to adjust for publication bias, offering more robust imputation of missing studies.</p>
+<div id="example-of-using-duval-and-tweedies-method" class="section level4 hasAnchor" number="5.0.4.1">
+<h4><span class="header-section-number">5.0.4.1</span> Example of Using Duval and Tweedie’s Method<a href="analysis-and-visualization-of-publication-bias.html#example-of-using-duval-and-tweedies-method" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="analysis-and-visualization-of-publication-bias.html#cb60-1" tabindex="-1"></a><span class="co"># Perform Duval and Tweedie&#39;s trim and fill</span></span>
+<span id="cb60-2"><a href="analysis-and-visualization-of-publication-bias.html#cb60-2" tabindex="-1"></a>duval_tweedie_res <span class="ot">&lt;-</span> <span class="fu">trimfill</span>(res, <span class="at">direction =</span> <span class="st">&quot;both&quot;</span>)</span>
+<span id="cb60-3"><a href="analysis-and-visualization-of-publication-bias.html#cb60-3" tabindex="-1"></a></span>
+<span id="cb60-4"><a href="analysis-and-visualization-of-publication-bias.html#cb60-4" tabindex="-1"></a><span class="co"># Create a funnel plot with Duval and Tweedie’s imputation</span></span>
+<span id="cb60-5"><a href="analysis-and-visualization-of-publication-bias.html#cb60-5" tabindex="-1"></a><span class="fu">funnel</span>(duval_tweedie_res, <span class="at">main =</span> <span class="st">&quot;Funnel Plot with Duval and Tweedie&#39;s Trim and Fill&quot;</span>)</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-34-1.png" width="672" /></p>
+</div>
+</div>
+<div id="egger-test" class="section level3 hasAnchor" number="5.0.5">
+<h3><span class="header-section-number">5.0.5</span> 3. Egger Test<a href="analysis-and-visualization-of-publication-bias.html#egger-test" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The Egger test statistically assesses funnel plot asymmetry. A significant result indicates potential publication bias.</p>
+<div id="conducting-the-egger-test" class="section level4 hasAnchor" number="5.0.5.1">
+<h4><span class="header-section-number">5.0.5.1</span> Conducting the Egger Test<a href="analysis-and-visualization-of-publication-bias.html#conducting-the-egger-test" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="analysis-and-visualization-of-publication-bias.html#cb61-1" tabindex="-1"></a><span class="co"># Conduct the Egger test</span></span>
+<span id="cb61-2"><a href="analysis-and-visualization-of-publication-bias.html#cb61-2" tabindex="-1"></a>egger_test <span class="ot">&lt;-</span> <span class="fu">regtest</span>(res)</span>
+<span id="cb61-3"><a href="analysis-and-visualization-of-publication-bias.html#cb61-3" tabindex="-1"></a></span>
+<span id="cb61-4"><a href="analysis-and-visualization-of-publication-bias.html#cb61-4" tabindex="-1"></a><span class="co"># Display the test results</span></span>
+<span id="cb61-5"><a href="analysis-and-visualization-of-publication-bias.html#cb61-5" tabindex="-1"></a><span class="fu">print</span>(egger_test)</span></code></pre></div>
+<pre><code>## 
+## Regression Test for Funnel Plot Asymmetry
+## 
+## Model:     mixed-effects meta-regression model
+## Predictor: standard error
+## 
+## Test for Funnel Plot Asymmetry: z = -1.2521, p = 0.2105
+## Limit Estimate (as sei -&gt; 0):   b =  1.4949 (CI: 0.3521, 2.6376)</code></pre>
+</div>
+</div>
+<div id="rosenthals-fail-safe-n" class="section level3 hasAnchor" number="5.0.6">
+<h3><span class="header-section-number">5.0.6</span> Rosenthal’s Fail-Safe N<a href="analysis-and-visualization-of-publication-bias.html#rosenthals-fail-safe-n" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Rosenthal’s Fail-Safe N calculates the number of unpublished studies with null results needed to invalidate the overall effect. A high Fail-Safe N suggests that publication bias is unlikely to significantly impact the findings.</p>
+<div id="example-of-calculating-fail-safe-n" class="section level4 hasAnchor" number="5.0.6.1">
+<h4><span class="header-section-number">5.0.6.1</span> Example of Calculating Fail-Safe N<a href="analysis-and-visualization-of-publication-bias.html#example-of-calculating-fail-safe-n" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="analysis-and-visualization-of-publication-bias.html#cb63-1" tabindex="-1"></a><span class="co"># Calculate the Fail-Safe N</span></span>
+<span id="cb63-2"><a href="analysis-and-visualization-of-publication-bias.html#cb63-2" tabindex="-1"></a>failsafe_n <span class="ot">&lt;-</span> <span class="fu">fsn</span>(res)</span>
+<span id="cb63-3"><a href="analysis-and-visualization-of-publication-bias.html#cb63-3" tabindex="-1"></a><span class="fu">print</span>(failsafe_n)</span></code></pre></div>
+<pre><code>## 
+## Fail-safe N Calculation Using the General Approach
+## 
+## Average Effect Size:         0.7867 (with file drawer: 0.2950)
+## Amount of Heterogeneity:     0.0000 (with file drawer: 0.1641)
+## Observed Significance Level: &lt;.0001 (with file drawer: 0.0493)
+## Target Significance Level:   0.05
+## 
+## Fail-safe N: 8</code></pre>
+</div>
+<div id="robust-bayesian-meta-analysis-robma" class="section level4 hasAnchor" number="5.0.6.2">
+<h4><span class="header-section-number">5.0.6.2</span> Robust Bayesian Meta-Analysis (RoBMA)<a href="analysis-and-visualization-of-publication-bias.html#robust-bayesian-meta-analysis-robma" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p><strong>Robust Bayesian Meta-Analysis (RoBMA)</strong> is an advanced method designed to address the limitations of traditional meta-analysis by incorporating information on publication bias, heterogeneity, and effect sizes in a single model. It relies on Bayesian principles to estimate the probability of the presence of a real effect while considering the potential for biases and study variability. RoBMA extends the traditional meta-analytic framework by integrating multiple models that account for different sources of uncertainty. It not only provides point estimates of effect sizes but also outputs the probability that publication bias and heterogeneity are influencing the results. This allows for a more transparent and reliable evaluation of the evidence base. Specifically, RoBMA offers:</p>
+<ul>
+<li><p><strong>Probabilistic conclusions</strong>: Instead of simple yes/no results, RoBMA provides probabilities for the presence of effects, heterogeneity, and bias.</p></li>
+<li><p><strong>Robust model averaging</strong>: It combines estimates across different models, reducing sensitivity to outliers and small study effects.</p></li>
+<li><p><strong>Enhanced diagnostics</strong>: RoBMA provides visual tools to detect and correct for bias, making it easier to understand and communicate findings.</p></li>
+</ul>
+</div>
+<div id="setting-up-and-running-a-robma-model-in-r" class="section level4 hasAnchor" number="5.0.6.3">
+<h4><span class="header-section-number">5.0.6.3</span> Setting Up and Running a RoBMA Model in R<a href="analysis-and-visualization-of-publication-bias.html#setting-up-and-running-a-robma-model-in-r" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>The implementation of RoBMA in R is straightforward using the <code>RoBMA</code> package. Below is a basic example using simulated effect sizes (<code>d</code>) and standard errors (<code>se</code>):</p>
+<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="analysis-and-visualization-of-publication-bias.html#cb65-1" tabindex="-1"></a><span class="co"># Load the necessary libraries</span></span>
+<span id="cb65-2"><a href="analysis-and-visualization-of-publication-bias.html#cb65-2" tabindex="-1"></a><span class="fu">library</span>(RoBMA)</span></code></pre></div>
+<pre><code>## Loading required namespace: runjags</code></pre>
+<pre><code>## 
+## Attaching package: &#39;RoBMA&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:brms&#39;:
+## 
+##     prior</code></pre>
+<pre><code>## The following object is masked from &#39;package:meta&#39;:
+## 
+##     forest</code></pre>
+<pre><code>## The following object is masked from &#39;package:metafor&#39;:
+## 
+##     forest</code></pre>
+<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb71-1"><a href="analysis-and-visualization-of-publication-bias.html#cb71-1" tabindex="-1"></a><span class="co"># Ensure your dataset &#39;dat&#39; is structured correctly</span></span>
+<span id="cb71-2"><a href="analysis-and-visualization-of-publication-bias.html#cb71-2" tabindex="-1"></a><span class="co"># Use the yi and vi columns from &#39;dat&#39;</span></span>
+<span id="cb71-3"><a href="analysis-and-visualization-of-publication-bias.html#cb71-3" tabindex="-1"></a><span class="co"># Fit the Bayesian meta-analysis model</span></span>
+<span id="cb71-4"><a href="analysis-and-visualization-of-publication-bias.html#cb71-4" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">RoBMA</span>(</span>
+<span id="cb71-5"><a href="analysis-and-visualization-of-publication-bias.html#cb71-5" tabindex="-1"></a>  <span class="at">d =</span> dat<span class="sc">$</span>yi,                     <span class="co"># Effect sizes</span></span>
+<span id="cb71-6"><a href="analysis-and-visualization-of-publication-bias.html#cb71-6" tabindex="-1"></a>  <span class="at">se =</span> <span class="fu">sqrt</span>(dat<span class="sc">$</span>vi),              <span class="co"># Standard errors from variances</span></span>
+<span id="cb71-7"><a href="analysis-and-visualization-of-publication-bias.html#cb71-7" tabindex="-1"></a>  <span class="at">study_names =</span> <span class="fu">as.character</span>(dat<span class="sc">$</span>paper),        <span class="co"># Unique study identifiers</span></span>
+<span id="cb71-8"><a href="analysis-and-visualization-of-publication-bias.html#cb71-8" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">1</span>,                        <span class="co"># Seed for reproducibility</span></span>
+<span id="cb71-9"><a href="analysis-and-visualization-of-publication-bias.html#cb71-9" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">2</span>,</span>
+<span id="cb71-10"><a href="analysis-and-visualization-of-publication-bias.html#cb71-10" tabindex="-1"></a>  <span class="at">sample =</span> <span class="dv">500</span>,</span>
+<span id="cb71-11"><a href="analysis-and-visualization-of-publication-bias.html#cb71-11" tabindex="-1"></a>  <span class="at">burnin =</span> <span class="dv">200</span>,<span class="at">parallel =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb71-12"><a href="analysis-and-visualization-of-publication-bias.html#cb71-12" tabindex="-1"></a></span>
+<span id="cb71-13"><a href="analysis-and-visualization-of-publication-bias.html#cb71-13" tabindex="-1"></a><span class="co"># Summarize the results</span></span>
+<span id="cb71-14"><a href="analysis-and-visualization-of-publication-bias.html#cb71-14" tabindex="-1"></a><span class="fu">summary</span>(fit)</span></code></pre></div>
+<pre><code>## Call:
+## RoBMA(d = dat$yi, se = sqrt(dat$vi), study_names = as.character(dat$paper), 
+##     chains = 2, sample = 500, burnin = 200, parallel = TRUE, 
+##     seed = 1)
+## 
+## Robust Bayesian meta-analysis
+## Components summary:
+##               Models Prior prob. Post. prob. Inclusion BF
+## Effect         18/36       0.500       0.171        0.206
+## Heterogeneity  18/36       0.500       1.000          Inf
+## Bias           32/36       0.500       0.359        0.560
+## 
+## Model-averaged estimates:
+##                    Mean Median 0.025 0.975
+## mu                0.018  0.000 0.000 0.204
+## tau               0.479  0.472 0.373 0.628
+## omega[0,0.025]    1.000  1.000 1.000 1.000
+## omega[0.025,0.05] 0.992  1.000 0.873 1.000
+## omega[0.05,0.5]   0.969  1.000 0.572 1.000
+## omega[0.5,0.95]   0.965  1.000 0.529 1.000
+## omega[0.95,0.975] 0.967  1.000 0.541 1.000
+## omega[0.975,1]    0.969  1.000 0.541 1.000
+## PET               0.099  0.000 0.000 1.183
+## PEESE             0.500  0.000 0.000 6.212
+## The estimates are summarized on the Cohen&#39;s d scale (priors were specified on the Cohen&#39;s d scale).
+## (Estimated publication weights omega correspond to one-sided p-values.)</code></pre>
+<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb73-1"><a href="analysis-and-visualization-of-publication-bias.html#cb73-1" tabindex="-1"></a><span class="co"># Plot the results for the parameter of interest</span></span>
+<span id="cb73-2"><a href="analysis-and-visualization-of-publication-bias.html#cb73-2" tabindex="-1"></a><span class="fu">plot</span>(fit, <span class="at">parameter =</span> <span class="st">&quot;mu&quot;</span>, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.5</span>, <span class="fl">0.5</span>))  <span class="co"># Adjust xlim as necessary</span></span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-37-1.png" width="672" /></p>
+</div>
+<div id="key-outputs-and-interpretation" class="section level4 hasAnchor" number="5.0.6.4">
+<h4><span class="header-section-number">5.0.6.4</span> Key Outputs and Interpretation<a href="analysis-and-visualization-of-publication-bias.html#key-outputs-and-interpretation" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<ol style="list-style-type: decimal">
+<li><p><strong>Model Components and Inclusion Probabilities</strong>:</p>
+<p>RoBMA assesses three primary components: Effect, Heterogeneity, and Bias. The <em>Inclusion Probability</em> indicates how likely each component is part of the model:</p>
+<ul>
+<li><p><strong>Effect</strong>: Probability that a true non-zero effect exists.</p></li>
+<li><p><strong>Heterogeneity</strong>: Probability that effect sizes vary significantly between studies.</p></li>
+<li><p><strong>Bias</strong>: Probability that results are influenced by publication bias.</p></li>
+</ul>
+<p>For example, if <code>Bias = 98%</code>, this suggests a very high likelihood that publication bias is present and impacting the results.</p></li>
+<li><p><strong>Model-Averaged Estimates</strong>:</p>
+<p>RoBMA reports <em>model-averaged</em> estimates for the average effect size (<code>mu</code>), between-study variance (<code>tau</code>), and other model parameters. This averaging reduces the impact of individual extreme results by incorporating information from all candidate models.</p>
+<ul>
+<li><p><code>mu</code>: The central tendency of the effect size (e.g., Cohen’s <em>d</em>).</p></li>
+<li><p><code>tau</code>: The estimated heterogeneity, reflecting how much the effect sizes vary between studies.</p></li>
+<li><p><strong>Bias Weights (<code>omega</code>)</strong>: These weights correspond to the probability of study inclusion based on their p-values, directly indicating the severity of publication bias.</p></li>
+</ul></li>
+<li><p><strong>Posterior Model Probabilities</strong>:</p>
+<p>Each model in RoBMA has a posterior probability, which tells you how well that specific combination of effect, heterogeneity, and bias explains the observed data. This helps in identifying the most plausible scenarios.</p></li>
+</ol>
+</div>
+<div id="visualizing-publication-bias-with-robma" class="section level4 hasAnchor" number="5.0.6.5">
+<h4><span class="header-section-number">5.0.6.5</span> Visualizing Publication Bias with RoBMA<a href="analysis-and-visualization-of-publication-bias.html#visualizing-publication-bias-with-robma" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>RoBMA provides tools to visually inspect and diagnose publication bias using enhanced funnel plots. To generate a funnel plot that shows bias-corrected effects, you can use:</p>
+<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb74-1"><a href="analysis-and-visualization-of-publication-bias.html#cb74-1" tabindex="-1"></a><span class="co"># Create an enhanced funnel plot with bias adjustment</span></span>
+<span id="cb74-2"><a href="analysis-and-visualization-of-publication-bias.html#cb74-2" tabindex="-1"></a><span class="fu">plot</span>(fit, <span class="at">type =</span> <span class="st">&quot;funnel&quot;</span>, <span class="at">show_legend =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-38-1.png" width="672" /></p>
+<p>The enhanced funnel plot compares the original effect sizes with those adjusted for potential biases. Asymmetry or clustering patterns in the plot indicate possible biases, while the adjusted estimates provide a more accurate picture of the underlying effect.</p>
+</div>
+<div id="advantages-of-using-robma" class="section level4 hasAnchor" number="5.0.6.6">
+<h4><span class="header-section-number">5.0.6.6</span> Advantages of Using RoBMA<a href="analysis-and-visualization-of-publication-bias.html#advantages-of-using-robma" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<ul>
+<li><p><strong>Comprehensive Bias Assessment</strong>: RoBMA integrates several models to check for the presence and impact of publication bias.</p></li>
+<li><p><strong>Flexible Prior Specification</strong>: Allows for the use of both informative and non-informative priors, adapting to various research scenarios.</p></li>
+<li><p><strong>Model-Averaging for Stability</strong>: By combining different models, RoBMA reduces the chance of overfitting and provides more robust conclusions.</p></li>
+</ul>
+</div>
+<div id="limitations-to-consider" class="section level4 hasAnchor" number="5.0.6.7">
+<h4><span class="header-section-number">5.0.6.7</span> Limitations to Consider<a href="analysis-and-visualization-of-publication-bias.html#limitations-to-consider" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<ul>
+<li><p><strong>Computational Complexity</strong>: Running RoBMA with large datasets or complex prior structures can be resource-intensive.</p></li>
+<li><p><strong>Advanced Interpretation</strong>: Understanding and explaining RoBMA results may require familiarity with Bayesian concepts and model averaging.</p></li>
+</ul>
+
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="plotting-meta-analytical-results.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/USERNAME/REPO/edit/BRANCH/06_plot.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["_main.pdf", "_main.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

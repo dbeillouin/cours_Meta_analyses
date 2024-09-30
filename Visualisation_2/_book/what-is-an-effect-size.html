@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Calculate and combine the effect-sizes</title>
+  <meta name="description" content="<p>This is beta-version of the visualisation exercice.
+set in the _output.yml file.
+The HTML output format for this example is bookdown::gitbook,</p>" />
+  <meta name="generator" content="bookdown 0.40 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Calculate and combine the effect-sizes" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="<p>This is beta-version of the visualisation exercice.
+set in the _output.yml file.
+The HTML output format for this example is bookdown::gitbook,</p>" />
+  <meta name="github-repo" content="rstudio/bookdown-demo" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Calculate and combine the effect-sizes" />
+  
+  <meta name="twitter:description" content="<p>This is beta-version of the visualisation exercice.
+set in the _output.yml file.
+The HTML output format for this example is bookdown::gitbook,</p>" />
+  
+
+<meta name="author" content="Damien Beillouin" />
+
+
+<meta name="date" content="2024-09-28" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+
+<link rel="next" href="comparative-meta-analytic-methods-for-evidence-synthesis.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Meta-analyses</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="what-is-an-effect-size.html"><a href="what-is-an-effect-size.html"><i class="fa fa-check"></i><b>1</b> What is an Effect Size?</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="what-is-an-effect-size.html"><a href="what-is-an-effect-size.html#visual-representation-of-effect-sizes"><i class="fa fa-check"></i><b>1.1</b> Visual representation of effect-sizes</a>
+<ul>
+<li class="chapter" data-level="1.1.1" data-path="what-is-an-effect-size.html"><a href="what-is-an-effect-size.html#different-metrics-for-measuring-effect-sizes"><i class="fa fa-check"></i><b>1.1.1</b> Different Metrics for Measuring Effect Sizes</a></li>
+<li class="chapter" data-level="1.1.2" data-path="what-is-an-effect-size.html"><a href="what-is-an-effect-size.html#how-to-measure-variability"><i class="fa fa-check"></i><b>1.1.2</b> How to Measure Variability</a></li>
+<li class="chapter" data-level="1.1.3" data-path="what-is-an-effect-size.html"><a href="what-is-an-effect-size.html#what-variability-means"><i class="fa fa-check"></i><b>1.1.3</b> What Variability Means</a></li>
+<li class="chapter" data-level="1.1.4" data-path="what-is-an-effect-size.html"><a href="what-is-an-effect-size.html#comparison-of-effect-size-and-p-value"><i class="fa fa-check"></i><b>1.1.4</b> Comparison of Effect Size and p-Value</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html"><i class="fa fa-check"></i><b>2</b> Comparative meta-analytic methods for evidence synthesis</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html#equal-effects-model"><i class="fa fa-check"></i><b>2.1</b> Equal-Effects Model</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html#example-data"><i class="fa fa-check"></i><b>2.1.1</b> Example Data</a></li>
+<li class="chapter" data-level="2.1.2" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html#fitting-the-equal-effects-model"><i class="fa fa-check"></i><b>2.1.2</b> Fitting the Equal-Effects Model</a></li>
+<li class="chapter" data-level="2.1.3" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html#comparison-of-results"><i class="fa fa-check"></i><b>2.1.3</b> Comparison of Results</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html#random-effects-model"><i class="fa fa-check"></i><b>2.2</b> Random-Effects Model</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html#fitting-the-random-effects-model"><i class="fa fa-check"></i><b>2.2.1</b> Fitting the Random-Effects Model</a></li>
+<li class="chapter" data-level="2.2.2" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html#comparison-of-results-1"><i class="fa fa-check"></i><b>2.2.2</b> Comparison of Results</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html#conclusion"><i class="fa fa-check"></i><b>2.3</b> Conclusion</a>
+<ul>
+<li class="chapter" data-level="2.3.1" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html#example-1-fixed-vs.-random-meta-analysis-models"><i class="fa fa-check"></i><b>2.3.1</b> Example 1: fixed vs. random Meta-Analysis models</a></li>
+<li class="chapter" data-level="2.3.2" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html#example-2-comparing-heterogeneity-across-models"><i class="fa fa-check"></i><b>2.3.2</b> Example 2: Comparing Heterogeneity across models</a></li>
+<li class="chapter" data-level="2.3.3" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html#example-3-multi-level-meta-analysis-with-hierarchical-data"><i class="fa fa-check"></i><b>2.3.3</b> Example 3: Multi-Level meta-Analysis with hierarchical Data</a></li>
+<li class="chapter" data-level="2.3.4" data-path="comparative-meta-analytic-methods-for-evidence-synthesis.html"><a href="comparative-meta-analytic-methods-for-evidence-synthesis.html#model-selection-in-meta-analysis"><i class="fa fa-check"></i><b>2.3.4</b> Model Selection in Meta-Analysis</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="analysing-model-variability.html"><a href="analysing-model-variability.html"><i class="fa fa-check"></i><b>3</b> Analysing model variability</a>
+<ul>
+<li class="chapter" data-level="3.0.1" data-path="analysing-model-variability.html"><a href="analysing-model-variability.html#using-parametric-and-non-parametric-bootstrapping-to-estimate-confidence-intervals-in-meta-analyses"><i class="fa fa-check"></i><b>3.0.1</b> Using Parametric and Non-Parametric Bootstrapping to Estimate Confidence Intervals in Meta-Analyses</a></li>
+<li class="chapter" data-level="3.0.2" data-path="analysing-model-variability.html"><a href="analysing-model-variability.html#overview"><i class="fa fa-check"></i><b>3.0.2</b> Overview</a></li>
+<li class="chapter" data-level="3.0.3" data-path="analysing-model-variability.html"><a href="analysing-model-variability.html#parametric-bootstrapping-step-by-step-example"><i class="fa fa-check"></i><b>3.0.3</b> Parametric Bootstrapping: Step-by-Step Example</a></li>
+<li class="chapter" data-level="3.0.4" data-path="analysing-model-variability.html"><a href="analysing-model-variability.html#non-parametric-bootstrapping-step-by-step-example"><i class="fa fa-check"></i><b>3.0.4</b> Non-Parametric Bootstrapping: Step-by-Step Example</a></li>
+<li class="chapter" data-level="3.0.5" data-path="analysing-model-variability.html"><a href="analysing-model-variability.html#conclusion-1"><i class="fa fa-check"></i><b>3.0.5</b> Conclusion</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="plotting-meta-analytical-results.html"><a href="plotting-meta-analytical-results.html"><i class="fa fa-check"></i><b>4</b> Plotting meta-analytical results</a>
+<ul>
+<li class="chapter" data-level="4.0.1" data-path="plotting-meta-analytical-results.html"><a href="plotting-meta-analytical-results.html#overview-1"><i class="fa fa-check"></i><b>4.0.1</b> Overview</a></li>
+<li class="chapter" data-level="4.0.2" data-path="plotting-meta-analytical-results.html"><a href="plotting-meta-analytical-results.html#example-1-forest-plot-with-metafor"><i class="fa fa-check"></i><b>4.0.2</b> Example 1: Forest plot with metafor</a></li>
+<li class="chapter" data-level="4.0.3" data-path="plotting-meta-analytical-results.html"><a href="plotting-meta-analytical-results.html#example-2-forest-plot-with-meta"><i class="fa fa-check"></i><b>4.0.3</b> Example 2: Forest plot with meta</a></li>
+<li class="chapter" data-level="4.0.4" data-path="plotting-meta-analytical-results.html"><a href="plotting-meta-analytical-results.html#example-3-forest-plot-with-ggplot"><i class="fa fa-check"></i><b>4.0.4</b> Example 3: Forest plot with ggplot</a></li>
+<li class="chapter" data-level="4.0.5" data-path="plotting-meta-analytical-results.html"><a href="plotting-meta-analytical-results.html#example-4-orchard-plots"><i class="fa fa-check"></i><b>4.0.5</b> Example 4: Orchard plots</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="analysis-and-visualization-of-publication-bias.html"><a href="analysis-and-visualization-of-publication-bias.html"><i class="fa fa-check"></i><b>5</b> Analysis and Visualization of Publication Bias</a>
+<ul>
+<li class="chapter" data-level="5.0.1" data-path="analysis-and-visualization-of-publication-bias.html"><a href="analysis-and-visualization-of-publication-bias.html#funnel-plots"><i class="fa fa-check"></i><b>5.0.1</b> Funnel Plots</a></li>
+<li class="chapter" data-level="5.0.2" data-path="analysis-and-visualization-of-publication-bias.html"><a href="analysis-and-visualization-of-publication-bias.html#reasons-for-asymmetry"><i class="fa fa-check"></i><b>5.0.2</b> Reasons for Asymmetry</a></li>
+<li class="chapter" data-level="5.0.3" data-path="analysis-and-visualization-of-publication-bias.html"><a href="analysis-and-visualization-of-publication-bias.html#trim-and-fill-method"><i class="fa fa-check"></i><b>5.0.3</b> Trim and Fill Method</a></li>
+<li class="chapter" data-level="5.0.4" data-path="analysis-and-visualization-of-publication-bias.html"><a href="analysis-and-visualization-of-publication-bias.html#duval-and-tweedies-trim-and-fill"><i class="fa fa-check"></i><b>5.0.4</b> Duval and Tweedie’s Trim and Fill</a></li>
+<li class="chapter" data-level="5.0.5" data-path="analysis-and-visualization-of-publication-bias.html"><a href="analysis-and-visualization-of-publication-bias.html#egger-test"><i class="fa fa-check"></i><b>5.0.5</b> 3. Egger Test</a></li>
+<li class="chapter" data-level="5.0.6" data-path="analysis-and-visualization-of-publication-bias.html"><a href="analysis-and-visualization-of-publication-bias.html#rosenthals-fail-safe-n"><i class="fa fa-check"></i><b>5.0.6</b> Rosenthal’s Fail-Safe N</a></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Calculate and combine the effect-sizes</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="header">
+<h1 class="title">Calculate and combine the effect-sizes</h1>
+<p class="author"><em>Damien Beillouin</em></p>
+<p class="date"><em>2024-09-28</em></p>
+</div>
+<div id="what-is-an-effect-size" class="section level1 hasAnchor" number="1">
+<h1><span class="header-section-number">Chapter 1</span> What is an Effect Size?<a href="what-is-an-effect-size.html#what-is-an-effect-size" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>An effect size is a metric that quantifies the <strong>direction</strong> and <strong>magnitude</strong> of an experimental or observational effect.
+It is essential in meta-analysis as it standardizes results across different studies to aggregate results.For example, if you are comparing the performance of two treatments (e.g., a control vs. a new intervention), the effect size tells you how much better or worse the new intervention performs compared to the control.Effect size should have the folowing characteristics:</p>
+<ul>
+<li><strong>Extracted directly</strong> from publications or <strong>calculated</strong> from reported data.</li>
+<li><strong>Standardized</strong> to be comparable across multiple primary studies.</li>
+<li><strong>Reliable</strong>: Effect sizes should accurately represent the underlying data (e.g., caution is needed when using ratios with low denominators).</li>
+</ul>
+<p>Effect sizes come in various forms depending on the type of data and research question (e.g., standardized mean difference, odds ratios, correlation coefficients).</p>
+<div id="visual-representation-of-effect-sizes" class="section level2 hasAnchor" number="1.1">
+<h2><span class="header-section-number">1.1</span> Visual representation of effect-sizes<a href="what-is-an-effect-size.html#visual-representation-of-effect-sizes" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Effect sizes are crucial for understanding how different treatments or conditions compare to each other in a study.
+To grasp their significance, it is helpful to visualize them, as graphical representation allows us to clearly see how much two groups overlap or differ.
+By illustrating varying levels of effect sizes, we can better understand what these numerical values mean in a practical context.
+Example Scenario: Comparing a Treatment vs. Control Group</p>
+<p>Let’s consider a hypothetical study where researchers are testing the effectiveness of a new treatment compared to a control group.
+For each group, a series of measurements were collected, allowing us to estimate the average value and the statistical distribution for each population.</p>
+<p>The goal is to determine if the treatment group exhibits a significant improvement or change compared to the control group.
+Here, the effect size is a standardized measure that quantifies how much the two groups differ.
+The larger the effect size, the more distinct the two groups are.
+Smaller effect sizes suggest that the two groups are relatively similar, while larger effect sizes indicate a more substantial difference</p>
+<p><img src="_main_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<div id="different-metrics-for-measuring-effect-sizes" class="section level3 hasAnchor" number="1.1.1">
+<h3><span class="header-section-number">1.1.1</span> Different Metrics for Measuring Effect Sizes<a href="what-is-an-effect-size.html#different-metrics-for-measuring-effect-sizes" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Effect sizes can be calculated using a variety of metrics depending on the type of data and the comparisons being made.
+Below, we present a table showing some of the most common effect size metrics, calculated for the same hypothetical data used in the visual demonstration above.</p>
+<table>
+<colgroup>
+<col width="27%" />
+<col width="31%" />
+<col width="40%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Metric</strong></th>
+<th><strong>Formula/Definition</strong></th>
+<th><strong>Interpretation</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Mean Difference</strong></td>
+<td>Mean_Treatment - Mean_Control</td>
+<td>Difference in mean values between the groups.</td>
+</tr>
+<tr class="even">
+<td><strong>Standardized Mean Difference (SMD)</strong></td>
+<td>(Mean_Treatment - Mean_Control) / SD_pooled</td>
+<td>Cohen’s <em>d</em> or Hedges’ <em>g</em> for continuous variables.</td>
+</tr>
+<tr class="odd">
+<td><strong>Odds Ratio (OR)</strong></td>
+<td>(Odds_Treatment / Odds_Control)</td>
+<td>Odds of an event occurring in the treatment vs. control.</td>
+</tr>
+<tr class="even">
+<td><strong>Log Odds Ratio</strong></td>
+<td>log(OR)</td>
+<td>Stabilized variance and more symmetrical distribution.</td>
+</tr>
+<tr class="odd">
+<td><strong>Risk Ratio (RR)</strong></td>
+<td>(Risk_Treatment / Risk_Control)</td>
+<td>Ratio of the probability of an event between groups.</td>
+</tr>
+<tr class="even">
+<td><strong>Log Risk Ratio</strong></td>
+<td>log(RR)</td>
+<td>Similar to log OR, stabilizing variances.</td>
+</tr>
+</tbody>
+</table>
+<p>Using the simulated data above, let’s compare the groups using several of these metrics:</p>
+<table>
+<colgroup>
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Effect Size Metric</strong></th>
+<th>Case study 1</th>
+<th><strong>Case study 2</strong></th>
+<th>Case study 3</th>
+<th>Case study 4</th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+<table>
+<tbody>
+<tr class="odd">
+<td><strong>Mean Difference</strong></td>
+<td>0</td>
+<td>3.15</td>
+<td>5.27</td>
+<td>7.86</td>
+</tr>
+</tbody>
+</table>
+<table>
+<tbody>
+<tr class="odd">
+<td><strong>Standardized Mean Difference (SMD)</strong></td>
+<td>0</td>
+<td>0.31</td>
+<td>0.52</td>
+<td>0.81</td>
+</tr>
+</tbody>
+</table>
+<table>
+<tbody>
+<tr class="odd">
+<td><strong>Odds Ratio (OR)</strong></td>
+<td>1</td>
+<td>1.28</td>
+<td>1.91</td>
+<td>3.75</td>
+</tr>
+</tbody>
+</table>
+<table>
+<tbody>
+<tr class="odd">
+<td><strong>Log Odds Ratio</strong></td>
+<td>0</td>
+<td>0.25</td>
+<td>0.65</td>
+<td>1.32</td>
+</tr>
+</tbody>
+</table>
+<table>
+<tbody>
+<tr class="odd">
+<td><strong>Risk Ratio (RR)</strong></td>
+<td>1</td>
+<td>1.18</td>
+<td>1.40</td>
+<td>2.25</td>
+</tr>
+</tbody>
+</table>
+<table>
+<tbody>
+<tr class="odd">
+<td><strong>Log Risk Ratio</strong></td>
+<td>0</td>
+<td>0.17</td>
+<td>0.34</td>
+<td>0.81</td>
+</tr>
+</tbody>
+</table>
+<p>These values illustrate how different metrics capture varying aspects of the comparison between groups.
+We will delve into these metrics in greater detail in the next sections, exploring when and why to use each one based on your research question and data type.</p>
+<p>Overall, effect sizes provide a powerful way to quantify the differences between groups, and choosing the appropriate metric ensures accurate and meaningful interpretations in meta-analyses and research synthesis.</p>
+</div>
+<div id="how-to-measure-variability" class="section level3 hasAnchor" number="1.1.2">
+<h3><span class="header-section-number">1.1.2</span> How to Measure Variability<a href="what-is-an-effect-size.html#how-to-measure-variability" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Variability in effect sizes can be measured using several approaches:</p>
+<ul>
+<li><p><strong>Confidence Intervals (CIs)</strong>: These provide a range within which the true effect size is likely to fall.
+A 95% CI indicates that if the study were repeated many times, 95% of the calculated intervals would contain the true effect size.</p></li>
+<li><p><strong>Standard Error (SE)</strong>: This metric quantifies the amount of variation in the effect size estimate due to sampling error.
+A smaller SE suggests that the effect size is a more reliable estimate.</p></li>
+<li><p><strong>Heterogeneity Statistics</strong>: In meta-analyses, measures like I² quantify the degree of variability among effect sizes from different studies.
+A high I² value indicates substantial variability, suggesting that differences between studies may not be due to chance alone.</p></li>
+</ul>
+</div>
+<div id="what-variability-means" class="section level3 hasAnchor" number="1.1.3">
+<h3><span class="header-section-number">1.1.3</span> What Variability Means<a href="what-is-an-effect-size.html#what-variability-means" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<ul>
+<li><p><strong>High Variability</strong>: Suggests that the effect of the treatment varies significantly across different studies or populations.
+This could indicate that certain factors (like participant characteristics or study design) influence the effectiveness of the intervention.</p></li>
+<li><p><strong>Low Variability</strong>: Implies that the effect size is consistent across studies, leading to stronger generalizations about the treatment’s effectiveness.</p></li>
+</ul>
+<p>By understanding and measuring the variability of effect sizes, researchers can provide more nuanced interpretations of their findings and enhance the credibility of their conclusions.
+This approach leads to better-informed decisions in both research and practice.</p>
+</div>
+<div id="comparison-of-effect-size-and-p-value" class="section level3 hasAnchor" number="1.1.4">
+<h3><span class="header-section-number">1.1.4</span> Comparison of Effect Size and p-Value<a href="what-is-an-effect-size.html#comparison-of-effect-size-and-p-value" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><strong>Understanding the Concepts</strong></p>
+<ul>
+<li><p><strong>Effect Size</strong>: This metric quantifies the magnitude of a treatment effect or the strength of an association.
+It provides a clear indication of how substantial a difference is between groups, regardless of sample size.
+A larger effect size suggests a more meaningful difference, helping researchers understand the practical significance of their findings.</p></li>
+<li><p><strong>P-Value</strong>: The p-value measures the probability that the observed results occurred by chance under the null hypothesis.
+It helps determine whether to reject the null hypothesis.
+A low p-value (typically &lt; 0.05) indicates that the observed difference is statistically significant, but it does not inform us about the size or importance of the effect.</p></li>
+</ul>
+<p><strong>Key Differences</strong></p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Focus</strong>:</p>
+<ul>
+<li><p><strong>Effect Size</strong>: Emphasizes the magnitude of the effect, providing context to the results.</p></li>
+<li><p><strong>P-Value</strong>: Emphasizes whether the effect is statistically significant, without indicating its size.</p></li>
+</ul></li>
+<li><p><strong>Interpretation</strong>:</p>
+<ul>
+<li><p><strong>Effect Size</strong>: A high effect size indicates a strong difference, while a low effect size suggests the groups are similar.
+It informs researchers about practical implications.</p></li>
+<li><p><strong>P-Value</strong>: A p-value tells us whether we can reject the null hypothesis.
+A significant p-value doesn’t necessarily imply a large or important effect.</p></li>
+</ul></li>
+<li><p><strong>Dependence on Sample Size</strong>:</p>
+<ul>
+<li><p><strong>Effect Size</strong>: Remains stable regardless of sample size, providing a consistent measure of difference.</p></li>
+<li><p><strong>P-Value</strong>: Can be influenced by sample size; larger samples can yield statistically significant p-values even for trivial differences.</p></li>
+</ul></li>
+</ol>
+
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+
+<a href="comparative-meta-analytic-methods-for-evidence-synthesis.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/USERNAME/REPO/edit/BRANCH/01-intro.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["_main.pdf", "_main.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
