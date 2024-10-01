@@ -107,7 +107,7 @@ summary(res.lmer)
 
 ### Comparison of Results
 
-1.  **Intercept Differences**: The estimated intercepts from `lme()` and `lmer()` differ from the estimate obtained via `rma()`.
+1.  **Intercept Differences**: The estimated intercepts from `lme()` and `lmer()` do not differ from the estimate obtained via `rma()`.
 
 2.  **Standard Errors**: The standard errors, t-values, and p-values also show discrepancies for similar reasons as mentioned earlier—`lme()` and `lmer()` treat sampling variances as unknown beyond a proportionality constant.
 
@@ -168,9 +168,136 @@ summary(bayes_model)
 
 This Bayesian approach enables us to derive posterior distributions for the effect sizes, facilitating a more nuanced interpretation of uncertainty compared to traditional frequentist methods. By leveraging Bayesian techniques, researchers can integrate prior knowledge and obtain more robust estimates, especially in cases where sample sizes are limited or when study results exhibit significant variability.
 
+### Meta-Forest Analysis: A Comparison with Classical Meta-Analytic Models
+
+Meta-forest analysis is a machine-learning-based extension of meta-analysis that addresses the limitations of traditional meta-analytic models. In standard approaches like meta-regression, we assume a linear relationship between moderators and the effect sizes, which can oversimplify the true patterns within the data. Meta-forest, on the other hand, leverages the power of random forests to capture **nonlinear interactions** and **complex relationships** between moderators and outcomes, providing a deeper understanding of heterogeneity.
+
+#### Key Differences and Advantages
+
+1.  **Handling Complex and Nonlinear Relationships**:\
+    Traditional meta-regression models fit a single linear equation to explain the relationship between effect sizes and moderators. This approach works well for straightforward datasets but struggles when the effects of moderators are nonlinear or when there are interactions between variables. Meta-forest overcomes these limitations by utilizing decision trees, which split the data into multiple regions and fit localized models, effectively capturing nonlinearities and interactions that would be missed otherwise.
+
+2.  **No Assumptions on Functional Form**:\
+    Classical models require specifying the functional form of the relationship a priori (e.g., linear or quadratic). If the chosen form is incorrect, the model can lead to biased or misleading conclusions. Meta-forest avoids this issue by being entirely data-driven, learning the shape of the relationships directly from the data without requiring these assumptions.
+
+3.  **Resilience to Overfitting**:\
+    While adding more moderators to a standard meta-regression model can quickly lead to overfitting, especially in small datasets, meta-forest models are designed to mitigate overfitting through cross-validation and ensemble averaging. This robustness is crucial when dealing with a large number of potential moderators, allowing researchers to explore multiple variables without risking model instability.
+
+4.  **Variable Importance and Feature Selection**:\
+    One of the most valuable outputs from a meta-forest model is the **variable importance** score. Unlike classical models, which may produce ambiguous results when variables are collinear or interact with each other, meta-forest provides a clear ranking of which moderators contribute the most to explaining heterogeneity. This feature is particularly beneficial when performing exploratory analyses or when the moderator space is large and uncertain.
+
+5.  **Partial Dependence Plots for Interpretation**:\
+    Meta-forest offers visual tools like **partial dependence plots** that show the marginal effect of each moderator while accounting for the influence of other variables. This allows researchers to interpret the role of each moderator in context, which is challenging to achieve with standard meta-regression models.
+
+#### Potential Drawbacks of Meta-Forest
+
+Despite its strengths, meta-forest also has some drawbacks:
+
+-   **Lack of Inference Statistics**:\
+    Unlike classical models, meta-forest does not provide p-values or confidence intervals for effect size estimates. While this is acceptable for exploratory analyses, it can be limiting if formal hypothesis testing is required.
+
+-   **Higher Complexity and Computational Cost**:\
+    The complexity of meta-forest models requires more computational resources and time, especially for large datasets or numerous moderators. Researchers may need to balance the improved flexibility against increased computational demand.
+
+-   **Limited Applicability for Small Datasets**:\
+    Meta-forest is most effective when there is a substantial number of studies and a diverse set of moderators. For small datasets, classical methods like mixed-effects models might be more appropriate due to their simpler structure and ease of interpretation.
+
+#### Practical Application: When to Use Meta-Forest?
+
+Meta-forest is an ideal tool when dealing with **exploratory analyses** or when the **relationships between moderators and effect sizes are unknown or suspected to be nonlinear**. It is particularly useful for:
+
+1.  Exploring datasets with **many potential moderators** where interactions are likely.
+
+2.  Identifying key predictors of heterogeneity when prior knowledge is limited.
+
+3.  Providing a preliminary understanding of complex datasets before fitting more traditional models.
+
+However, for datasets where linear assumptions are well-supported and computational efficiency is a concern, classical methods like **meta-regression** remain preferable.
+
+#### Example of Implementing a Meta-Forest Model
+
+Below is a demonstration of how to fit a meta-forest model and assess the relative importance of moderators:
+
+```{r, message=FALSE, warning=FALSE}
+# Load required libraries
+library(metaforest)
+library(caret)
+
+# Hypothetical dataset: Replace this with your own meta-analysis data
+set.seed(123)
+data_agro <- data.frame(
+  yi = rnorm(60, 0.3, 0.2),         # Simulated effect sizes
+  vi = min(0.01,rnorm(60, 0.1, 0.05)),        # Variances of the effect sizes
+  Intervention = sample(c("Fruit", "Mixed", "Timber"), 60, replace = TRUE),
+  StudyID = rep(1:15, each = 4),    # 15 unique studies
+  Region = sample(c("Tropical", "Temperate"), 60, replace = TRUE)
+)
+
+# Step 1: Run initial MetaForest model with many trees to check convergence
+initial_model <- MetaForest(
+  formula = yi ~ Intervention + Region,
+  data = data_agro,
+  study = "StudyID",
+  whichweights = "random",          # Use random-effects weighting scheme
+  num.trees = 15000                 # Set a high number of trees for convergence
+)
+
+# Step 2: Plot convergence trajectory (Mean Squared Error vs. Number of Trees)
+plot(initial_model)
+
+# Step 3: Tune MetaForest model using cross-validation with `caret`
+# Define the parameter grid for tuning
+tuning_grid <- expand.grid(
+  whichweights = c("random", "fixed", "unif"),
+  mtry = 1:2,                       # Number of variables to possibly split at in each node
+  min.node.size = 2:5               # Minimum size of terminal nodes
+)
+
+# Setup 10-fold cross-validation
+grouped_cv <- trainControl(method = "cv", index = groupKFold(data_agro$StudyID, k = 10))
+
+# Train MetaForest model using `caret` for optimal tuning
+tuned_model <- train(
+  y = data_agro$yi,
+  x = data_agro[, c("Intervention", "Region", "StudyID", "vi")],
+  method = ModelInfo_mf(),           # MetaForest method setup for `caret`
+  trControl = grouped_cv,            # Cross-validation setup
+  tuneGrid = tuning_grid,            # Grid of tuning parameters
+  num.trees = 5000                   # Number of trees for final model
+)
+
+# Step 4: Examine the optimal tuning parameters and model performance
+best_params <- tuned_model$results[which.min(tuned_model$results$RMSE), ]
+print(best_params)
+
+# Step 5: Assess the final model and visualize results
+final_model <- tuned_model$finalModel
+
+# R² from out-of-bag predictions (OOB R² indicates model fit for unseen data)
+r2_oob <- final_model$forest$r.squared
+cat("OOB R-squared: ", r2_oob)
+
+# Variable importance plot to identify influential moderators
+VarImpPlot(final_model)
+
+# Step 6: Visualize partial dependence of top moderators
+PartialDependence(final_model, vars = names(final_model$forest$variable.importance)[1:2], rawdata = TRUE, pi = 0.95)
+
+```
+
+#### Handling Random Structures and Weights in Meta-Forest Models
+
+Meta-forest models handle **random structures** and **weights** differently from traditional meta-analysis models:
+
+-   **Random Effects**: Traditional models explicitly incorporate random effects to model between-study variability. Meta-forest, however, relies on the structure of decision trees to capture variability implicitly. While this can account for some heterogeneity, it does not separate fixed and random components as effectively as mixed-effects models.
+
+-   **Weights**: Classical meta-analyses use **inverse variance weighting** to prioritize studies with higher precision. Meta-forest can integrate study weights similarly during the tree-fitting process, ensuring that precise studies have more influence. However, unlike static weights in classical models, meta-forest adjusts them adaptively during iterations, making it more suitable for complex interactions and nonlinear patterns.
+
 ## Conclusion
 
 In summary, while the `lm()`, `lme()`, and `lmer()` functions can fit various linear models, they are not appropriate for meta-analysis due to their assumptions about the error variances. The `rma()` function is specifically designed for meta-analytic contexts, ensuring that known sampling variances are correctly utilized, resulting in reliable estimates and standard errors. Additionally, the `meta` package provides an accessible alternative for meta-analyses, while Bayesian methods using `brms` allow for flexible modeling and uncertainty quantification.
+
+## Practical implementations
 
 ### Example 1:  fixed vs. random Meta-Analysis models
 
@@ -179,7 +306,7 @@ The first dataset explores the impact of two effect size measures: Standardized 
 
 -   **Calculation of effect-sizes**
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 
 dat <- metadat::dat.curtis1998
 
@@ -193,7 +320,7 @@ lnRR <- escalc(measure = "ROM", n1i = dat$n1i, n2i = dat$n2i, m1i = dat$m1i, m2i
 
 -   **Model Comparison:**
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 # Fixed-Effect Model (SMD):
 fixed_SMD <- rma(yi = SMD$yi, vi = SMD$vi, method = "FE", data = dat)
 fixed_lnRR <- rma(yi = lnRR$yi, vi = lnRR$vi, method = "FE", data = dat)
@@ -205,7 +332,7 @@ random_m_lnRR <- rma(yi = lnRR$yi, vi = lnRR$vi, method = "REML", data = dat)
 
 -   **Extraction and comparisons of the results**
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 # Extract relevant results for comparison
 model_comparison <- data.frame(
   Model = c("Fixed Effect (SMD)", "Random Effect (SMD)", "Fixed Effect (lnRR)", "Random Effect (lnRR)"),
@@ -241,19 +368,19 @@ Here, we calculate Risk Differences (RD) and explore the impact of between-study
 
 -   **Random-Effects Model Using DerSimonian-Laird (DL)**:
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 res_dl <- rma(yi = lnRR$yi, vi = lnRR$vi, method = "DL", data = dat)
 ```
 
 -   **Random-Effects Model Using REML**:
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 res_reml <- rma(yi = lnRR$yi, vi = lnRR$vi, method = "REML", data = dat)
 ```
 
 -   **Extraction and comparisons of the results**
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 # Extract relevant results for comparison
 model_comparison2 <- data.frame(
   Model = c("DL", "REML"),
@@ -289,7 +416,7 @@ In hierarchical data structures, three-level models allow us to account for depe
 
 -   **Three-Level model setup**:
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 dat<-cbind(dat, lnRR)
 # Three-level meta-analysis
 three_level_m <- rma.mv(yi = yi, V = vi, random = list(~1 | id, ~1 | paper), data = dat)
@@ -371,7 +498,7 @@ When fitting mixed-effects models, choosing between different random and fixed s
 
     -   Use the likelihood ratio test (`anova()`) to compare models with and without each random component:
 
-        ```{r}
+        ```{r, message=FALSE, warning=FALSE}
         model1 <- rma.mv(yi, vi, random = ~ 1 | paper, data = dat)
         model2 <- rma.mv(yi, vi, random = ~ 1 | paper/id, data = dat)
         anova(model1, model2)
@@ -423,8 +550,6 @@ This structured approach ensures that both theoretical considerations and statis
 
 **Bootstrapping** is a statistical technique used to estimate the sampling distribution of an estimator by repeatedly resampling from the observed data. In meta-analysis, bootstrapping is commonly applied to construct more robust confidence intervals (CIs) for parameters such as the overall effect size (μ\muμ) and the between-study variance (τ2\tau^2τ2). This chapter will demonstrate how to implement both parametric and non-parametric bootstrapping methods using the `boot` package in R, emphasizing best practices for obtaining reliable results.
 
-### Overview
-
 -   **Parametric Bootstrapping**: Assumes a specific distributional form for the data (e.g., normal distribution of residuals). The data are generated based on parameter estimates from the fitted model.
 
 -   **Non-Parametric Bootstrapping**: Does not rely on specific distributional assumptions. The bootstrap samples are created directly by resampling the original data with replacement.
@@ -443,7 +568,7 @@ Let's illustrate this approach with a random-effects model:
 
 The function `boot.func()` calculates the effect size and variance components based on each bootstrap dataset:
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 # Load necessary libraries
 library(metafor)
 library(boot)
@@ -494,7 +619,7 @@ print(res.boot)
 
 After running the bootstrap, we can calculate the confidence intervals for the mean effect size (μ\muμ) and the between-study variance (τ2\tau^2τ2) using different bootstrap methods (normal, basic, studentized, percentile):
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 # Confidence intervals for mu
 boot.ci(res.boot, type=c("norm", "basic", "stud", "perc"), index=1:2)
 
@@ -511,7 +636,7 @@ Non-parametric bootstrapping involves generating new datasets by resampling the 
 
 **Defining the Function**
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 # Load necessary libraries
 library(metafor)
 library(boot)
@@ -565,7 +690,7 @@ print(res.boot)
 
 After running the bootstrap, we can calculate the confidence intervals for the mean effect size (μ\muμ) and the between-study variance (τ2\tau^2τ2) using different bootstrap methods (normal, basic, studentized, percentile):
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 # Confidence intervals for mu
 boot.ci(res.boot, type=c("norm", "basic", "stud", "perc"), index=1:2)
 
@@ -586,7 +711,7 @@ The choice between parametric and non-parametric bootstrapping depends on the un
 
 To visualize the bootstrap distributions, we can create kernel density plots to inspect the variability and shape of the bootstrap samples:
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 # Visualize the bootstrap distribution for mu
 plot(density(res.boot$t[,1]), main="Bootstrap Distribution of Mu")
 abline(v=quantile(res.boot$t[,1], probs=c(0.025, 0.975)), col="red")

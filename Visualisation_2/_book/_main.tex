@@ -603,7 +603,7 @@ Alternatively, we can use the \texttt{lmer()} function from the \texttt{lme4} pa
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \item
-  \textbf{Intercept Differences}: The estimated intercepts from \texttt{lme()} and \texttt{lmer()} differ from the estimate obtained via \texttt{rma()}.
+  \textbf{Intercept Differences}: The estimated intercepts from \texttt{lme()} and \texttt{lmer()} do not differ from the estimate obtained via \texttt{rma()}.
 \item
   \textbf{Standard Errors}: The standard errors, t-values, and p-values also show discrepancies for similar reasons as mentioned earlier---\texttt{lme()} and \texttt{lmer()} treat sampling variances as unknown beyond a proportionality constant.
 \end{enumerate}
@@ -770,7 +770,7 @@ Bayesian meta-analysis presents a flexible framework that accommodates the incor
 ## Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 ## and Tail_ESS are effective sample size measures, and Rhat is the potential
 ## scale reduction factor on split chains (at convergence, Rhat = 1).
-## ]  (Warmup)
+## 40%]  (Warmup)
 ## Chain 2: Iteration:  80 / 200 [ 40%]  (Warmup)
 ## Chain 1: Iteration: 100 / 200 [ 50%]  (Warmup)
 ## Chain 1: Iteration: 101 / 200 [ 50%]  (Sampling)
@@ -786,23 +786,198 @@ Bayesian meta-analysis presents a flexible framework that accommodates the incor
 ## Chain 2: Iteration: 180 / 200 [ 90%]  (Sampling)
 ## Chain 1: Iteration: 200 / 200 [100%]  (Sampling)
 ## Chain 1: 
-## Chain 1:  Elapsed Time: 0.034 seconds (Warm-up)
+## Chain 1:  Elapsed Time: 0.035 seconds (Warm-up)
 ## Chain 1:                0.025 seconds (Sampling)
-## Chain 1:                0.059 seconds (Total)
+## Chain 1:                0.06 seconds (Total)
 ## Chain 1: 
 ## Chain 2: Iteration: 200 / 200 [100%]  (Sampling)
 ## Chain 2: 
 ## Chain 2:  Elapsed Time: 0.033 seconds (Warm-up)
-## Chain 2:                0.025 seconds (Sampling)
-## Chain 2:                0.058 seconds (Total)
+## Chain 2:                0.027 seconds (Sampling)
+## Chain 2:                0.06 seconds (Total)
 ## Chain 2:
 \end{verbatim}
 
 This Bayesian approach enables us to derive posterior distributions for the effect sizes, facilitating a more nuanced interpretation of uncertainty compared to traditional frequentist methods. By leveraging Bayesian techniques, researchers can integrate prior knowledge and obtain more robust estimates, especially in cases where sample sizes are limited or when study results exhibit significant variability.
 
+\subsection{Meta-Forest Analysis: A Comparison with Classical Meta-Analytic Models}\label{meta-forest-analysis-a-comparison-with-classical-meta-analytic-models}
+
+Meta-forest analysis is a machine-learning-based extension of meta-analysis that addresses the limitations of traditional meta-analytic models. In standard approaches like meta-regression, we assume a linear relationship between moderators and the effect sizes, which can oversimplify the true patterns within the data. Meta-forest, on the other hand, leverages the power of random forests to capture \textbf{nonlinear interactions} and \textbf{complex relationships} between moderators and outcomes, providing a deeper understanding of heterogeneity.
+
+\subsubsection{Key Differences and Advantages}\label{key-differences-and-advantages}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Handling Complex and Nonlinear Relationships}:\\
+  Traditional meta-regression models fit a single linear equation to explain the relationship between effect sizes and moderators. This approach works well for straightforward datasets but struggles when the effects of moderators are nonlinear or when there are interactions between variables. Meta-forest overcomes these limitations by utilizing decision trees, which split the data into multiple regions and fit localized models, effectively capturing nonlinearities and interactions that would be missed otherwise.
+\item
+  \textbf{No Assumptions on Functional Form}:\\
+  Classical models require specifying the functional form of the relationship a priori (e.g., linear or quadratic). If the chosen form is incorrect, the model can lead to biased or misleading conclusions. Meta-forest avoids this issue by being entirely data-driven, learning the shape of the relationships directly from the data without requiring these assumptions.
+\item
+  \textbf{Resilience to Overfitting}:\\
+  While adding more moderators to a standard meta-regression model can quickly lead to overfitting, especially in small datasets, meta-forest models are designed to mitigate overfitting through cross-validation and ensemble averaging. This robustness is crucial when dealing with a large number of potential moderators, allowing researchers to explore multiple variables without risking model instability.
+\item
+  \textbf{Variable Importance and Feature Selection}:\\
+  One of the most valuable outputs from a meta-forest model is the \textbf{variable importance} score. Unlike classical models, which may produce ambiguous results when variables are collinear or interact with each other, meta-forest provides a clear ranking of which moderators contribute the most to explaining heterogeneity. This feature is particularly beneficial when performing exploratory analyses or when the moderator space is large and uncertain.
+\item
+  \textbf{Partial Dependence Plots for Interpretation}:\\
+  Meta-forest offers visual tools like \textbf{partial dependence plots} that show the marginal effect of each moderator while accounting for the influence of other variables. This allows researchers to interpret the role of each moderator in context, which is challenging to achieve with standard meta-regression models.
+\end{enumerate}
+
+\subsubsection{Potential Drawbacks of Meta-Forest}\label{potential-drawbacks-of-meta-forest}
+
+Despite its strengths, meta-forest also has some drawbacks:
+
+\begin{itemize}
+\item
+  \textbf{Lack of Inference Statistics}:\\
+  Unlike classical models, meta-forest does not provide p-values or confidence intervals for effect size estimates. While this is acceptable for exploratory analyses, it can be limiting if formal hypothesis testing is required.
+\item
+  \textbf{Higher Complexity and Computational Cost}:\\
+  The complexity of meta-forest models requires more computational resources and time, especially for large datasets or numerous moderators. Researchers may need to balance the improved flexibility against increased computational demand.
+\item
+  \textbf{Limited Applicability for Small Datasets}:\\
+  Meta-forest is most effective when there is a substantial number of studies and a diverse set of moderators. For small datasets, classical methods like mixed-effects models might be more appropriate due to their simpler structure and ease of interpretation.
+\end{itemize}
+
+\subsubsection{Practical Application: When to Use Meta-Forest?}\label{practical-application-when-to-use-meta-forest}
+
+Meta-forest is an ideal tool when dealing with \textbf{exploratory analyses} or when the \textbf{relationships between moderators and effect sizes are unknown or suspected to be nonlinear}. It is particularly useful for:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Exploring datasets with \textbf{many potential moderators} where interactions are likely.
+\item
+  Identifying key predictors of heterogeneity when prior knowledge is limited.
+\item
+  Providing a preliminary understanding of complex datasets before fitting more traditional models.
+\end{enumerate}
+
+However, for datasets where linear assumptions are well-supported and computational efficiency is a concern, classical methods like \textbf{meta-regression} remain preferable.
+
+\subsubsection{Example of Implementing a Meta-Forest Model}\label{example-of-implementing-a-meta-forest-model}
+
+Below is a demonstration of how to fit a meta-forest model and assess the relative importance of moderators:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Load required libraries}
+\FunctionTok{library}\NormalTok{(metaforest)}
+\FunctionTok{library}\NormalTok{(caret)}
+
+\CommentTok{\# Hypothetical dataset: Replace this with your own meta{-}analysis data}
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{123}\NormalTok{)}
+\NormalTok{data\_agro }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+  \AttributeTok{yi =} \FunctionTok{rnorm}\NormalTok{(}\DecValTok{60}\NormalTok{, }\FloatTok{0.3}\NormalTok{, }\FloatTok{0.2}\NormalTok{),         }\CommentTok{\# Simulated effect sizes}
+  \AttributeTok{vi =} \FunctionTok{min}\NormalTok{(}\FloatTok{0.01}\NormalTok{,}\FunctionTok{rnorm}\NormalTok{(}\DecValTok{60}\NormalTok{, }\FloatTok{0.1}\NormalTok{, }\FloatTok{0.05}\NormalTok{)),        }\CommentTok{\# Variances of the effect sizes}
+  \AttributeTok{Intervention =} \FunctionTok{sample}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\StringTok{"Fruit"}\NormalTok{, }\StringTok{"Mixed"}\NormalTok{, }\StringTok{"Timber"}\NormalTok{), }\DecValTok{60}\NormalTok{, }\AttributeTok{replace =} \ConstantTok{TRUE}\NormalTok{),}
+  \AttributeTok{StudyID =} \FunctionTok{rep}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{15}\NormalTok{, }\AttributeTok{each =} \DecValTok{4}\NormalTok{),    }\CommentTok{\# 15 unique studies}
+  \AttributeTok{Region =} \FunctionTok{sample}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\StringTok{"Tropical"}\NormalTok{, }\StringTok{"Temperate"}\NormalTok{), }\DecValTok{60}\NormalTok{, }\AttributeTok{replace =} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{)}
+
+\CommentTok{\# Step 1: Run initial MetaForest model with many trees to check convergence}
+\NormalTok{initial\_model }\OtherTok{\textless{}{-}} \FunctionTok{MetaForest}\NormalTok{(}
+  \AttributeTok{formula =}\NormalTok{ yi }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Intervention }\SpecialCharTok{+}\NormalTok{ Region,}
+  \AttributeTok{data =}\NormalTok{ data\_agro,}
+  \AttributeTok{study =} \StringTok{"StudyID"}\NormalTok{,}
+  \AttributeTok{whichweights =} \StringTok{"random"}\NormalTok{,          }\CommentTok{\# Use random{-}effects weighting scheme}
+  \AttributeTok{num.trees =} \DecValTok{15000}                 \CommentTok{\# Set a high number of trees for convergence}
+\NormalTok{)}
+
+\CommentTok{\# Step 2: Plot convergence trajectory (Mean Squared Error vs. Number of Trees)}
+\FunctionTok{plot}\NormalTok{(initial\_model)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{_main_files/figure-latex/unnamed-chunk-14-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Step 3: Tune MetaForest model using cross{-}validation with \textasciigrave{}caret\textasciigrave{}}
+\CommentTok{\# Define the parameter grid for tuning}
+\NormalTok{tuning\_grid }\OtherTok{\textless{}{-}} \FunctionTok{expand.grid}\NormalTok{(}
+  \AttributeTok{whichweights =} \FunctionTok{c}\NormalTok{(}\StringTok{"random"}\NormalTok{, }\StringTok{"fixed"}\NormalTok{, }\StringTok{"unif"}\NormalTok{),}
+  \AttributeTok{mtry =} \DecValTok{1}\SpecialCharTok{:}\DecValTok{2}\NormalTok{,                       }\CommentTok{\# Number of variables to possibly split at in each node}
+  \AttributeTok{min.node.size =} \DecValTok{2}\SpecialCharTok{:}\DecValTok{5}               \CommentTok{\# Minimum size of terminal nodes}
+\NormalTok{)}
+
+\CommentTok{\# Setup 10{-}fold cross{-}validation}
+\NormalTok{grouped\_cv }\OtherTok{\textless{}{-}} \FunctionTok{trainControl}\NormalTok{(}\AttributeTok{method =} \StringTok{"cv"}\NormalTok{, }\AttributeTok{index =} \FunctionTok{groupKFold}\NormalTok{(data\_agro}\SpecialCharTok{$}\NormalTok{StudyID, }\AttributeTok{k =} \DecValTok{10}\NormalTok{))}
+
+\CommentTok{\# Train MetaForest model using \textasciigrave{}caret\textasciigrave{} for optimal tuning}
+\NormalTok{tuned\_model }\OtherTok{\textless{}{-}} \FunctionTok{train}\NormalTok{(}
+  \AttributeTok{y =}\NormalTok{ data\_agro}\SpecialCharTok{$}\NormalTok{yi,}
+  \AttributeTok{x =}\NormalTok{ data\_agro[, }\FunctionTok{c}\NormalTok{(}\StringTok{"Intervention"}\NormalTok{, }\StringTok{"Region"}\NormalTok{, }\StringTok{"StudyID"}\NormalTok{, }\StringTok{"vi"}\NormalTok{)],}
+  \AttributeTok{method =} \FunctionTok{ModelInfo\_mf}\NormalTok{(),           }\CommentTok{\# MetaForest method setup for \textasciigrave{}caret\textasciigrave{}}
+  \AttributeTok{trControl =}\NormalTok{ grouped\_cv,            }\CommentTok{\# Cross{-}validation setup}
+  \AttributeTok{tuneGrid =}\NormalTok{ tuning\_grid,            }\CommentTok{\# Grid of tuning parameters}
+  \AttributeTok{num.trees =} \DecValTok{5000}                   \CommentTok{\# Number of trees for final model}
+\NormalTok{)}
+
+\CommentTok{\# Step 4: Examine the optimal tuning parameters and model performance}
+\NormalTok{best\_params }\OtherTok{\textless{}{-}}\NormalTok{ tuned\_model}\SpecialCharTok{$}\NormalTok{results[}\FunctionTok{which.min}\NormalTok{(tuned\_model}\SpecialCharTok{$}\NormalTok{results}\SpecialCharTok{$}\NormalTok{RMSE), ]}
+\FunctionTok{print}\NormalTok{(best\_params)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    whichweights mtry min.node.size      RMSE  Rsquared       MAE     RMSESD
+## 20         unif    1             5 0.1813407 0.1106552 0.1465791 0.03107815
+##    RsquaredSD      MAESD
+## 20  0.1610125 0.03347646
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Step 5: Assess the final model and visualize results}
+\NormalTok{final\_model }\OtherTok{\textless{}{-}}\NormalTok{ tuned\_model}\SpecialCharTok{$}\NormalTok{finalModel}
+
+\CommentTok{\# R² from out{-}of{-}bag predictions (OOB R² indicates model fit for unseen data)}
+\NormalTok{r2\_oob }\OtherTok{\textless{}{-}}\NormalTok{ final\_model}\SpecialCharTok{$}\NormalTok{forest}\SpecialCharTok{$}\NormalTok{r.squared}
+\FunctionTok{cat}\NormalTok{(}\StringTok{"OOB R{-}squared: "}\NormalTok{, r2\_oob)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## OOB R-squared:  -0.07849894
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Variable importance plot to identify influential moderators}
+\FunctionTok{VarImpPlot}\NormalTok{(final\_model)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{_main_files/figure-latex/unnamed-chunk-14-2.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Step 6: Visualize partial dependence of top moderators}
+\FunctionTok{PartialDependence}\NormalTok{(final\_model, }\AttributeTok{vars =} \FunctionTok{names}\NormalTok{(final\_model}\SpecialCharTok{$}\NormalTok{forest}\SpecialCharTok{$}\NormalTok{variable.importance)[}\DecValTok{1}\SpecialCharTok{:}\DecValTok{2}\NormalTok{], }\AttributeTok{rawdata =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{pi =} \FloatTok{0.95}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{_main_files/figure-latex/unnamed-chunk-14-3.pdf}
+
+\subsubsection{Handling Random Structures and Weights in Meta-Forest Models}\label{handling-random-structures-and-weights-in-meta-forest-models}
+
+Meta-forest models handle \textbf{random structures} and \textbf{weights} differently from traditional meta-analysis models:
+
+\begin{itemize}
+\item
+  \textbf{Random Effects}: Traditional models explicitly incorporate random effects to model between-study variability. Meta-forest, however, relies on the structure of decision trees to capture variability implicitly. While this can account for some heterogeneity, it does not separate fixed and random components as effectively as mixed-effects models.
+\item
+  \textbf{Weights}: Classical meta-analyses use \textbf{inverse variance weighting} to prioritize studies with higher precision. Meta-forest can integrate study weights similarly during the tree-fitting process, ensuring that precise studies have more influence. However, unlike static weights in classical models, meta-forest adjusts them adaptively during iterations, making it more suitable for complex interactions and nonlinear patterns.
+\end{itemize}
+
 \section{Conclusion}\label{conclusion}
 
 In summary, while the \texttt{lm()}, \texttt{lme()}, and \texttt{lmer()} functions can fit various linear models, they are not appropriate for meta-analysis due to their assumptions about the error variances. The \texttt{rma()} function is specifically designed for meta-analytic contexts, ensuring that known sampling variances are correctly utilized, resulting in reliable estimates and standard errors. Additionally, the \texttt{meta} package provides an accessible alternative for meta-analyses, while Bayesian methods using \texttt{brms} allow for flexible modeling and uncertainty quantification.
+
+\section{Practical implementations}\label{practical-implementations}
 
 \subsection{Example 1: fixed vs.~random Meta-Analysis models}\label{example-1-fixed-vs.-random-meta-analysis-models}
 
@@ -1218,8 +1393,6 @@ This structured approach ensures that both theoretical considerations and statis
 
 \textbf{Bootstrapping} is a statistical technique used to estimate the sampling distribution of an estimator by repeatedly resampling from the observed data. In meta-analysis, bootstrapping is commonly applied to construct more robust confidence intervals (CIs) for parameters such as the overall effect size (μ\muμ) and the between-study variance (τ2\tau\^{}2τ2). This chapter will demonstrate how to implement both parametric and non-parametric bootstrapping methods using the \texttt{boot} package in R, emphasizing best practices for obtaining reliable results.
 
-\subsection{Overview}\label{overview}
-
 \begin{itemize}
 \item
   \textbf{Parametric Bootstrapping}: Assumes a specific distributional form for the data (e.g., normal distribution of residuals). The data are generated based on parameter estimates from the fitted model.
@@ -1527,7 +1700,7 @@ To visualize the bootstrap distributions, we can create kernel density plots to 
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{_main_files/figure-latex/unnamed-chunk-27-1.pdf}
+\includegraphics{_main_files/figure-latex/unnamed-chunk-28-1.pdf}
 
 \subsection{Conclusion}\label{conclusion-1}
 
@@ -1537,7 +1710,7 @@ In the next section, we will delve deeper into \textbf{prediction intervals}, wh
 
 \chapter{Plotting meta-analytical results}\label{plotting-meta-analytical-results}
 
-\subsection{Overview}\label{overview-1}
+\subsection{Overview}\label{overview}
 
 This chapter focuses on the visualization of meta-analytical results, which is crucial for effectively communicating findings and insights drawn from aggregated data. Visualization techniques help researchers and stakeholders quickly grasp complex relationships and patterns within the data. In this chapter, we will cover various plotting methods, including forest plots, funnel plots, and advanced visualizations using R packages such as \texttt{ggplot2}, \texttt{metafor}, and \texttt{dmetar}.
 
@@ -1637,7 +1810,7 @@ This chapter focuses on the visualization of meta-analytical results, which is c
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{_main_files/figure-latex/unnamed-chunk-28-1.pdf}
+\includegraphics{_main_files/figure-latex/unnamed-chunk-29-1.pdf}
 
 \subsection{Example 2: Forest plot with meta}\label{example-2-forest-plot-with-meta}
 
@@ -1682,7 +1855,7 @@ This chapter focuses on the visualization of meta-analytical results, which is c
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{_main_files/figure-latex/unnamed-chunk-29-1.pdf}
+\includegraphics{_main_files/figure-latex/unnamed-chunk-30-1.pdf}
 
 \subsection{Example 3: Forest plot with ggplot}\label{example-3-forest-plot-with-ggplot}
 
@@ -1692,22 +1865,6 @@ This chapter focuses on the visualization of meta-analytical results, which is c
 \FunctionTok{library}\NormalTok{(ggplot2)}
 \FunctionTok{library}\NormalTok{(dplyr)}
 \FunctionTok{library}\NormalTok{(ggpubr)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## 
-## Attaching package: 'ggpubr'
-\end{verbatim}
-
-\begin{verbatim}
-## The following object is masked from 'package:cowplot':
-## 
-##     get_legend
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \FunctionTok{library}\NormalTok{(ggstar)}
 
 \CommentTok{\# Prepare the data: Calculate estimates, confidence intervals, and other metrics}
@@ -1745,7 +1902,7 @@ This chapter focuses on the visualization of meta-analytical results, which is c
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{_main_files/figure-latex/unnamed-chunk-30-1.pdf}
+\includegraphics{_main_files/figure-latex/unnamed-chunk-31-1.pdf}
 
 \subsection{Example 4: Orchard plots}\label{example-4-orchard-plots}
 
@@ -1809,7 +1966,7 @@ This chapter focuses on the visualization of meta-analytical results, which is c
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{_main_files/figure-latex/unnamed-chunk-31-1.pdf}
+\includegraphics{_main_files/figure-latex/unnamed-chunk-32-1.pdf}
 
 \chapter{Analysis and Visualization of Publication Bias}\label{analysis-and-visualization-of-publication-bias}
 
@@ -1876,7 +2033,7 @@ A funnel plot is a scatter plot that helps visualize the relationship between th
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{_main_files/figure-latex/unnamed-chunk-32-1.pdf}
+\includegraphics{_main_files/figure-latex/unnamed-chunk-33-1.pdf}
 
 \subsubsection{Understanding Funnel Plots}\label{understanding-funnel-plots}
 
@@ -1896,11 +2053,9 @@ A funnel plot is a scatter plot that helps visualize the relationship between th
 
 In a bias-free scenario, 95\% of studies would be expected to lie within the dashed lines representing the 95\% confidence interval.
 
-\subsubsection{Interpreting Funnel Plots}\label{interpreting-funnel-plots}
+\textbf{Interpreting Funnel Plots and Reasons for Asymmetry}
 
-When analyzing a funnel plot, look for symmetry. A symmetrical plot suggests that publication bias is unlikely, while an asymmetrical plot may indicate bias. \textbf{Image B} illustrates an asymmetrical funnel, where points predominantly cluster on one side, suggesting that the summary estimate may overstate the effect.
-
-\subsection{Reasons for Asymmetry}\label{reasons-for-asymmetry}
+When analyzing a funnel plot, look for symmetry. A symmetrical plot suggests that publication bias is unlikely, while an asymmetrical plot may indicate bias.
 
 Asymmetry in a funnel plot can arise from several factors:
 
@@ -1915,6 +2070,15 @@ Asymmetry in a funnel plot can arise from several factors:
   \textbf{Artefactual Correlation}: Correlations between effect estimates and their standard errors can create false asymmetry.
 \item
   \textbf{Chance}: Random variation is more likely in analyses with fewer studies.
+\end{itemize}
+
+Methods such as the Precision Effect Test (PET) and Precision Effect Estimation with Standard Error (PEESE) have been developed to help researchers better assess and adjust for publication bias.
+
+\begin{itemize}
+\item
+  \textbf{PET} evaluates the relationship between effect sizes and their standard errors, positing that smaller studies (often unpublished) will display larger effect sizes due to the likelihood of publication. By fitting a regression model where effect sizes are regressed on their standard errors, researchers can determine whether a systematic bias exists. If the regression shows a significant slope, it suggests that publication bias is present, as smaller studies are showing disproportionately large effects.
+\item
+  \textbf{PEESE} builds on the insights from PET by providing a more nuanced approach to estimate the true effect size. It uses both the effect sizes and their standard errors, allowing for a more accurate adjustment of the effect size that accounts for the potential bias introduced by smaller studies. PEESE calculates an adjusted effect size by modeling the observed effect sizes and their variances, yielding a refined estimate that is less susceptible to the biases highlighted in PET.
 \end{itemize}
 
 \subsection{Trim and Fill Method}\label{trim-and-fill-method}
@@ -1966,29 +2130,11 @@ The \emph{trim and fill} method adjusts for publication bias by estimating the n
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{_main_files/figure-latex/unnamed-chunk-33-1.pdf}
+\includegraphics{_main_files/figure-latex/unnamed-chunk-34-1.pdf}
 
 In this example, the \texttt{trimfill} function from the \texttt{metafor} package adjusts the meta-analysis results for publication bias.
 
-\subsection{Duval and Tweedie's Trim and Fill}\label{duval-and-tweedies-trim-and-fill}
-
-An alternative to the traditional \emph{trim and fill}, Duval and Tweedie's method provides an updated approach to adjust for publication bias, offering more robust imputation of missing studies.
-
-\subsubsection{Example of Using Duval and Tweedie's Method}\label{example-of-using-duval-and-tweedies-method}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\# Perform Duval and Tweedie\textquotesingle{}s trim and fill}
-\NormalTok{duval\_tweedie\_res }\OtherTok{\textless{}{-}} \FunctionTok{trimfill}\NormalTok{(res, }\AttributeTok{direction =} \StringTok{"both"}\NormalTok{)}
-
-\CommentTok{\# Create a funnel plot with Duval and Tweedie’s imputation}
-\FunctionTok{funnel}\NormalTok{(duval\_tweedie\_res, }\AttributeTok{main =} \StringTok{"Funnel Plot with Duval and Tweedie\textquotesingle{}s Trim and Fill"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{_main_files/figure-latex/unnamed-chunk-34-1.pdf}
-
-\subsection{3. Egger Test}\label{egger-test}
+\subsection{Egger Test}\label{egger-test}
 
 The Egger test statistically assesses funnel plot asymmetry. A significant result indicates potential publication bias.
 
@@ -2041,7 +2187,7 @@ Rosenthal's Fail-Safe N calculates the number of unpublished studies with null r
 ## Fail-safe N: 8
 \end{verbatim}
 
-\subsubsection{Robust Bayesian Meta-Analysis (RoBMA)}\label{robust-bayesian-meta-analysis-robma}
+\subsection{Robust Bayesian Meta-Analysis (RoBMA)}\label{robust-bayesian-meta-analysis-robma}
 
 \textbf{Robust Bayesian Meta-Analysis (RoBMA)} is an advanced method designed to address the limitations of traditional meta-analysis by incorporating information on publication bias, heterogeneity, and effect sizes in a single model. It relies on Bayesian principles to estimate the probability of the presence of a real effect while considering the potential for biases and study variability. RoBMA extends the traditional meta-analytic framework by integrating multiple models that account for different sources of uncertainty. It not only provides point estimates of effect sizes but also outputs the probability that publication bias and heterogeneity are influencing the results. This allows for a more transparent and reliable evaluation of the evidence base. Specifically, RoBMA offers:
 
@@ -2062,38 +2208,7 @@ The implementation of RoBMA in R is straightforward using the \texttt{RoBMA} pac
 \begin{Highlighting}[]
 \CommentTok{\# Load the necessary libraries}
 \FunctionTok{library}\NormalTok{(RoBMA)}
-\end{Highlighting}
-\end{Shaded}
 
-\begin{verbatim}
-## Loading required namespace: runjags
-\end{verbatim}
-
-\begin{verbatim}
-## 
-## Attaching package: 'RoBMA'
-\end{verbatim}
-
-\begin{verbatim}
-## The following object is masked from 'package:brms':
-## 
-##     prior
-\end{verbatim}
-
-\begin{verbatim}
-## The following object is masked from 'package:meta':
-## 
-##     forest
-\end{verbatim}
-
-\begin{verbatim}
-## The following object is masked from 'package:metafor':
-## 
-##     forest
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \CommentTok{\# Ensure your dataset \textquotesingle{}dat\textquotesingle{} is structured correctly}
 \CommentTok{\# Use the yi and vi columns from \textquotesingle{}dat\textquotesingle{}}
 \CommentTok{\# Fit the Bayesian meta{-}analysis model}

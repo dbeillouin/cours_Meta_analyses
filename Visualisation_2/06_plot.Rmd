@@ -12,7 +12,7 @@ This chapter focuses on the visualization of meta-analytical results, which is c
 
 ### Example 1: Forest plot with metafor
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 dat <- data.frame(author = c("Dyson", "Jönsson", "Morris", "Saslow", "Saslow", "Sato", "Tay", "Yamada"),
                   year   = c(2010, 2009, 2019, 2014, 2017, 2017, 2014, 2014),
                   ai     = c(3, 6, 11, 8, 6, 4, 36, 2), ##Nb event experimental group
@@ -108,7 +108,7 @@ text(sav$xlim[1], k + 4.5, pos = 4, "Risk difference between low and very low ca
 
 ### Example 2: Forest plot with meta
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 library(meta)
 # Perform meta-analysis using the metagen function from `meta`
 # Perform meta-analysis using the metagen function from `meta`
@@ -150,7 +150,7 @@ grid.text("Random-effects model with Knapp-Hartung adjustments",
 
 ### Example 3: Forest plot with ggplot
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 # Load necessary libraries
 library(ggplot2)
 library(dplyr)
@@ -261,7 +261,7 @@ Publication bias is a significant concern in meta-analysis, as it can distort th
 
 A funnel plot is a scatter plot that helps visualize the relationship between the effect size and the precision of individual studies in a meta-analysis. It is an essential tool for identifying potential publication bias.
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 # Load necessary libraries
 library(metafor)
 library(ggplot2)
@@ -328,11 +328,9 @@ funnel_plot
 
 In a bias-free scenario, 95% of studies would be expected to lie within the dashed lines representing the 95% confidence interval.
 
-#### Interpreting Funnel Plots
+**Interpreting Funnel Plots and Reasons for Asymmetry**
 
-When analyzing a funnel plot, look for symmetry. A symmetrical plot suggests that publication bias is unlikely, while an asymmetrical plot may indicate bias. **Image B** illustrates an asymmetrical funnel, where points predominantly cluster on one side, suggesting that the summary estimate may overstate the effect.
-
-### Reasons for Asymmetry
+When analyzing a funnel plot, look for symmetry. A symmetrical plot suggests that publication bias is unlikely, while an asymmetrical plot may indicate bias.
 
 Asymmetry in a funnel plot can arise from several factors:
 
@@ -346,13 +344,19 @@ Asymmetry in a funnel plot can arise from several factors:
 
 -   **Chance**: Random variation is more likely in analyses with fewer studies.
 
+Methods such as the Precision Effect Test (PET) and Precision Effect Estimation with Standard Error (PEESE) have been developed to help researchers better assess and adjust for publication bias.
+
+-   **PET** evaluates the relationship between effect sizes and their standard errors, positing that smaller studies (often unpublished) will display larger effect sizes due to the likelihood of publication. By fitting a regression model where effect sizes are regressed on their standard errors, researchers can determine whether a systematic bias exists. If the regression shows a significant slope, it suggests that publication bias is present, as smaller studies are showing disproportionately large effects.
+
+-   **PEESE** builds on the insights from PET by providing a more nuanced approach to estimate the true effect size. It uses both the effect sizes and their standard errors, allowing for a more accurate adjustment of the effect size that accounts for the potential bias introduced by smaller studies. PEESE calculates an adjusted effect size by modeling the observed effect sizes and their variances, yielding a refined estimate that is less susceptible to the biases highlighted in PET.
+
 ### Trim and Fill Method
 
 The *trim and fill* method adjusts for publication bias by estimating the number of studies that would need to be added to achieve symmetry. This method imputes missing studies to provide a more accurate effect size.
 
 #### Example of Using Trim and Fill
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 # Perform trim and fill analysis
 trimmed_res <- trimfill(res)
 
@@ -366,28 +370,13 @@ funnel(trimmed_res, main = "Funnel Plot with Trim and Fill")
 
 In this example, the `trimfill` function from the `metafor` package adjusts the meta-analysis results for publication bias.
 
-### Duval and Tweedie’s Trim and Fill
-
-An alternative to the traditional *trim and fill*, Duval and Tweedie’s method provides an updated approach to adjust for publication bias, offering more robust imputation of missing studies.
-
-#### Example of Using Duval and Tweedie’s Method
-
-```{r}
-# Perform Duval and Tweedie's trim and fill
-duval_tweedie_res <- trimfill(res, direction = "both")
-
-# Create a funnel plot with Duval and Tweedie’s imputation
-funnel(duval_tweedie_res, main = "Funnel Plot with Duval and Tweedie's Trim and Fill")
-
-```
-
-### 3. Egger Test
+### Egger Test
 
 The Egger test statistically assesses funnel plot asymmetry. A significant result indicates potential publication bias.
 
 #### Conducting the Egger Test
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 # Conduct the Egger test
 egger_test <- regtest(res)
 
@@ -402,14 +391,14 @@ Rosenthal's Fail-Safe N calculates the number of unpublished studies with null r
 
 #### Example of Calculating Fail-Safe N
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 # Calculate the Fail-Safe N
 failsafe_n <- fsn(res)
 print(failsafe_n)
 
 ```
 
-#### Robust Bayesian Meta-Analysis (RoBMA)
+### Robust Bayesian Meta-Analysis (RoBMA)
 
 **Robust Bayesian Meta-Analysis (RoBMA)** is an advanced method designed to address the limitations of traditional meta-analysis by incorporating information on publication bias, heterogeneity, and effect sizes in a single model. It relies on Bayesian principles to estimate the probability of the presence of a real effect while considering the potential for biases and study variability. RoBMA extends the traditional meta-analytic framework by integrating multiple models that account for different sources of uncertainty. It not only provides point estimates of effect sizes but also outputs the probability that publication bias and heterogeneity are influencing the results. This allows for a more transparent and reliable evaluation of the evidence base. Specifically, RoBMA offers:
 
@@ -423,7 +412,7 @@ print(failsafe_n)
 
 The implementation of RoBMA in R is straightforward using the `RoBMA` package. Below is a basic example using simulated effect sizes (`d`) and standard errors (`se`):
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 # Load the necessary libraries
 library(RoBMA)
 
