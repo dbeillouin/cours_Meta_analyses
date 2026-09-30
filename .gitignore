@@ -1,6 +1,8 @@
-.Rproj.user
+_site/
+.quarto/
+*_files/
+Rplots.pdf
 .Rhistory
 .RData
-.Ruserdata
-
-/.quarto/
+.Rproj.user/
+.DS_Store

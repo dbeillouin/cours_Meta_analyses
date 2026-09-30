@@ -1,0 +1,17 @@
+project:
+  type: default
+  output-dir: _site
+  render:
+    - seances/*/slides.qmd
+    - td/*/*.qmd
+  post-render: R/post_render.R
+
+execute:
+  freeze: auto
+  echo: false
+  warning: false
+  message: false
+
+bibliography: references.bib
+csl: theme/ecology.csl
+lang: en

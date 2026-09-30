@@ -1,0 +1,256 @@
+---
+title: "Explaining heterogeneity in R"
+subtitle: "Practical · Wednesday 16:33–16:55 · FRB-CESAB training course"
+author: "Damien Beillouin"
+format:
+  html:
+    theme: [cosmo, ../../theme/cesab-doc.scss]
+    toc: true
+    toc-location: left
+    toc-title: "Practical"
+    number-sections: true
+    embed-resources: true
+    html-math-method: mathml
+    code-copy: true
+    fig-width: 8
+    fig-height: 4.5
+    fig-dpi: 150
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup-hidden
+#| include: false
+data_file <- "../../donnees/derivees/intercropping_biodiversity.csv"
+```
+
+::: {.callout-tip appearance="simple" icon="false"}
+## By the end of this practical, you will be able to
+
+1.  Fit and read a **meta-regression** (omnibus test, coefficients, pseudo-R²).
+2.  Separate the **within-study** from the **between-study** part of a moderator effect.
+3.  Check coefficients of variation and **impute missing SDs** transparently.
+:::
+
+| Time | What | Section |
+|------|------|---------|
+| 16:33 | Meta-regression: pests vs natural enemies (1 blank) | [1](#setup) · [2](#metareg) |
+| 16:40 | Within- vs between-study (1 blank) · *optional:* validity | [3](#within) |
+| 16:47 | Missing SDs (code given: run and interpret) | [4](#missing) |
+
+Work **in pairs**. Only two blanks (`___`) to fill: the rest of the script is given, and the work is to **read and discuss the outputs**. The questions are in the script (`# Q:`).
+| 16:55 | Debrief (until 17:00) | [5](#key) |
+
+# Setup {#setup}
+
+Open `meta_analysis_course.Rproj` (the course kit), then `td_advanced.R` (exercises with blanks `___`).
+
+```{r}
+#| label: load
+library(dplyr)
+library(metafor)
+library(ggplot2)
+
+# In the participant pack: data_file <- "intercropping_biodiversity.csv"
+ic <- read.csv(data_file)
+
+dat <- ic |>
+  filter(functional_group %in% c("Pests", "Natural enemies"), !sd_missing, !zero_mean) |>
+  escalc(measure = "ROM", m1i = b_mean_t, sd1i = b_sd_t, n1i = b_n_t,
+         m2i = b_mean_c, sd2i = b_sd_c, n2i = b_n_c, data = _)
+
+pct <- function(x) round(100 * (exp(x) - 1), 1)
+fit <- function(d, mods = ~ 1)          # the multilevel model of this afternoon
+  rma.mv(yi, vi, mods = mods, random = ~ 1 | study_id / es_id,
+         data = d, test = "t", dfs = "contain")
+
+table(dat$functional_group)
+```
+
+# Meta-regression {#metareg}
+
+**Predict first:** will intercropping have the same effect on pests and on their natural enemies?
+
+**Exercise 1.** Add `functional_group` as a moderator.
+
+```{r}
+#| label: ex1-template
+#| eval: false
+m0 <- fit(dat)                          # no moderator
+m1 <- fit(dat, mods = ~ ___)            # with moderator
+m1                                      # find: Test of Moderators (F, p)
+robust(m1, cluster = study_id, clubSandwich = TRUE)   # few studies: check with CR2
+```
+
+::: {.callout-note collapse="true" title="Solution"}
+```{r}
+#| label: ex1-solution
+m0 <- fit(dat)
+m1 <- fit(dat, mods = ~ functional_group)
+m1
+m1r <- robust(m1, cluster = study_id, clubSandwich = TRUE)
+m1r
+```
+
+-   **Test of Moderators**: *F* is large, *p* < 0.001 → the effect differs between groups.
+-   With **cluster-robust (CR2)** tests the denominator df drop to about **10** (only a few studies carry the contrast), but *p* stays ≈ 0.001: the difference survives.
+-   `intrcpt` = natural enemies (reference level); `functional_groupPests` = **difference** pests − natural enemies (lnRR scale).
+:::
+
+**Exercise 2** (code given — run and read). One estimate per group (intercept removed with `0 +`) and the share of heterogeneity explained. How large is the pseudo-R²? At which level does the moderator explain something?
+
+::: {.callout-note collapse="true" title="Code and answer"}
+```{r}
+#| label: ex2-solution
+m1b <- fit(dat, mods = ~ 0 + functional_group)
+pct(coef(m1b))
+
+R2 <- 1 - sum(m1$sigma2) / sum(m0$sigma2)
+round(100 * R2, 1)
+round(100 * (1 - m1$sigma2 / m0$sigma2), 1)
+```
+
+Pests decrease, natural enemies tend to increase — consistent with the *enemies hypothesis*. But the moderator explains only about **10%** of the heterogeneity overall, and almost all of it **within studies** (~15%) rather than between studies (~2%). Pseudo-R² is rough (it can even be negative) — both models must be fitted on **the same rows**, as here.
+:::
+
+# Within-study check and study quality {#within}
+
+**Exercise 3.** Split the moderator into a **within-study** part (does a study that measured both groups see a difference?) and a **between-study** part (do studies of pests differ from studies of enemies?). Only a few studies measured both groups.
+
+```{r}
+#| label: ex3-template
+#| eval: false
+dat <- dat |>
+  mutate(pest = as.numeric(functional_group == "Pests")) |>
+  group_by(study_id) |>
+  mutate(pest_m = mean(pest),          # share of pest rows in the study (between)
+         pest_w = pest - ___) |>       # deviation from the study mean (within)
+  ungroup()
+sum(tapply(dat$pest, dat$study_id, function(x) length(unique(x))) == 2)  # studies with both
+m_wb <- fit(dat, mods = ~ pest_w + pest_m)
+pct(coef(m_wb)[-1])
+m_wb
+```
+
+::: {.callout-note collapse="true" title="Solution"}
+```{r}
+#| label: ex3-solution
+dat <- dat |>
+  mutate(pest = as.numeric(functional_group == "Pests")) |>
+  group_by(study_id) |>
+  mutate(pest_m = mean(pest), pest_w = pest - pest_m) |>
+  ungroup()
+sum(tapply(dat$pest, dat$study_id, function(x) length(unique(x))) == 2)
+m_wb <- fit(dat, mods = ~ pest_w + pest_m)
+pct(coef(m_wb)[-1])
+m_wb
+```
+
+-   **Within** studies (same field, year, crop): pests about **−36%** relative to natural enemies, clearly different from 0.
+-   **Between** studies: about **−28%**, and uncertain (*p* ≈ 0.09).
+-   Same direction and similar size: the difference is not just an artefact of *which* studies measured *which* group. The within-study estimate is the one that controls for study context — it is the stronger evidence.
+:::
+
+*(optional)* **Exercise 4.** For natural enemies only, is study quality (`validity_biodiv`) a moderator? How many comparisons could not be appraised?
+
+::: {.callout-note collapse="true" title="Solution"}
+```{r}
+#| label: ex4-solution
+ne <- filter(dat, functional_group == "Natural enemies")
+sum(is.na(ne$validity_biodiv))
+m_v <- fit(ne, mods = ~ 0 + factor(validity_biodiv))
+pct(coef(m_v))
+fit(ne, mods = ~ factor(validity_biodiv))$pval[2]
+```
+
+Comparisons meeting all validity criteria show a clear increase of natural enemies; the others show none. But the "not valid" level rests on only **6 studies** (93 rows) and the "valid" one on 12 studies: a between-study association with few clusters. Poor designs may mask a real benefit — or valid studies differ in other ways (crop, region, taxa). And 1 comparison in 5 could not be appraised at all.
+:::
+
+# Missing SDs {#missing}
+
+Back to **pests**, this time keeping the comparisons without a usable SD (but with non-zero means).
+
+```{r}
+#| label: missing-data
+pz <- ic |> filter(functional_group == "Pests", !zero_mean)
+c(total = nrow(pz), sd_missing = sum(pz$sd_missing))
+```
+
+**Exercise 5. Check the CVs first** (code given — run and read). The coefficient of variation (SD / mean) of each **study** with SDs. Which studies look implausible?
+
+::: {.callout-note collapse="true" title="Code and answer"}
+```{r}
+#| label: ex5-solution
+cvs <- pz |>
+  filter(!sd_missing) |>
+  mutate(cv_t = b_sd_t / b_mean_t, cv_c = b_sd_c / b_mean_c)
+cvs |>
+  group_by(study_id) |>
+  summarise(cv = mean((cv_t + cv_c) / 2), n = mean(b_n_t)) |>
+  arrange(desc(cv)) |>
+  head(5)
+```
+
+Two studies (722 and 729) have a mean CV above 3 — study 729 with *n* = 1,200 per group. In the database, these SDs were **rebuilt as SE × √n** with *n* = the number of subsamples, not of independent plots (pseudo-replication): the "SD" is inflated and so is *n*. **Go back to the paper, and recompute from it — never just patch the number.** Here we set these two studies aside, both from the CV pool and from the analysis.
+:::
+
+**Exercise 6. Impute and compare** (code given — run it and read the output).
+
+```{r}
+#| label: ex6
+suspect <- c(722, 729)                  # studies flagged in Exercise 5
+# typical CV = mean CV weighted by n, per group, then squared
+# (Nakagawa et al. 2023; what metafor does with vtype = "AV")
+weighted.mean(cvs$cv_t, cvs$b_n_t)^2          # without the screen: absurd
+ok   <- filter(cvs, !study_id %in% suspect)
+cv2t <- weighted.mean(ok$cv_t, ok$b_n_t)^2
+cv2c <- weighted.mean(ok$cv_c, ok$b_n_c)^2
+c(cv2t, cv2c)                           # with the screen: plausible
+
+pz <- pz |>
+  mutate(yi = log(b_mean_t / b_mean_c),
+         vi = ifelse(sd_missing,
+                     cv2t / b_n_t + cv2c / b_n_c,          # imputed: typical CV, squared
+                     b_sd_t^2 / (b_n_t * b_mean_t^2) +     # observed SDs
+                       b_sd_c^2 / (b_n_c * b_mean_c^2))) |>
+  filter(!study_id %in% suspect)
+table(pz$study_id[pz$sd_missing])       # where do the imputed rows come from?
+
+m_cc  <- fit(filter(pz, !sd_missing))
+m_imp <- fit(pz)
+rbind(complete_cases = pct(c(m_cc$b,  m_cc$ci.lb,  m_cc$ci.ub)),
+      with_imputed   = pct(c(m_imp$b, m_imp$ci.lb, m_imp$ci.ub)))
+```
+
+::: {.callout-caution icon="false"}
+## Interpret
+Does the conclusion change? What would you write in the methods and results sections?
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+Nearly identical estimates (about −28% vs −30%): the conclusion is robust to the missing SDs. But look where the imputed rows come from: **45 of 53 from a single study (525)**. The first step is to go back to that paper. Without the CV screen, the squared typical CV is about 30 instead of about 0.2, and imputation would have given these rows almost no weight. Report the number of comparisons with imputed variances, the method [@nakagawa2023], the CV screening (and the studies set aside), and both results.
+:::
+
+# Debrief {#key}
+
+::: {.callout-tip appearance="simple" icon="false"}
+1.  Meta-regression tests whether a moderator **explains** heterogeneity: report the omnibus test, coefficients **and** residual heterogeneity (pseudo-R²).
+2.  Between-study moderator effects are **associations**; within-study contrasts are stronger.
+3.  Missing SDs: **check CVs by study**, recompute from the paper when you can, impute transparently, compare with complete cases.
+4.  Tomorrow (group projects): the biodiversity–yield pairs (`biodiversity_yield_pairs.csv`) are a good playground for a multivariate question.
+:::
+
+## Going further in the online notebook {.unnumbered}
+
+-   [Moderators, missing data and networks](https://literaturesynthesis.github.io/notebook/chapters/heterogeneity-moderators.html)
+-   [Certainty of evidence and what can be inferred](https://literaturesynthesis.github.io/notebook/chapters/certainty.html)
+-   [Your turn: soil carbon under agroforestry (end-to-end exercise)](https://literaturesynthesis.github.io/notebook/chapters/your-turn.html)
+-   [Before you submit: a checklist](https://literaturesynthesis.github.io/notebook/chapters/checklist.html)
+
+## References
+
+::: {#refs}
+:::

@@ -1,0 +1,393 @@
+---
+title: "Why does the effect vary?"
+subtitle: "Meta-regression, missing data and a glimpse of network meta-analysis"
+---
+
+```{r}
+#| label: setup
+#| include: false
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(metafor)
+library(readr)
+source("../../R/theme_cesab.R")
+knitr::opts_chunk$set(dev = "png", dev.args = list(bg = "transparent"), out.width = "100%")
+
+ic   <- read_csv("../../donnees/derivees/intercropping_biodiversity.csv", show_col_types = FALSE)
+comp <- read_csv("../../donnees/derivees/comparisons_all.csv", show_col_types = FALSE)
+pc   <- function(x) round(100 * (exp(x) - 1))
+fit  <- function(d, mods = ~ 1)
+  rma.mv(yi, vi, mods = mods, random = ~ 1 | study_id / es_id, data = d, test = "t", dfs = "contain")
+
+dat <- ic |>
+  filter(functional_group %in% c("Pests", "Natural enemies"), !sd_missing, !zero_mean) |>
+  escalc(measure = "ROM", m1i = b_mean_t, sd1i = b_sd_t, n1i = b_n_t,
+         m2i = b_mean_c, sd2i = b_sd_c, n2i = b_n_c, data = _)
+k <- nrow(dat); n_study <- n_distinct(dat$study_id)
+
+m0  <- fit(dat)
+m1  <- fit(dat, ~ functional_group)
+m1b <- fit(dat, ~ 0 + functional_group)
+m1r <- robust(m1, cluster = study_id, clubSandwich = TRUE)
+R2    <- 100 * (1 - sum(m1$sigma2) / sum(m0$sigma2))
+R2lev <- 100 * (1 - m1$sigma2 / m0$sigma2)      # by level: studies, comparisons
+
+# within- vs between-study decomposition of the moderator
+dat <- dat |> mutate(pest = as.numeric(functional_group == "Pests")) |>
+  group_by(study_id) |> mutate(pest_m = mean(pest), pest_w = pest - pest_m) |> ungroup()
+m_wb <- fit(dat, ~ pest_w + pest_m)
+n_both <- dat |> group_by(study_id) |> summarise(b = n_distinct(functional_group)) |> filter(b == 2) |> nrow()
+
+pests <- filter(dat, functional_group == "Pests")
+m_p   <- fit(pests); pr_p <- predict(m_p)
+
+ne     <- filter(dat, functional_group == "Natural enemies")
+m_nev  <- fit(ne, ~ factor(validity_biodiv))
+m_nevb <- fit(ne, ~ 0 + factor(validity_biodiv))
+
+# missing SDs, pests: CV check and imputation (Nakagawa et al. 2023, simplified)
+pz <- ic |> filter(functional_group == "Pests", !zero_mean)
+cvs <- pz |> filter(!sd_missing) |> mutate(cv_t = b_sd_t / b_mean_t, cv_c = b_sd_c / b_mean_c)
+cv_study <- cvs |> group_by(study_id) |> summarise(cv = mean((cv_t + cv_c) / 2), n = mean(b_n_t))
+suspect  <- cv_study$study_id[cv_study$cv > 3]
+# Nakagawa et al. (2023), as in metafor vtype = "AV": n-weighted mean CV per group, squared
+cv2_nofilter <- weighted.mean(cvs$cv_t, cvs$b_n_t)^2
+ok   <- cvs |> filter(!study_id %in% suspect)
+cv2t <- weighted.mean(ok$cv_t, ok$b_n_t)^2; cv2c <- weighted.mean(ok$cv_c, ok$b_n_c)^2
+pz <- pz |> mutate(yi = log(b_mean_t / b_mean_c),
+                   vi = ifelse(sd_missing, cv2t / b_n_t + cv2c / b_n_c,
+                               b_sd_t^2 / (b_n_t * b_mean_t^2) + b_sd_c^2 / (b_n_c * b_mean_c^2)))
+pz    <- filter(pz, !study_id %in% suspect)
+m_cc  <- fit(filter(pz, !sd_missing))
+m_imp <- fit(pz)
+n_525 <- sum(pz$sd_missing & pz$study_id == 525)
+```
+
+## Learning objectives {.objectives}
+
+By the end of this session, you will be able to:
+
+1.  Use **meta-regression** to test whether a moderator explains heterogeneity — and interpret it without over-claiming.
+2.  Tell **within-study** from **between-study** evidence for a moderator.
+3.  Handle **missing standard deviations** transparently.
+4.  Recognise when a **network meta-analysis** (or another advanced method) is needed.
+
+::: notes
+45 min: ~18 min slides, ~22 min practical, ~5 min debrief and wrap-up of Wednesday. This session answers the question left open at 14:00: why is the prediction interval so wide?
+:::
+
+## The question left open at 14:00
+
+::: {.columns}
+::: {.column width="50%"}
+Pests under intercropping: **`r pc(pr_p$pred)`%** on average...
+
+...but in a new field anywhere from **`r pc(pr_p$pi.lb)`%** to **+`r pc(pr_p$pi.ub)`%**.
+
+::: {.fragment .box .blue}
+[Why?]{.box-title}
+Crop, pest species, climate, design, intercrop density... A **moderator** is a study or comparison characteristic that may explain part of this variation.
+:::
+:::
+
+::: {.column width="48%"}
+::: {.fragment .box .green}
+[At 15:00 we already did it]{.box-title}
+The multilevel Egger test added precision as a moderator; the validity test added study quality. **Meta-regression = a meta-analysis with predictors.**
+:::
+:::
+:::
+
+# Meta-regression {.section-divider background-image="../../theme/img/bg-keymessages.jpg"}
+
+## From meta-analysis to meta-regression
+
+::: {.columns}
+::: {.column width="50%"}
+This afternoon's multilevel model, **plus a predictor**:
+
+$$y_{ij} = \beta_0 + \beta_1 x_{ij} + u_j + u_{ij} + \varepsilon_{ij}$$
+
+-   [β~1~ x~ij~]{style="color:#045C82;font-weight:600"}: the moderator (categorical or continuous)
+-   [u~j~]{style="color:#2E8B8C;font-weight:600"}, [u~ij~]{style="color:#6E9A1A;font-weight:600"}: what the moderator does **not** explain (residual heterogeneity, between and within studies)
+-   ε~ij~: sampling error, known (v~ij~)
+:::
+
+::: {.column width="48%"}
+::: {.fragment .box .blue}
+[Three things to read]{.box-title}
+
+1.  **Omnibus test** (*F*): does the moderator explain anything?
+2.  **Coefficients**: how much, in which direction?
+3.  **Pseudo-R²**: how much of the heterogeneity is explained?
+:::
+:::
+:::
+
+::: notes
+~1 min. Nothing new in the random part: it is the model of 14:00. Only the fixed part grows.
+:::
+
+## The same model in R
+
+```r
+rma.mv(yi, vi,
+       mods   = ~ functional_group,
+       random = ~ 1 | study_id / es_id,
+       test = "t", dfs = "contain", data = dat)
+```
+
+| In the equation | In the code | Meaning |
+|---|---|---|
+| [β~1~ x~ij~]{style="color:#045C82;font-weight:600"} | [`mods = ~ functional_group`]{style="color:#045C82"} | the moderator |
+| [u~j~]{style="color:#2E8B8C;font-weight:600"} | [`study_id`]{style="color:#2E8B8C"} | between-study heterogeneity |
+| [u~ij~]{style="color:#6E9A1A;font-weight:600"} | [`es_id`]{style="color:#6E9A1A"} | within-study heterogeneity |
+| ε~ij~ | `vi` | sampling error (known) |
+
+::: {.fragment}
+**Pseudo-R²** = share of the total heterogeneity removed by the moderator, computed on the **same rows**:
+$$R^2 = 1 - \frac{\sum\sigma^2_{\text{with moderator}}}{\sum\sigma^2_{\text{without}}}$$
+:::
+
+## Pests vs natural enemies
+
+::: {.columns}
+::: {.column width="55%"}
+```{r}
+#| label: plot-groups
+#| fig-width: 7.8
+#| fig-height: 4.6
+k_g <- dat |> group_by(functional_group) |> summarise(k = n(), s = n_distinct(study_id))
+tibble(functional_group = sub("functional_group", "", names(coef(m1b))),
+       est = coef(m1b), lo = m1b$ci.lb, hi = m1b$ci.ub) |>
+  left_join(k_g, by = "functional_group") |>
+  mutate(lab = paste0(functional_group, "\n(", s, " studies, k = ", k, ")")) |>
+  ggplot(aes(est, lab)) +
+  geom_vline(xintercept = 0, linetype = 2, colour = cesab[["grey"]]) +
+  geom_errorbarh(aes(xmin = lo, xmax = hi), height = 0, linewidth = 3, colour = cesab[["teal"]]) +
+  geom_point(shape = 23, size = 7, fill = "white", colour = cesab[["blue"]], stroke = 2) +
+  scale_x_continuous(labels = \(x) pct(x), breaks = log(c(0.5, 0.75, 1, 1.25, 1.5))) +
+  labs(x = "Abundance, intercropping vs monoculture", y = NULL) +
+  theme_cesab(18)
+```
+:::
+
+::: {.column width="43%"}
+-   Difference: pests `r pc(coef(m1)[2])`% relative to natural enemies
+-   Omnibus test, cluster-robust: *F* = `r round(m1r$QM, 1)` on 1 and `r round(m1r$QMdf[2])` df, *p* = `r round(m1r$QMp, 3)`
+-   Pseudo-R² ≈ **`r round(R2)`%** (`r round(R2lev[2])`% of within-study, `r round(R2lev[1])`% of between-study variance)
+
+::: {.fragment .box .warn}
+A clear moderator... that explains only **~`r round(R2)`%** of the heterogeneity. Most of the variation remains unexplained.
+:::
+:::
+:::
+
+::: notes
+~3 min. Intercropping reduces pests and tends to favour their natural enemies — consistent with the "enemies hypothesis". Why cluster-robust? The model-based test uses 575 df because the moderator varies within studies, assuming the same difference in every study; with only ~14 studies informing the contrast, CR2 gives ~10 df — more honest. Pseudo-R² can be negative and is imprecise; fit both models on the same rows.
+:::
+
+## The groups, or the studies that measured them? {.question}
+
+::: question-card
+[Your call]{.q-kicker}
+
+[Studies on pests and studies on natural enemies may differ in crops, regions, designs... Can we trust the difference?]{.q-text}
+:::
+
+::: {.columns}
+::: {.column width="50%"}
+::: {.fragment .box .warn}
+**Between-study** differences are **observational**: any study characteristic that travels with the moderator can **confound** it.
+:::
+:::
+::: {.column width="48%"}
+::: {.fragment .box .green}
+`r n_both` studies measured **both** groups. Split the moderator into its within- and between-study parts (`mods = ~ pest_w + pest_m`):\
+**within studies: `r pc(coef(m_wb)[2])`%** · between studies: `r pc(coef(m_wb)[3])`% (*p* = `r round(m_wb$pval[3], 2)`).\
+The within-study contrast — same fields, same year — is the stronger evidence.
+:::
+:::
+:::
+
+::: notes
+~3 min. pest_w = pest − study mean of pest (within); pest_m = study mean (between). Within-study contrasts hold the field, year and crop constant [@thompson2002].
+:::
+
+## Meta-regression: the rules of the game {.big-table}
+
+| Rule | Why |
+|---|---|
+| Choose moderators **a priori**, in the protocol | Testing many moderators guarantees false positives |
+| **≈ 10 studies** (not rows) per moderator level or coefficient | A between-study moderator is tested on the number of **studies** (remember *df* ≈ 10 above): many rows per study add little |
+| Report the **omnibus test**, coefficients **and** residual heterogeneity | "Significant" is not "explains the variation" |
+| Beware **confounding** between moderators | Crops, regions and designs travel together |
+| Prefer **within-study** contrasts when they exist | They control for study context |
+| Moderator effects are **associations**, not causes | Studies were not randomised to moderator levels |
+
+::: {.source}
+Source: @thompson2002; @nakagawa2023mee; @borenstein2021, chap. 20–21.
+:::
+
+::: notes
+~2 min. The 10-studies rule is a rule of thumb, not a law: power also depends on the number of effect sizes and on their precision, and a within-study moderator gains from many rows per study. But for a between-study moderator, the studies are the real sample size. With pollinators (3 studies) or decomposers (1 study), no meta-regression is credible.
+:::
+
+# Missing data {.section-divider background-image="../../theme/img/bg-keymessages.jpg"}
+
+## Missing SDs: check before you impute
+
+::: {.columns}
+::: {.column width="52%"}
+```{r}
+#| label: plot-cv
+#| fig-width: 7.5
+#| fig-height: 4.8
+ggplot(cv_study, aes(n, cv)) +
+  geom_hline(yintercept = 3, linetype = 2, colour = cesab[["warn"]]) +
+  geom_point(size = 4, colour = cesab[["blue"]], alpha = 0.7) +
+  scale_x_log10() +
+  labs(x = "Sample size per group (log scale)", y = "CV (SD / mean)",
+       title = "Pest studies with SDs, one point per study") +
+  theme_cesab(17)
+```
+:::
+
+::: {.column width="46%"}
+To impute a missing SD for lnRR, we borrow the **typical coefficient of variation** of the other studies [@nakagawa2023].
+
+::: {.fragment .box .warn}
+First, look at the CVs: `r length(suspect)` studies stand out (CV > 3), one with *n* = 1,200 per group. Their SDs were **rebuilt as SE × √n**: if *n* counts subsamples rather than true replicates, both the SD and the precision are wrong. **Check the paper.**
+:::
+:::
+:::
+
+## Missing SDs: impute, then compare
+
+::: {.columns}
+::: {.column width="50%"}
+Pests (suspect studies set aside): `r sum(pz$sd_missing)` of `r nrow(pz)` comparisons have no usable SD — `r n_525` of them from **one** study.
+
+**Why the CV?** The variance of lnRR is
+
+$$v \approx \frac{SD_T^2}{n_T \bar{x}_T^2} + \frac{SD_C^2}{n_C \bar{x}_C^2} = \frac{CV_T^2}{n_T} + \frac{CV_C^2}{n_C}$$
+
+So a missing SD only needs a **typical CV**, borrowed from the other studies:
+
+$$v_{\text{imputed}} = \frac{\overline{CV}_T^{\,2}}{n_T} + \frac{\overline{CV}_C^{\,2}}{n_C}$$
+
+::: {.small .muted}
+$\overline{CV}$: mean CV weighted by *n*, per group [@nakagawa2023; metafor `vtype = "AV"`]. The screening matters: squared mean CV = `r round(cv2t, 2)` without the suspect studies, `r round(cv2_nofilter)` with them.
+:::
+:::
+
+::: {.column width="48%"}
+| | Pest abundance [95% CI] |
+|---|---|
+| Complete cases (`r nrow(filter(pz, !sd_missing))`) | `r pc(m_cc$b)`% [`r pc(m_cc$ci.lb)`; `r pc(m_cc$ci.ub)`] |
+| With imputed SDs (`r nrow(pz)`) | `r pc(m_imp$b)`% [`r pc(m_imp$ci.lb)`; `r pc(m_imp$ci.ub)`] |
+
+::: {.fragment .box .green}
+Same conclusion — but most imputed rows come from one study, so do not over-generalise. Report **both**. Effect sizes: **recompute** them (from *t*, *p*, figures, medians), never fill them with averages.
+:::
+:::
+:::
+
+# Beyond one comparison {.section-divider background-image="../../theme/img/bg-keymessages.jpg"}
+
+## Network meta-analysis: comparing the never-compared
+
+::: {.columns}
+::: {.column width="55%"}
+```{r}
+#| label: plot-network
+#| fig-width: 8
+#| fig-height: 5.8
+net <- comp |>
+  filter(!is.na(practice), !is.na(comparator_system)) |>
+  distinct(study_id, practice, comparator_system) |>
+  count(practice, comparator_system, name = "n")
+practices <- sort(unique(net$practice)); comps <- sort(unique(net$comparator_system))
+ang_p <- seq(100, 260, length.out = length(practices)) * pi / 180
+ang_c <- seq(-50, 50, length.out = length(comps)) * pi / 180
+nodes <- bind_rows(tibble(node = practices, x = cos(ang_p), y = sin(ang_p), type = "practice"),
+                   tibble(node = comps, x = 0.6 * cos(ang_c) + 0.3, y = 0.6 * sin(ang_c), type = "comparator"))
+edges <- net |>
+  left_join(nodes |> select(practice = node, x, y), by = "practice") |>
+  left_join(nodes |> select(comparator_system = node, xend = x, yend = y), by = "comparator_system")
+ggplot() +
+  geom_segment(data = edges, aes(x, y, xend = xend, yend = yend, linewidth = n),
+               colour = cesab[["teal"]], alpha = 0.6) +
+  geom_point(data = nodes, aes(x, y, colour = type), size = 6) +
+  geom_text(data = nodes, aes(x, y, label = node, hjust = ifelse(type == "practice", 1.18, -0.22)), size = 4.6) +
+  scale_linewidth(range = c(0.4, 6), name = "Studies") +
+  scale_colour_manual(values = c(practice = cesab[["blue"]], comparator = cesab[["green"]]), name = NULL) +
+  coord_equal(xlim = c(-2.1, 1.5)) +
+  theme_void(base_size = 15, base_family = "Poppins") + theme(legend.position = "bottom")
+```
+:::
+
+::: {.column width="43%"}
+Intercropping or agroforestry: which is better? **Only 1 of 237 studies tested both.**
+
+::: {.fragment .box .blue}
+**Network meta-analysis** combines direct and **indirect** evidence (A vs C and B vs C → A vs B) to rank practices [@salanti2012].
+:::
+
+::: {.fragment .box .warn}
+Here: a **star** around Monoculture, no closed loop → consistency cannot be checked; and **transitivity** is doubtful (the "monoculture" of agroforestry studies ≠ that of intercropping studies). Tools: `netmeta`, `rma.mv`.
+:::
+:::
+:::
+
+## Other tools you may meet {.big-table}
+
+| Method | When | Keep in mind |
+|---|---|---|
+| **Multivariate meta-analysis** | Several correlated outcomes (e.g. biodiversity **and** yield on the same plots) | Needs the within-study correlation — test a range [@vanhouwelingen2002] |
+| **Selection models** | Sensitivity to publication bias | Need many studies; ignore dependence |
+| **Random forests** (MetaForest) | Exploring many candidate moderators | Exploratory only; weight by precision; cross-validate **by study** |
+| **Bayesian** meta-analysis | Few studies, informative priors, complex structures | Priors must be justified and tested |
+
+::: notes
+~2 min. MetaForest and model averaging are fine as exploration, not as confirmation. Selection models also ignore dependence between effect sizes. The biodiversity–yield trade-off (1,096 comparisons with both outcomes in our data) is a good group-project topic for Thursday.
+:::
+
+## Practical · run, read, discuss — in pairs
+
+| Time | Task | You… |
+|------|------|------|
+| 16:33 | **Meta-regression**: pests vs natural enemies | fill **1 blank**, read *F*, coefficients, R² |
+| 16:40 | **Within vs between** studies | fill **1 blank**, compare the two estimates |
+| 16:47 | **Missing SDs**: CVs, impute, compare | run the given code, interpret |
+| 16:55 | Debrief and wrap-up of the day (until 17:00) | |
+
+::: {.box .blue}
+The script is **almost complete**: the work is **reading the outputs**, not writing code. Questions to discuss are in the script (`# Q:`). Open **`meta_analysis_course.Rproj`** (the course kit), then **`td_advanced.R`**; folded answers on the practical web page.
+:::
+
+## Key messages {.key-messages background-image="../../theme/img/bg-keymessages.jpg"}
+
+1.  Meta-regression tests whether a moderator **explains** heterogeneity; report the omnibus test, coefficients **and** what remains unexplained.
+2.  Between-study moderators are **associations**; within-study contrasts are stronger.
+3.  Missing SDs: **check CVs**, impute transparently, show results **with and without**.
+4.  Advanced methods (network, multivariate, machine learning) answer specific questions — they do not rescue weak data.
+
+## In the online notebook {.dense}
+
+Each point of this session developed further, with the same data, more pitfalls and exercises with solutions:
+
+-   [Moderators, missing data and networks](https://literaturesynthesis.github.io/notebook/chapters/heterogeneity-moderators.html)
+-   [Certainty of evidence and what can be inferred](https://literaturesynthesis.github.io/notebook/chapters/certainty.html)
+-   [Your turn: soil carbon under agroforestry (end-to-end exercise)](https://literaturesynthesis.github.io/notebook/chapters/your-turn.html)
+-   [Before you submit: a checklist](https://literaturesynthesis.github.io/notebook/chapters/checklist.html)
+
+::: {.box .blue}
+**literaturesynthesis.github.io/notebook**
+:::
+
+## References
+
+::: {#refs}
+:::

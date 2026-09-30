@@ -1,0 +1,38 @@
+---
+title: "Meta-analysis and systematic reviews in ecology and agronomy"
+subtitle: "FRB-CESAB training course 2026 · sessions by Damien Beillouin (CIRAD)"
+---
+
+All the material of the course is here: slides, practical pages and the participant kit. Everything uses the same real data, the global database of diversified farming experiments of @jones2021.
+
+## Before the course
+
+Download the kit, unzip it, open `meta_analysis_course.Rproj` in RStudio and run `00_install_and_check.R`. It installs the packages of the week and ends with "All good". If it does not, send a screenshot to the organisers before Monday.
+
+::: {.callout-tip appearance="simple" icon="false"}
+**[Download the participant kit (zip)](kit_meta_analysis_course_2026.zip)**: R scripts of the four practicals, data, installation check, formula sheet.
+:::
+
+## Sessions
+
+| When | Session | Slides | Practical |
+|---|---|---|---|
+| Mon 9:30 | Introduction to evidence synthesis | [web](01-introduction.html) · [pdf](01-introduction.pdf) | |
+| Tue 14:00 | Mapping the evidence with R | [web](02-td-evidence-map.html) · [pdf](02-td-evidence-map.pdf) | [page](02-td-evidence-map_TD.html) |
+| Wed 9:00 | Effect sizes | [web](03-effect-sizes.html) · [pdf](03-effect-sizes.pdf) | [formula sheet](03-effect-sizes_formula_sheet.pdf) |
+| Wed 14:00 | Fixed, random and multilevel models | [web](04-models.html) · [pdf](04-models.pdf) | [page](04-models_TD.html) |
+| Wed 15:00 | Publication bias and sensitivity | [web](05-bias.html) · [pdf](05-bias.pdf) | [page](05-bias_TD.html) |
+| Wed 16:15 | Why does the effect vary? Moderators and missing data | [web](06-advanced.html) · [pdf](06-advanced.pdf) | [page](06-advanced_TD.html) |
+
+In the web version of the slides, press **F** for full screen and **S** for the speaker notes. The practical pages contain every exercise with its solution folded.
+
+## After the course
+
+The online notebook [*Meta-analyses & Systematic Reviews*](https://literaturesynthesis.github.io/notebook) develops each session with the same data, the pitfalls we see most often in agronomic and ecological meta-analyses, a complete worked example and an end-to-end exercise on soil carbon under agroforestry.
+
+## Licence and data
+
+Course material © the authors. Data: @jones2021, prepared subsets. Please cite the original database if you reuse it.
+
+::: {#refs}
+:::

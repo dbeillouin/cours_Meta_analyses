@@ -1,0 +1,352 @@
+---
+title: "Publication bias and sensitivity in R"
+subtitle: "Practical · Wednesday 15:22–15:55 · FRB-CESAB training course"
+author: "Damien Beillouin"
+format:
+  html:
+    theme: [cosmo, ../../theme/cesab-doc.scss]
+    toc: true
+    toc-location: left
+    toc-title: "Practical"
+    number-sections: true
+    embed-resources: true
+    html-math-method: mathml
+    code-copy: true
+    fig-width: 8
+    fig-height: 5
+    fig-dpi: 150
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup-hidden
+#| include: false
+data_file <- "../../donnees/derivees/intercropping_biodiversity.csv"
+```
+
+::: {.callout-tip appearance="simple" icon="false"}
+## By the end of this practical, you will be able to
+
+1.  Draw and read a **contour-enhanced funnel plot**.
+2.  Test for **small-study effects** and **time-lag bias** in a multilevel model.
+3.  Run **leave-one-study-out**, **influence** and **study-quality** sensitivity analyses.
+4.  Build a **robustness table** for your paper.
+:::
+
+| Time | What | Section |
+|------|------|---------|
+| 15:22 | Load data, fit the main model, funnel plot (code given) | [1](#setup) · [2](#funnel) |
+| 15:27 | Classic vs multilevel Egger, PET-PEESE | [3](#tests) |
+| 15:37 | Sensitivity: leave-one-study-out, validity | [4](#sensitivity) |
+| 15:47 | Your turn — or the *(optional)* parts: time-lag, Cook, fail-safe N | [6](#turn) · [5](#fsn) |
+| 15:55 | **Debrief** with the whole group | [7](#key) |
+
+Sections marked *(optional)* are for those who are ahead.
+
+# Setup {#setup}
+
+Open `meta_analysis_course.Rproj` (the course kit), then `td_bias.R` (exercises with blanks `___`). Same data as in the previous practical.
+
+```{r}
+#| label: load
+library(dplyr)
+library(metafor)
+library(ggplot2)
+
+# In the participant pack: data_file <- "intercropping_biodiversity.csv"
+ic <- read.csv(data_file)
+
+grp <- "Pests"        # <- in section 6 you will change this word only
+
+dat <- ic |>
+  filter(functional_group == grp, !sd_missing, !zero_mean) |>
+  escalc(measure = "ROM", m1i = b_mean_t, sd1i = b_sd_t, n1i = b_n_t,
+         m2i = b_mean_c, sd2i = b_sd_c, n2i = b_n_c, data = _) |>
+  mutate(sei = sqrt(vi),                          # standard error
+         se_n = sqrt(1 / b_n_t + 1 / b_n_c),     # precision based on sample size only
+         inv_n = 1 / b_n_t + 1 / b_n_c,
+         year_c = year - mean(year))              # centred publication year
+
+pct <- function(x) round(100 * (exp(x) - 1), 1)
+
+# the main model (from the previous practical)
+m <- rma.mv(yi, vi, random = ~ 1 | study_id / es_id, data = dat,
+            test = "t", dfs = "contain")
+pct(c(m$b, m$ci.lb, m$ci.ub))
+```
+
+# Contour-enhanced funnel plot {#funnel}
+
+**Exercise 1.** Draw the funnel with significance contours centred on **zero** (fill in one number, then spend your time on the interpretation).
+
+```{r}
+#| label: ex1-template
+#| eval: false
+funnel(dat$yi, dat$vi, yaxis = "sei",
+       level = c(90, 95, 99), shade = c("white", "gray75", "gray90"),
+       refline = ___, legend = TRUE, xlab = "lnRR")
+```
+
+::: {.callout-note collapse="true" title="Solution"}
+```{r}
+#| label: ex1-solution
+funnel(dat$yi, dat$vi, yaxis = "sei",
+       level = c(90, 95, 99), shade = c("white", "gray75", "gray90"),
+       refline = 0, legend = TRUE, xlab = "lnRR")
+```
+:::
+
+::: {.callout-caution icon="false"}
+## Interpret (2 min)
+Is the funnel symmetric? On which side, and in which zone (white = non-significant), are the imprecise comparisons?
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+The bottom of the funnel (imprecise comparisons) is roughly symmetric around 0, with points in the white (non-significant) zone on both sides: no obvious gap where suppressed non-significant results would be. At the very top, `r sum(dat$sei < 0.02)` comparisons have SE < 0.02 — suspiciously precise (two studies; possibly SEs recorded as SDs). Tiny variances are always worth checking at extraction.
+:::
+
+# Testing small-study effects and time-lag bias {#tests}
+
+**Exercise 2.** First the *classic* Egger test, which treats every comparison as independent:
+
+```{r}
+#| label: egger-classic
+regtest(rma(yi, vi, data = dat))
+```
+
+Now the **multilevel** version [@nakagawa2022]: add a precision measure as a moderator of the main model.
+
+::: {.callout-warning}
+## The lnRR trap
+The SE of a lnRR is computed from the means themselves, which creates an artificial correlation between effect and SE. For lnRR (and SMD), use a precision measure based on **sample size only**: `se_n` $= \sqrt{1/n_T + 1/n_C}$.
+:::
+
+**Predict first:** will the small-study effect look stronger with `sei` or with `se_n`?
+
+```{r}
+#| label: ex2-template
+#| eval: false
+pet_se <- rma.mv(yi, vi, mods = ~ sei,  random = ~ 1 | study_id / es_id,
+                 data = dat, test = "t", dfs = "contain")
+pet    <- rma.mv(yi, vi, mods = ~ ___, random = ~ 1 | study_id / es_id,
+                 data = dat, test = "t", dfs = "contain")
+round(c(slope_p_SE = pet_se$pval[2], slope_p_n = pet$pval[2]), 3)
+robust(pet, cluster = study_id, clubSandwich = TRUE)   # cluster-robust check
+```
+
+::: {.callout-note collapse="true" title="Solution"}
+```{r}
+#| label: ex2-solution
+pet_se <- rma.mv(yi, vi, mods = ~ sei,  random = ~ 1 | study_id / es_id,
+                 data = dat, test = "t", dfs = "contain")
+pet    <- rma.mv(yi, vi, mods = ~ se_n, random = ~ 1 | study_id / es_id,
+                 data = dat, test = "t", dfs = "contain")
+round(c(slope_p_SE = pet_se$pval[2], slope_p_n = pet$pval[2]), 3)
+robust(pet, cluster = study_id, clubSandwich = TRUE)
+```
+
+With the SE, the slope looks "significant"; with the sample-size measure (and even more with cluster-robust inference) it is not: **no robust evidence of a small-study effect**. The SE-based result was largely the lnRR artefact.
+:::
+
+**PET-PEESE: would the conclusion change if there were bias?** The intercept of `pet` estimates the effect of an infinitely large study (PET); PEESE uses `inv_n` instead. Rule [@stanley2014]: if the PET intercept is significant, report PEESE.
+
+```{r}
+#| label: petpeese
+peese <- rma.mv(yi, vi, mods = ~ inv_n, random = ~ 1 | study_id / es_id,
+                data = dat, test = "t", dfs = "contain")
+rbind(main  = pct(c(m$b, m$ci.lb, m$ci.ub)),
+      PET   = pct(c(coef(pet)[1],   pet$ci.lb[1],   pet$ci.ub[1])),
+      PEESE = pct(c(coef(peese)[1], peese$ci.lb[1], peese$ci.ub[1])))
+```
+
+The adjusted estimates are, if anything, stronger reductions: the conclusion does not rest on publication bias. With strong heterogeneity, treat them as sensitivity checks, not as "the true effect".
+
+**Exercise 3** *(optional)*. Time-lag bias: do effects change with publication year?
+
+```{r}
+#| label: ex3-template
+#| eval: false
+tl <- rma.mv(yi, vi, mods = ~ ___, random = ~ 1 | study_id / es_id,
+             data = dat, test = "t", dfs = "contain")
+tl
+```
+
+::: {.callout-note collapse="true" title="Solution"}
+```{r}
+#| label: ex3-solution
+tl <- rma.mv(yi, vi, mods = ~ year_c, random = ~ 1 | study_id / es_id,
+             data = dat, test = "t", dfs = "contain")
+tl
+```
+
+Slope ≈ 0 and far from significant: **no evidence** of a decline effect — but with 28 studies the test has little power.
+:::
+
+# Sensitivity analyses {#sensitivity}
+
+**Exercise 4. Leave-one-*study*-out.** The loop is given: complete it so that each refit drops **one whole study**. (≈ 1 min to run.)
+
+```{r}
+#| label: ex4-template
+#| eval: false
+ids <- unique(dat$study_id)
+loo <- sapply(ids, function(i) {
+  f <- rma.mv(yi, vi, random = ~ 1 | study_id / es_id,
+              data = dat[dat$study_id ___ i, ], test = "t", dfs = "contain")
+  c(est = f$b[1], ci.lb = f$ci.lb, ci.ub = f$ci.ub)
+})
+pct(range(loo["est", ]))     # range of the pooled effect
+any(loo["ci.ub", ] > 0)      # does any CI cross zero?
+```
+
+::: {.callout-note collapse="true" title="Solution"}
+```{r}
+#| label: ex4-solution
+ids <- unique(dat$study_id)
+loo <- sapply(ids, function(i) {
+  f <- rma.mv(yi, vi, random = ~ 1 | study_id / es_id,
+              data = dat[dat$study_id != i, ], test = "t", dfs = "contain")
+  c(est = f$b[1], ci.lb = f$ci.lb, ci.ub = f$ci.ub)
+})
+pct(range(loo["est", ]))
+any(loo["ci.ub", ] > 0)
+```
+
+We leave out **studies**, not rows: rows of a study are not independent.
+:::
+
+**Exercise 5** *(optional)*. **Influence** (Cook's distance, by study) [@viechtbauer2010b]:
+
+```{r}
+#| label: ex5-template
+#| eval: false
+cd <- cooks.distance(m, cluster = dat$___)
+sort(round(cd, 2), decreasing = TRUE)[1:5]
+```
+
+::: {.callout-note collapse="true" title="Solution"}
+```{r}
+#| label: ex5-solution
+cd <- cooks.distance(m, cluster = dat$study_id)
+sort(round(cd, 2), decreasing = TRUE)[1:5]
+```
+
+No study stands out from the others (the largest distance is small and close to the next ones): no single study drives the result.
+:::
+
+**Exercise 6. Study quality.** How many comparisons could not be appraised (`NA`)? Then refit the model with only the comparisons that meet all validity criteria (`validity_biodiv == 1`, coded by the authors of the database), and test validity as a **moderator** (comparing two CIs by eye is not a test).
+
+```{r}
+#| label: ex6-template
+#| eval: false
+m_val <- rma.mv(yi, vi, random = ~ 1 | study_id / es_id,
+                data = filter(dat, validity_biodiv == ___), test = "t", dfs = "contain")
+pct(c(m_val$b, m_val$ci.lb, m_val$ci.ub))
+```
+
+::: {.callout-note collapse="true" title="Solution"}
+```{r}
+#| label: ex6-solution
+m_val <- rma.mv(yi, vi, random = ~ 1 | study_id / es_id,
+                data = filter(dat, validity_biodiv == 1), test = "t", dfs = "contain")
+pct(c(m_val$b, m_val$ci.lb, m_val$ci.ub))
+m_val$s.nlevels[1]                  # number of studies left
+sum(is.na(dat$validity_biodiv))     # comparisons that could not be appraised
+
+m_vmod <- rma.mv(yi, vi, mods = ~ factor(validity_biodiv), random = ~ 1 | study_id / es_id,
+                 data = dat, test = "t", dfs = "contain")
+m_vmod$pval[2]                      # does validity change the effect?
+```
+
+Same estimate, validity does not moderate the effect for pests. Note that a third of the comparisons could not be appraised: report it.
+:::
+
+# *(optional)* Fail-safe N: why not {#fsn}
+
+```{r}
+#| label: fsn
+fsn(yi, vi, data = dat)
+```
+
+::: {.callout-caution icon="false"}
+## Discuss
+Millions of "missing" studies would be needed to cancel the effect. Does that make you confident? What does this number assume about the missing studies, about heterogeneity and about dependence?
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+It assumes missing studies have exactly zero effect, ignores heterogeneity and the dependence between comparisons, and says nothing about the size of any bias. It is almost always "reassuring", hence uninformative: **do not report it** [@nakagawa2022].
+:::
+
+::: {.callout-note collapse="true" title="(optional) Trim-and-fill, as a sensitivity analysis only"}
+Trim-and-fill cannot handle dependent effect sizes; apply it to **one aggregated effect per study** (here assuming ρ = 0.5 within studies, and a common effect within each study — a strong simplification):
+
+```{r}
+#| label: trimfill
+agg <- aggregate(dat, cluster = study_id, rho = 0.5)
+tf  <- trimfill(rma(yi, vi, data = agg))
+tf
+```
+
+Here no study is imputed. Report it, if at all, as a sensitivity check — never as "the corrected effect".
+:::
+
+# Your turn: natural enemies {#turn}
+
+Go back to section 1, set `grp <- "Natural enemies"`, and rerun **sections 1–3 only** (skip the slow leave-one-out). Is there a small-study effect with `se_n`? Would bias explain the (small, non-significant) increase? Then run Exercise 6: does validity matter here?
+
+::: {.callout-note collapse="true" title="Solution"}
+```{r}
+#| label: turn-solution
+ne <- ic |>
+  filter(functional_group == "Natural enemies", !sd_missing, !zero_mean) |>
+  escalc(measure = "ROM", m1i = b_mean_t, sd1i = b_sd_t, n1i = b_n_t,
+         m2i = b_mean_c, sd2i = b_sd_c, n2i = b_n_c, data = _) |>
+  mutate(se_n = sqrt(1 / b_n_t + 1 / b_n_c))
+f_ne <- function(mods) rma.mv(yi, vi, mods = mods, random = ~ 1 | study_id / es_id,
+                              data = ne, test = "t", dfs = "contain")
+m_ne   <- f_ne(~ 1)
+pet_ne <- f_ne(~ se_n)
+val_ne <- f_ne(~ factor(validity_biodiv))
+rbind(main = pct(c(m_ne$b, m_ne$ci.lb, m_ne$ci.ub)),
+      PET  = pct(c(coef(pet_ne)[1], pet_ne$ci.lb[1], pet_ne$ci.ub[1])))
+c(slope_p = pet_ne$pval[2], validity_p = val_ne$pval[2])
+coef(val_ne)
+```
+
+The increase of natural enemies is small and not significant; the small-study slope is not significant with `se_n`, and the PET estimate is close to zero: the evidence is **inconclusive**, whatever the bias. But **validity matters**: comparisons meeting all validity criteria show a clearly **larger increase** of natural enemies (about +27%) than the others (about −7%) — poorly designed comparisons may be masking a real benefit. That is a moderator — the topic of the next session.
+:::
+
+# Debrief: your robustness table {#key}
+
+Fill it in for pests — this is what reviewers expect:
+
+| Analysis | Estimate [95% CI] | Conclusion changes? |
+|---|---|---|
+| Main multilevel model | | |
+| Only valid comparisons | | |
+| Leave-one-study-out (range) | | |
+| Small-study effect (`se_n`) / PEESE | | |
+| Time-lag (slope) | | |
+
+::: {.callout-tip appearance="simple" icon="false"}
+1.  Bias is best **prevented** by the search, not corrected by statistics.
+2.  **Asymmetry ≠ publication bias**: read the direction; use contour-enhanced funnels.
+3.  With several effect sizes per study, use **multilevel** tests — for lnRR with a **sample-size-based** precision; drop fail-safe N; trim-and-fill only as sensitivity.
+4.  Report all sensitivity analyses in a **robustness table**.
+
+**Next session (16:15):** *explaining* heterogeneity — meta-regression. (The multilevel Egger test you just ran was already a meta-regression!)
+:::
+
+## Going further in the online notebook {.unnumbered}
+
+-   [Publication bias and sensitivity](https://literaturesynthesis.github.io/notebook/chapters/publication-bias.html)
+-   [Data extraction and critical appraisal](https://literaturesynthesis.github.io/notebook/chapters/extraction-appraisal.html)
+-   [Reading a meta-analysis critically](https://literaturesynthesis.github.io/notebook/chapters/critical-reading.html)
+
+## References
+
+::: {#refs}
+:::

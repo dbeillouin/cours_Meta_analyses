@@ -1,0 +1,213 @@
+/*-- scss:defaults --*/
+// FRB-CESAB 2026 slide theme — derived from Masque_Cesab_2026.pptx
+// Poppins (SIL OFL) is embedded by build_theme.py -> works offline, in one HTML file
+
+$cesab-blue:      #045C82;
+$cesab-teal:      #56B8B9;
+$cesab-green:     #86BC25;
+$cesab-lime:      #BCCF00;
+$cesab-ink:       #1F2A33;
+$cesab-grey:      #5B6770;
+$cesab-light:     #EEF5F7;
+$cesab-warn:      #C0392B;
+
+$font-family-sans-serif: "Poppins", "Helvetica Neue", Arial, sans-serif;
+$font-family-monospace:  "Menlo", "Consolas", "DejaVu Sans Mono", monospace;
+$presentation-font-size-root: 34px;
+$presentation-line-height: 1.35;
+$body-color: $cesab-ink;
+$link-color: $cesab-blue;
+$presentation-heading-font: "Poppins", sans-serif;
+$presentation-heading-color: $cesab-blue;
+$presentation-heading-font-weight: 600;
+$presentation-h2-font-size: 1.45em;
+$presentation-h3-font-size: 1.1em;
+$code-block-bg: #F4F7F8;
+$code-block-font-size: 0.72em;
+$code-block-border-color: $cesab-teal;
+$code-color: $cesab-blue;
+$selection-bg: $cesab-lime;
+
+/*-- scss:rules --*/
+
+@@FONTS@@
+
+
+// ---------- default background: "Diapo avec titre" layout -----------------
+.reveal .slide-background-content {
+  background-image: url("@@BG_CONTENT@@");
+  background-size: cover;
+  background-position: center;
+}
+
+// ---------- slide frame --------------------------------------------------
+.reveal .slides section {
+  padding: 0 2.2% 0 3.2%;
+  box-sizing: border-box;
+}
+.reveal .slides section > h2:first-child,
+.reveal .slides section > .slide-title {
+  margin: 0.15em 0 0.65em 0;
+  letter-spacing: -0.01em;
+}
+.reveal h2 { text-transform: none; }
+.reveal h3 { color: $cesab-teal; font-weight: 600; margin-top: 0.4em; }
+.reveal strong { color: $cesab-blue; font-weight: 600; }
+.reveal em { color: inherit; }
+.reveal ul, .reveal ol { margin-left: 1em; }
+.reveal li { margin-bottom: 0.35em; }
+.reveal ul li::marker { color: $cesab-teal; }
+.reveal .slide-number {
+  color: $cesab-grey; background: transparent; font-size: 0.55em;
+  right: auto !important; left: 50% !important; transform: translateX(-50%);
+  bottom: 12px !important;
+}
+.reveal .footer { display: none; }
+.reveal:has(section.quarto-title-block.present) .slide-number { display: none !important; }
+
+// small, muted text (sources, captions)
+.reveal .source, .reveal .caption-src {
+  font-size: 0.5em; color: $cesab-grey; line-height: 1.3;
+  position: absolute; bottom: 1.2em; left: 7%; right: 22%;
+}
+.reveal .source a { color: $cesab-grey; }
+.reveal .muted { color: $cesab-grey; }
+.reveal .small { font-size: 0.75em; }
+.reveal .smaller-text { font-size: 0.62em; }
+.reveal .big { font-size: 1.6em; line-height: 1.2; }
+.reveal .center { text-align: center; }
+.reveal .c-teal { color: $cesab-teal; }
+.reveal .c-green { color: $cesab-green; }
+.reveal .c-blue { color: $cesab-blue; }
+.reveal .c-warn { color: $cesab-warn; }
+
+// ---------- title slide ("Page de garde") ---------------------------------
+.reveal section.quarto-title-block {
+  text-align: left !important;
+  padding-left: 7.5% !important;
+  padding-top: 23.6% !important;
+  top: 0 !important;
+}
+.reveal section.quarto-title-block > * { max-width: 52% !important; text-align: left !important; }
+.reveal section.quarto-title-block .quarto-title-authors { display: block !important; }
+.reveal section.quarto-title-block .title {
+  font-size: 1.75em; font-weight: 700; color: $cesab-ink;
+  line-height: 1.12; margin-bottom: 0.3em;
+}
+.reveal section.quarto-title-block .subtitle {
+  font-size: 0.95em; font-weight: 500; color: $cesab-blue; margin-bottom: 1.2em;
+}
+.reveal section.quarto-title-block .quarto-title-authors { justify-content: flex-start; }
+.reveal section.quarto-title-block .quarto-title-author-name,
+.reveal section.quarto-title-block .quarto-title-affiliation,
+.reveal section.quarto-title-block .date { color: $cesab-blue; font-size: 0.62em; margin: 0; }
+.reveal section.quarto-title-block .quarto-title-author { padding: 0; margin-left: 0 !important; }
+.reveal section.quarto-title-block .quarto-title-authors { margin-left: 0 !important; padding-left: 0 !important; }
+
+// ---------- section divider ----------------------------------------------
+.reveal section.section-divider { text-align: left; }
+.reveal section.section-divider h1,
+.reveal section.section-divider h2 {
+  font-size: 2.1em; margin-top: 22%; margin-left: 4%; max-width: 52%; text-align: left;
+  color: $cesab-blue; font-weight: 700; line-height: 1.15;
+}
+.reveal section.section-divider .section-kicker {
+  display: block; margin-left: 4%; color: $cesab-teal;
+  font-weight: 600; font-size: 0.8em; letter-spacing: 0.08em; text-transform: uppercase;
+}
+
+// ---------- learning objectives -------------------------------------------
+.reveal .objectives ol { counter-reset: obj; list-style: none; margin-left: 0; }
+.reveal .objectives ol li {
+  counter-increment: obj; position: relative; padding-left: 2.2em;
+  margin-bottom: 0.7em;
+}
+.reveal .objectives ol li::before {
+  content: counter(obj); position: absolute; left: 0; top: -0.05em;
+  width: 1.45em; height: 1.45em; border-radius: 50%;
+  background: $cesab-blue; color: #fff; font-weight: 600; font-size: 0.9em;
+  display: flex; align-items: center; justify-content: center;
+}
+
+// ---------- key messages ("Messages clés" layout) --------------------------
+.reveal section.key-messages h2 {
+  font-size: 1.9em; font-weight: 700; color: $cesab-ink;
+  text-transform: uppercase; margin-left: 22% !important; margin-top: 0.35em !important;
+}
+.reveal section.key-messages ol {
+  list-style: none; counter-reset: km; margin: 0.6em 0 0 3.5%; width: 64%;
+}
+.reveal section.key-messages ol li {
+  counter-increment: km; position: relative; padding-left: 2.2em;
+  margin-bottom: 0.9em; font-size: 0.92em; line-height: 1.3;
+}
+.reveal section.key-messages ol li::before {
+  content: counter(km); position: absolute; left: 0; top: -0.05em;
+  color: $cesab-blue; font-weight: 600; font-size: 1.25em;
+  border-right: 3px solid $cesab-blue; padding-right: 0.35em; line-height: 1.1;
+}
+
+// ---------- boxes ---------------------------------------------------------
+.reveal .box {
+  border-radius: 14px; padding: 0.55em 0.85em; margin: 0.35em 0; font-size: 0.85em;
+  color: $cesab-ink;
+  background: $cesab-light; border-left: 8px solid $cesab-teal;
+}
+.reveal .box.blue  { border-left-color: $cesab-blue; }
+.reveal .box.green { border-left-color: $cesab-green; }
+.reveal .box.warn  { border-left-color: $cesab-warn; background: #FBEDEB; }
+.reveal .box > :first-child { margin-top: 0; }
+.reveal .box > :last-child  { margin-bottom: 0; }
+.reveal .box-title {
+  display: block; font-weight: 600; color: $cesab-blue; margin-bottom: 0.25em;
+}
+
+// ---------- question / poll / quiz ----------------------------------------
+.reveal section.question { text-align: left; }
+.reveal .question-card {
+  background: linear-gradient(135deg, #03496A 0%, $cesab-blue 60%, #0A6E86 100%);
+  color: #fff; border-radius: 22px; padding: 0.9em 1.2em; margin-top: 0.4em;
+  width: 70%;
+}
+.reveal .question-card .q-kicker {
+  text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.55em;
+  font-weight: 600; opacity: 0.9;
+}
+.reveal .question-card .q-text {
+  font-size: 1.25em; font-weight: 600; line-height: 1.25; margin-top: 0.2em;
+}
+.reveal .question-card strong { color: #FFFFFF; font-weight: 700; box-shadow: inset 0 -0.18em 0 $cesab-lime; }
+.reveal .answers { margin: 0.6em 0 0 0 !important; padding: 0; width: 70%; }
+.reveal .answers ul { list-style: none; margin: 0 !important; padding: 0; display: flex; gap: 0.6em; }
+.reveal .answers ul li::marker { content: none; }
+.reveal .answers li {
+  border: 2px solid $cesab-teal; border-radius: 12px; padding: 0.3em 0.7em;
+  margin-bottom: 0.4em; font-size: 0.85em; background: #fff;
+}
+.reveal .answers li.correct.fragment.visible {
+  background: $cesab-green; border-color: $cesab-green; color: #fff;
+}
+
+// ---------- tables --------------------------------------------------------
+.reveal table { font-size: 0.7em; border-collapse: collapse; }
+.reveal table th {
+  background: $cesab-blue; color: #fff; font-weight: 600;
+  border: none !important; padding: 0.4em 0.6em !important;
+}
+.reveal table td { border-bottom: 1px solid #D5E3E8 !important; padding: 0.35em 0.6em !important; vertical-align: top; }
+.reveal table tr:nth-child(even) td { background: #F6FAFB; }
+
+// ---------- images --------------------------------------------------------
+.reveal .img-frame img { border-radius: 10px; box-shadow: 0 6px 22px rgba(4, 92, 130, 0.18); }
+.reveal figure figcaption { font-size: 0.5em; color: $cesab-grey; }
+
+// ---------- speaker-note friendly print ------------------------------------
+@media print {
+  .reveal .slide-background-content { background-image: url("@@BG_CONTENT@@"); }
+}
+
+// ---------- bibliography slide --------------------------------------------
+.reveal #refs, .reveal .references { font-size: 0.8em; line-height: 1.3; column-count: 2; column-gap: 2em; }
+.reveal #refs .csl-entry { margin-bottom: 0.45em; break-inside: avoid; }
+.reveal section.dense table { font-size: 0.6em; }
+.reveal section.big-table table { font-size: 0.8em; }

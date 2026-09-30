@@ -1,0 +1,564 @@
+---
+title: "Effect sizes"
+subtitle: "Understanding, choosing and computing the currency of meta-analysis"
+---
+
+```{r}
+#| label: setup
+#| include: false
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(metafor)
+library(readr)
+source("../../R/theme_cesab.R")
+knitr::opts_chunk$set(dev = "png", dev.args = list(bg = "transparent"), out.width = "100%")
+
+ic <- read_csv("../../donnees/derivees/intercropping_biodiversity.csv", show_col_types = FALSE)
+
+# The worked example: one real comparison from the running dataset
+ex <- ic |> filter(es_id == 2011)
+mT <- ex$b_mean_t; sT <- ex$b_sd_t; nT <- ex$b_n_t
+mC <- ex$b_mean_c; sC <- ex$b_sd_c; nC <- ex$b_n_c
+f2 <- function(x, d = 2) formatC(x, format = "f", digits = d)
+
+# hand calculations (shown on the answer slide)
+lnrr   <- log(mT / mC)
+v_lnrr <- sT^2 / (nT * mT^2) + sC^2 / (nC * mC^2)
+sp     <- sqrt(((nT - 1) * sT^2 + (nC - 1) * sC^2) / (nT + nC - 2))
+d      <- (mT - mC) / sp
+J      <- 1 - 3 / (4 * (nT + nC - 2) - 1)
+g      <- J * d
+v_g    <- 1 / nT + 1 / nC + g^2 / (2 * (nT + nC))
+chk_rom <- escalc("ROM", m1i = mT, sd1i = sT, n1i = nT, m2i = mC, sd2i = sC, n2i = nC)
+chk_smd <- escalc("SMD", m1i = mT, sd1i = sT, n1i = nT, m2i = mC, sd2i = sC, n2i = nC)
+
+# the whole running dataset
+usable <- ic |> filter(!sd_missing, !zero_mean)
+both <- usable |>
+  escalc("ROM", m1i = b_mean_t, sd1i = b_sd_t, n1i = b_n_t,
+         m2i = b_mean_c, sd2i = b_sd_c, n2i = b_n_c, data = _, var.names = c("lnrr", "v_lnrr")) |>
+  escalc("SMD", m1i = b_mean_t, sd1i = b_sd_t, n1i = b_n_t,
+         m2i = b_mean_c, sd2i = b_sd_c, n2i = b_n_c, data = _, var.names = c("g", "v_g")) |>
+  mutate(geary = pmin(b_mean_t / b_sd_t * sqrt(b_n_t), b_mean_c / b_sd_c * sqrt(b_n_c)))
+```
+
+## Learning objectives {.objectives}
+
+By the end of this session, you will be able to:
+
+1.  Explain what an **effect size** is and why each one comes with a **sampling variance**.
+2.  **Choose** the right metric for your data: mean difference, Hedges' *g*, log response ratio, log odds ratio, Fisher's *z*.
+3.  **Compute** them by hand and with `metafor::escalc()`.
+4.  Recognise the **traps**: small samples, near-zero means, missing SDs, unsafe conversions.
+
+::: notes
+60 min: ~35 min lecture, 2 exercises (~15 min), quiz (~3 min). Everything uses the running example: intercropping vs monoculture.
+:::
+
+# What is an effect size? {.section-divider background-image="../../theme/img/bg-keymessages.jpg"}
+
+## Studies do not speak the same language
+
+::: {.columns}
+::: {.column width="50%"}
+The `r nrow(ic)` intercropping comparisons of our running example report biodiversity as:
+
+-   **abundance** or **species richness**,
+-   in individuals per trap, per plant, per m², per hour...
+-   with **SD**, **SE**, **95% CI** or **median + IQR** as the measure of spread.
+
+::: {.fragment .box .blue}
+[An effect size]{.box-title}
+puts all studies on **one common scale**: the **direction** and **magnitude** of the difference between intervention and comparator — plus its **uncertainty**.
+:::
+:::
+
+::: {.column width="48%"}
+```{r}
+#| label: plot-reported
+#| fig-width: 6.5
+#| fig-height: 5
+ic |>
+  count(b_error_reported) |>
+  mutate(b_error_reported = recode(b_error_reported,
+    "standard error" = "Standard error", "standard deviation" = "Standard deviation",
+    "confidence intervals" = "Confidence interval", "median,iqr" = "Median + IQR")) |>
+  ggplot(aes(n, reorder(b_error_reported, n))) +
+  geom_col(fill = cesab[["teal"]], width = 0.65) +
+  geom_text(aes(label = n), hjust = -0.2, size = 6) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.2))) +
+  labs(x = "Number of comparisons", y = NULL, title = "How spread was reported") +
+  theme_cesab(18)
+```
+:::
+:::
+
+::: {.source}
+Source: @jones2021; the authors converted everything to SD before sharing the data.
+:::
+
+## Why not just use p-values?
+
+```{r}
+#| label: plot-pvalue
+#| fig-width: 13
+#| fig-height: 4.3
+tibble(study = factor(c("Study A: n = 2,000 per group", "Study B: n = 4 per group"),
+                      levels = c("Study B: n = 4 per group", "Study A: n = 2,000 per group")),
+       est = c(log(0.95), log(0.55)), se = c(0.018, 0.37)) |>
+  mutate(lo = est - 1.96 * se, hi = est + 1.96 * se,
+         p = 2 * pnorm(-abs(est / se)),
+         lab = paste0("effect ", pct(est), "   p = ", signif(p, 2))) |>
+  ggplot(aes(est, study)) +
+  geom_vline(xintercept = 0, linetype = 2, colour = cesab[["grey"]]) +
+  geom_errorbarh(aes(xmin = lo, xmax = hi), height = 0, linewidth = 2, colour = cesab[["teal"]]) +
+  geom_point(size = 5, colour = cesab[["blue"]]) +
+  geom_text(aes(label = lab), vjust = -1.3, hjust = 1, nudge_x = -0.02, size = 6) +
+  scale_x_continuous(labels = \(x) pct(x), breaks = log(c(0.25, 0.5, 1, 1.5))) +
+  labs(x = "Change in pest abundance (illustrative studies)", y = NULL) +
+  theme_cesab(19)
+```
+
+::: {.columns}
+::: {.column width="50%"}
+::: {.box .warn}
+A p-value mixes **effect size** and **sample size**: a tiny effect can be "highly significant", a large one "not significant".
+:::
+:::
+::: {.column width="48%"}
+::: {.fragment .box .green}
+Meta-analysis combines **effect sizes and their uncertainty**, not p-values [@nakagawa2007].
+:::
+:::
+:::
+
+## Every study sees the truth through noise
+
+```{r}
+#| label: plot-sampling
+#| fig-width: 13
+#| fig-height: 3.9
+set.seed(42)
+true <- log(0.7)
+sim <- expand_grid(n = c(4, 10, 40), rep = 1:300) |>
+  rowwise() |>
+  mutate(t = mean(rnorm(n, 7, 3)), c = mean(rnorm(n, 10, 3)), yi = log(pmax(t, 0.1) / c)) |>
+  ungroup() |>
+  mutate(n = factor(paste("n =", n, "per group"), levels = paste("n =", c(4, 10, 40), "per group")))
+ggplot(sim, aes(yi)) +
+  geom_histogram(binwidth = 0.05, fill = cesab[["teal"]], colour = "white") +
+  geom_vline(xintercept = true, colour = cesab[["warn"]], linewidth = 1.3) +
+  facet_wrap(~ n) +
+  scale_x_continuous(labels = \(x) pct(x), breaks = log(c(0.5, 0.7, 1))) +
+  coord_cartesian(xlim = log(c(0.35, 1.4))) +
+  labs(x = "Observed effect in 300 simulated studies (red: true effect, -30%)", y = NULL) +
+  theme_cesab(18) + theme(axis.text.y = element_blank())
+```
+
+$$\hat\theta_k = \theta_k + \varepsilon_k \qquad \text{observed} = \text{true} + \text{sampling error}, \quad \text{Var}(\varepsilon_k) = v_k$$
+
+::: {.fragment .box .blue style="width:80%;"}
+Each effect size comes with its **sampling variance** $v_k$. In the meta-analysis this afternoon, each study is **weighted** by the inverse of its variance, $w_k = 1/v_k$: precise studies count more. (In a random-effects model, the weight also includes the real variation between studies, $\tau^2$: $w_k = 1/(v_k + \tau^2)$.)
+:::
+
+::: notes
+~3 min. We observe theta-hat and can estimate its variance v from the study's SD and n. We never observe the true theta. The sampling variance shrinks with n: that is what the three panels show.
+:::
+
+# Which metric for which data? {.section-divider background-image="../../theme/img/bg-keymessages.jpg"}
+
+## A decision tree
+
+```{=html}
+<div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:18px; font-size:0.95em; margin-top:10px;">
+  <div class="box blue" style="margin:0;"><b>Continuous outcome, two groups</b><br><span class="muted">means, SD, n</span>
+    <ul style="margin-top:8px;">
+      <li>Same unit everywhere &rarr; <b>Mean difference (MD)</b></li>
+      <li>Different scales, additive effect &rarr; <b>standardised mean difference</b> (Hedges' <i>g</i>)</li>
+      <li>Positive values, proportional effect &rarr; <b>log response ratio (lnRR)</b></li>
+    </ul></div>
+  <div class="box green" style="margin:0;"><b>Binary outcome, two groups</b><br><span class="muted">counts in a 2&times;2 table</span>
+    <ul style="margin-top:8px;">
+      <li>Presence/absence, survival, infestation &rarr; <b>log odds ratio</b> (or log risk ratio)</li>
+    </ul></div>
+  <div class="box" style="margin:0;"><b>Relationship between two continuous variables</b><br><span class="muted">correlation r, n</span>
+    <ul style="margin-top:8px;">
+      <li>e.g. yield vs landscape complexity &rarr; <b>Fisher's <i>z</i></b></li>
+    </ul></div>
+</div>
+```
+
+::: {.columns style="margin-top:18px;"}
+::: {.column width="50%"}
+::: {.box .blue}
+**Proportional** (→ lnRR): "−30% aphids", same meaning with 10 or 1,000 aphids. Abundance, biomass, yield: a true zero, effects multiply.\
+**Additive** (→ *g*): "+5 units". Scores, indices, variables with an arbitrary zero.
+:::
+:::
+::: {.column width="48%"}
+::: {.fragment .box .warn}
+In ecology and agronomy, **lnRR** and **Hedges' *g*** (a standardised mean difference, SMD) dominate. Our running example → **lnRR**. Fix the metric **in the protocol**, before seeing the results.
+:::
+:::
+:::
+
+::: {.fragment .small .muted}
+Show of hands: *which metric for your own data?*
+:::
+
+::: notes
+~4 min. The choice follows the data AND the question: an additive vs a proportional effect. Changing metric after looking at the results is a form of p-hacking.
+:::
+
+## Our worked example
+
+::: {.columns}
+::: {.column width="46%"}
+Aphids on fennel, **intercropped with cotton** vs **fennel monoculture** [@fernandes2013], one comparison of our dataset:
+
+| | Intercropping (T) | Monoculture (C) |
+|---|---|---|
+| Mean | `r mT` | `r mC` |
+| SD | `r sT` | `r sC` |
+| n | `r nT` | `r nC` |
+:::
+
+::: {.column width="52%"}
+```{r}
+#| label: plot-example
+#| fig-width: 7
+#| fig-height: 4.6
+tibble(x = seq(-5, 40, 0.1)) |>
+  mutate(`Intercropping (T)` = dnorm(x, mT, sT), `Monoculture (C)` = dnorm(x, mC, sC)) |>
+  pivot_longer(-x) |>
+  ggplot(aes(x, value, fill = name, colour = name)) +
+  geom_area(alpha = 0.35, position = "identity", linewidth = 1) +
+  geom_vline(xintercept = c(mT, mC), colour = c(cesab[["blue"]], cesab[["green"]]), linetype = 2) +
+  scale_fill_manual(values = c(cesab[["blue"]], cesab[["green"]]), name = NULL) +
+  scale_colour_manual(values = c(cesab[["blue"]], cesab[["green"]]), name = NULL) +
+  labs(x = "Aphids per plant", y = NULL) +
+  theme_cesab(17) + theme(axis.text.y = element_blank())
+```
+:::
+:::
+
+::: {.box .blue}
+Convention for the whole week: **T (intervention) in the numerator / first**, C (comparator) second. A negative effect = fewer pests with intercropping.
+:::
+
+## The log response ratio (lnRR)
+
+::: {.columns}
+::: {.column width="52%"}
+$$\ln RR = \ln\left(\frac{\bar X_T}{\bar X_C}\right)$$
+
+$$v_{\ln RR} = \frac{SD_T^2}{n_T \bar X_T^2} + \frac{SD_C^2}{n_C \bar X_C^2}$$
+
+<span class="small muted">[@hedges1999]</span>
+
+**Back to percent** for reporting:
+
+$$\text{change} = 100 \times \left(e^{\ln RR} - 1\right)\%$$
+:::
+
+::: {.column width="46%"}
+::: {.box .blue}
+[Why the log?]{.box-title}
+The ratio is **asymmetric** (halving = 0.5, doubling = 2); its log is **symmetric** (−0.69, +0.69) and closer to normal.
+:::
+
+::: {.box .green}
+[Why ecologists like it]{.box-title}
+**Unit-free** and **proportional**: "intercropping reduces aphids by 65%" speaks to agronomists — and its value does not depend on the SD (only its variance does).
+:::
+:::
+:::
+
+## Exercise 1 · By hand (pairs, 8 min) {.question}
+
+::: question-card
+[Calculator ready]{.q-kicker}
+
+[With the aphid example (T: `r mT` ± `r sT`, n = `r nT`; C: `r mC` ± `r sC`, n = `r nC`), compute **lnRR**, its **variance**, and the **% change**.]{.q-text}
+:::
+
+::: {.fragment .box .green style="width:80%;"}
+lnRR = ln(`r mT` / `r mC`) = **`r f2(lnrr, 3)`**\
+*v* = `r sT`² / (`r nT` × `r mT`²) + `r sC`² / (`r nC` × `r mC`²) = **`r f2(v_lnrr, 4)`** (SE = `r f2(sqrt(v_lnrr), 3)`)\
+Change = 100 × (e^`r f2(lnrr, 3)`^ − 1) = **`r round(100 * (exp(lnrr) - 1))`%**\
+:::
+
+::: notes
+Give 6–8 min, walk around; expect e^x to be the stumbling block. Then reveal. Keep the answer (-1.053) in mind: the very next slide asks participants to predict what R returns.
+:::
+
+## Now let R do it (live coding, 5 min)
+
+::: {.question-card style="width:100%; padding:0.4em 0.9em;"}
+[Predict first]{.q-kicker} [What value of yi should R return for our aphid example?]{.q-text style="font-size:0.9em;"}
+:::
+
+```{r}
+#| label: escalc-demo
+#| echo: true
+#| output-location: fragment
+library(metafor)
+# ic <- read.csv("intercropping_biodiversity.csv")      # running example
+
+dat <- escalc(measure = "ROM",                           # lnRR ("ratio of means")
+              m1i = b_mean_t, sd1i = b_sd_t, n1i = b_n_t,  # T = intercropping
+              m2i = b_mean_c, sd2i = b_sd_c, n2i = b_n_c,  # C = monoculture
+              data = ic)
+# other metrics: measure = "SMD" (Hedges' g), "OR", "ZCOR"
+
+dat[dat$es_id == 2011, c("es_id", "yi", "vi")]          # our worked example
+c(NA_yi = sum(is.na(dat$yi)), vi_zero = sum(dat$vi == 0, na.rm = TRUE))  # what to deal with
+```
+
+::: {.fragment .small}
+-   `yi` = effect size, `vi` = sampling variance: **the input of every meta-analysis** (`rma()`, this afternoon).
+-   Zero mean → `NA`; zero SD → `vi = 0` ("infinite" precision!): **count both** before `rma()`.
+:::
+
+::: notes
+Ask for the prediction (-1.053 from Exercise 1) before running. For SMD, escalc uses the exact J (gamma function): g = -3.113, vs -3.117 with the approximate J by hand.
+:::
+
+## Hedges' *g*, step by step
+
+::: {.columns}
+::: {.column width="44%"}
+**Idea**: express the difference in **standard-deviation units**.
+
+$$d = \frac{\bar X_T - \bar X_C}{SD_{pooled}}$$
+
+Useful when studies use **different scales** and the effect is additive.
+
+::: {.box .warn}
+Small samples **inflate** *d* → multiply by a correction *J* < 1: that is **Hedges' *g*** [@hedges1981].
+:::
+:::
+
+::: {.column width="54%"}
+With our aphids:
+
+::: {.fragment}
+**1.** Difference: `r mT` − `r mC` = **`r f2(mT - mC)`** aphids
+:::
+
+::: {.fragment}
+**2.** Pooled SD (equal *n*: average the variances): √((`r sT`² + `r sC`²) / 2) = **`r f2(sp)`**
+:::
+
+::: {.fragment}
+**3.** *d* = `r f2(mT - mC)` / `r f2(sp)` = **`r f2(d)`** standard deviations
+:::
+
+::: {.fragment}
+**4.** With 4 + 4 plants, *J* = `r f2(J, 2)` → ***g*** = **`r f2(g)`**
+:::
+
+::: {.fragment .box .green}
+`escalc(measure = "SMD")` does all of this — and the variance. You never compute *g* by hand in practice.
+:::
+:::
+:::
+
+::: notes
+~4 min, demonstrated by the teacher after Exercise 1 (not asked to participants). All formulas (pooled SD, J, variance of g) are in the formula sheet at the end.
+:::
+
+# The traps {.section-divider background-image="../../theme/img/bg-keymessages.jpg"}
+
+## Trap 1 · Means close to zero {.question}
+
+::: question-card
+[Your call]{.q-kicker}
+
+[`r sum(ic$zero_mean, na.rm = TRUE)` comparisons in our data have a **zero mean**. What do you do with them for a lnRR?]{.q-text}
+:::
+
+::: {.columns}
+::: {.column width="48%"}
+::: {.fragment}
+**Exact zeros**: no lnRR (and most also have SD = 0, so no *g*). Report them; test the conclusion **with and without**.
+:::
+
+::: {.fragment}
+**Near zero**: lnRR is biased. Geary's rule: each mean ≥ **3 SE** from zero → **`r round(100 * mean(both$geary < 3))`%** of our usable comparisons fail it.
+:::
+:::
+
+::: {.column width="50%"}
+::: {.fragment .box .blue}
+[What to do]{.box-title}
+
+-   Near zero or small *n*: **bias-corrected lnRR** [@lajeunesse2015] — formula and R code on the handout.
+-   **Never** add an arbitrary constant (+1) without testing its influence.
+:::
+:::
+:::
+
+::: notes
+~3 min. Ask first, collect 2–3 answers, then reveal. Note that mean*sqrt(n)/SD = mean/SE. Lajeunesse (2015) gives a small-sample version of Geary's test (handout). The bias of lnRR grows when mean/SE is small, whether because n is small or the mean is near zero. Correction formula in the formula sheet.
+:::
+
+## Trap 2 · Missing or disguised SDs
+
+::: {.columns}
+::: {.column width="55%"}
+::: {.box .blue}
+[The common case: a standard error]{.box-title}
+**SD = SE × √n**\
+`r sum(ic$b_error_reported == "standard error", na.rm = TRUE)` of our `r nrow(ic)` comparisons were reported with a SE.
+:::
+
+::: {.small .muted}
+Also possible: from a 95% CI, or from a median and IQR [@wan2014] — see the formula sheet.
+:::
+:::
+
+::: {.column width="43%"}
+::: {.fragment .box .warn}
+**`r sum(ic$sd_missing)`** comparisons (**`r round(100 * mean(ic$sd_missing))`%**) have **no usable SD**.\
+Never set it to 0 or drop silently. Robust fix for lnRR: compute the sampling variance from the **average squared coefficient of variation** (CV = SD/mean, weighted by *n*) of the other studies [@nakagawa2023]. Not possible for zero means.
+:::
+:::
+:::
+
+::: {.fragment .small}
+Traps 1 and 2 together: **`r nrow(ic) - nrow(usable)`** of `r nrow(ic)` comparisons (`r round(100 * (1 - nrow(usable) / nrow(ic)))`%) are unusable as such for lnRR. This afternoon we set them aside — and say so.
+:::
+
+::: notes
+~2 min. Link with Joseph's session on quantitative extraction (metaDigitise): values read from figures are often SEs. Always record which spread measure was reported — a codebook column.
+:::
+
+## Trap 3 · lnRR and *g*: same direction, different magnitudes
+
+::: {.columns}
+::: {.column width="55%"}
+```{r}
+#| label: plot-g-lnrr
+#| fig-width: 7.5
+#| fig-height: 5.6
+ggplot(both, aes(lnrr, g)) +
+  geom_hline(yintercept = 0, colour = cesab[["grey"]]) +
+  geom_vline(xintercept = 0, colour = cesab[["grey"]]) +
+  geom_point(alpha = 0.55, size = 2.4, colour = cesab[["blue"]]) +
+  coord_cartesian(ylim = c(-8, 8)) +
+  labs(x = "lnRR", y = "Hedges' g",
+       caption = paste(sum(abs(both$g) > 8), "points with |g| > 8 not shown")) +
+  theme_cesab(18)
+```
+:::
+
+::: {.column width="43%"}
+The `r nrow(both)` usable comparisons, computed both ways:
+
+-   Same **direction** always (both follow $\bar X_T - \bar X_C$)
+-   Similar **ranking** (Spearman ρ = `r f2(cor(both$lnrr, both$g, method = "spearman"))`)
+-   But very different **magnitudes**: *g* explodes when the SD is tiny
+
+::: {.fragment .box .warn}
+*g* depends on the SD (trap size, plot size, subsamples); lnRR does not. **Never mix both** in one analysis, and do not convert lnRR ↔ *g*.
+:::
+:::
+:::
+
+## Other kinds of data, in one slide
+
+::: {.columns}
+::: {.column width="50%"}
+::: {.box .green}
+[Yes/no outcomes]{.box-title}
+Plants infested or not, seedlings alive or dead → a 2×2 table of counts → **log odds ratio** (or log risk ratio, the log of the ratio of proportions).\
+`escalc("OR", ai=, bi=, ci=, di=)`
+:::
+:::
+
+::: {.column width="48%"}
+::: {.box}
+[Correlations]{.box-title}
+e.g. habitat cover vs pest control → **Fisher's *z***.\
+Pool ***z***, not *r*, then back-transform.\
+`escalc("ZCOR", ri=, ni=)`
+:::
+:::
+:::
+
+::: {.box .warn}
+[Conversions between metrics]{.box-title}
+Possible (log OR → *d*, *r* → *d*), but only for a **minority** of studies: flag them and run a **sensitivity analysis** without them. **Never lnRR ↔ *g***. Formulas in the formula sheet [@borenstein2021, chap. 7].
+:::
+
+::: notes
+~3 min. No formulas here on purpose: the formula sheet at the end has them.
+:::
+
+## Quick quiz {.question}
+
+::: {.columns}
+::: {.column width="50%"}
+**1.** Earthworm biomass (g/m²) under conservation vs conventional tillage, studies in many different units. Metric?
+
+::: {.fragment .box .green}
+**lnRR** — positive, proportional, unit-free.
+:::
+
+**2.** lnRR = −0.36. Change in %?
+
+::: {.fragment .box .green}
+100 × (e^−0.36^ − 1) = **−30%**.
+:::
+:::
+
+::: {.column width="48%"}
+**3.** Proportion of fields where a weed is present, with vs without cover crop. Metric?
+
+::: {.fragment .box .green}
+**log odds ratio** (or log risk ratio).
+:::
+
+**4.** Why use *g* rather than *d*?
+
+::: {.fragment .box .green}
+*d* **overestimates |effect|** in small samples; *g* corrects it.
+:::
+:::
+:::
+
+## Key messages {.key-messages background-image="../../theme/img/bg-keymessages.jpg"}
+
+1.  **Effect size + sampling variance** = the unit of every meta-analysis; the variance becomes the **weight**.
+2.  The **data and the question** choose the metric: MD, *g*, lnRR, log OR, *z*. Fix it in the protocol.
+3.  lnRR: check **Geary**, correct small-sample **bias**, handle **zeros** and **missing SDs** explicitly.
+4.  Never mix **non-convertible** metrics (lnRR ↔ *g*); flag and test any conversion.
+
+## Going further
+
+**All formulas** (with the exact *J*, bias-corrected lnRR and its variance, conversions and their variances): see the **A4 formula sheet** handout.
+
+
+-   **Variability as an outcome**: lnCVR, the log ratio of coefficients of variation [@nakagawa2015].
+-   **Paired / before–after designs** (SMCC, ROMC in `escalc`) need the correlation between measurements.
+-   **Several treatments vs one control** create **dependent** effect sizes → multilevel models, this afternoon.
+
+## In the online notebook {.dense}
+
+Each point of this session developed further, with the same data, more pitfalls and exercises with solutions:
+
+-   [Effect sizes](https://literaturesynthesis.github.io/notebook/chapters/effect-sizes.html)
+-   [Formula sheet (appendix)](https://literaturesynthesis.github.io/notebook/chapters/formulas.html)
+-   [From research question to estimand](https://literaturesynthesis.github.io/notebook/chapters/question-estimand.html)
+-   [Dependence: map it before you model it](https://literaturesynthesis.github.io/notebook/chapters/dependence.html)
+
+::: {.box .blue}
+**literaturesynthesis.github.io/notebook**
+:::
+
+## References
+
+::: {#refs}
+:::

@@ -1,0 +1,50 @@
+---
+title: "Effect sizes — formula sheet"
+author: ""
+subtitle: "FRB-CESAB training course · Wednesday 9:00 · keep it at hand during the exercises"
+format:
+  html:
+    theme: [cosmo, ../../theme/cesab-doc.scss]
+    embed-resources: true
+    html-math-method: mathml
+    toc: false
+---
+
+**Convention:** T = intervention (e.g. intercropping), C = comparator (e.g. monoculture); $\bar X$ mean, $SD$ standard deviation, $n$ sample size, $v$ sampling variance. Weight of a study in a meta-analysis: $w = 1/v$ (fixed effect) or $w = 1/(v + \tau^2)$ (random effects).
+
+| Quantity | Formula |
+|---|---|
+| Mean difference | $MD = \bar X_T - \bar X_C$, $\quad v = \dfrac{SD_T^2}{n_T} + \dfrac{SD_C^2}{n_C}$ |
+| Pooled SD | $SD_p = \sqrt{\dfrac{(n_T-1)SD_T^2 + (n_C-1)SD_C^2}{n_T+n_C-2}}$ |
+| Hedges' *g* | $g = J\,\dfrac{\bar X_T - \bar X_C}{SD_p}$, $\quad v_g = \dfrac{1}{n_T}+\dfrac{1}{n_C}+\dfrac{g^2}{2(n_T+n_C)}$ |
+| Correction *J* ($m = n_T+n_C-2$) | exact: $J = \dfrac{\Gamma(m/2)}{\sqrt{m/2}\,\Gamma((m-1)/2)}$ (used by `escalc`); approx.: $J \approx 1 - \dfrac{3}{4m-1}$ |
+| lnRR [@hedges1999] | $\ln RR = \ln(\bar X_T/\bar X_C)$, $\quad v = \dfrac{SD_T^2}{n_T\bar X_T^2}+\dfrac{SD_C^2}{n_C\bar X_C^2}$ |
+| Bias-corrected lnRR [@lajeunesse2015] | $\ln RR^{\Delta} = \ln RR + \dfrac12\left(\dfrac{SD_T^2}{n_T\bar X_T^2}-\dfrac{SD_C^2}{n_C\bar X_C^2}\right)$, $\quad v^{\Delta} = v + \dfrac12\left(\dfrac{SD_T^4}{n_T^2\bar X_T^4}+\dfrac{SD_C^4}{n_C^2\bar X_C^4}\right)$ |
+| Geary's rule | mean / SE ≥ 3 (i.e. mean × √n / SD ≥ 3) in both groups; small *n* [@lajeunesse2015]: $\dfrac{\bar X}{SD}\,\dfrac{4n^{3/2}}{1+4n} \geq 3$ |
+| Log odds ratio (2×2 table *a b / c d*) | $\ln\dfrac{ad}{bc}$, $\quad v = \dfrac1a+\dfrac1b+\dfrac1c+\dfrac1d$ (add 0.5 to each cell if one is 0) |
+| Fisher's *z* | $z = \dfrac12\ln\dfrac{1+r}{1-r}$, $\quad v_z = \dfrac{1}{n-3}$ |
+| SD from SE | SD = SE × √n |
+| SD from a 95% CI | SD = √n × (upper − lower) / (2 t~0.975, n−1~) (≈ 3.92 only for large *n*; with *n* = 4 use 6.37) |
+| SD from median, IQR, range | estimators of @wan2014 |
+| log OR → *d* (assumes a logistic latent trait) | $d = \ln OR\,\sqrt3/\pi$, $\quad v_d = v_{\ln OR}\,3/\pi^2$ |
+| *r* → *d* (point-biserial *r*, two groups) | $d = \dfrac{2r}{\sqrt{1-r^2}}$, $\quad v_d = \dfrac{4\,v_r}{(1-r^2)^3}$; back: $r = d/\sqrt{d^2+4}$ (equal groups) |
+| Back to % | $100\,(e^{\ln RR}-1)$ |
+
+**Which metric?** Positive variable with a true zero, proportional effect (abundance, biomass, yield) → lnRR. Scores or indices with an arbitrary zero, different scales → Hedges' *g*. Yes/no outcome → log odds ratio. Correlation → Fisher's *z*.
+
+**In R:** `metafor::escalc(measure = "ROM" | "SMD" | "MD" | "OR" | "ZCOR", ...)` returns `yi` (effect size) and `vi` (sampling variance). A zero mean gives `NA`, a zero SD gives `vi = 0`: check both.
+
+**Bias-corrected lnRR in R** (not built into `escalc`):
+
+```r
+tT <- sd1^2 / (n1 * m1^2); tC <- sd2^2 / (n2 * m2^2)
+yi_c <- log(m1 / m2) + 0.5 * (tT - tC)
+vi_c <- tT + tC + 0.5 * (tT^2 + tC^2)
+```
+
+**Missing SDs for lnRR** [@nakagawa2023]: replace the unknown CV²/n terms by the *n*-weighted mean CV² of the studies with SDs. Conversions: only for a minority of studies, flagged, with a sensitivity analysis without them [@borenstein2021]. Never convert lnRR ↔ *g*.
+
+## References
+
+::: {#refs}
+:::

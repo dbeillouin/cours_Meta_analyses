@@ -1,0 +1,10 @@
+project:
+  type: default
+  output-dir: ../docs
+format:
+  html:
+    theme: [cosmo, ../theme/cesab-doc.scss]
+    embed-resources: true
+    toc: false
+bibliography: references.bib
+csl: ../theme/ecology.csl

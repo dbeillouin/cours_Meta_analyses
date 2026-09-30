@@ -1,0 +1,457 @@
+---
+title: "Pooling effect sizes"
+subtitle: "Common-effect, random-effects and multilevel models — and how to show the results"
+---
+
+```{r}
+#| label: setup
+#| include: false
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(metafor)
+library(readr)
+source("../../R/theme_cesab.R")
+knitr::opts_chunk$set(dev = "png", dev.args = list(bg = "transparent"), out.width = "100%")
+
+ic <- read_csv("../../donnees/derivees/intercropping_biodiversity.csv", show_col_types = FALSE)
+dat <- ic |>
+  filter(functional_group == "Pests", !sd_missing, !zero_mean) |>
+  escalc(measure = "ROM", m1i = b_mean_t, sd1i = b_sd_t, n1i = b_n_t,
+         m2i = b_mean_c, sd2i = b_sd_c, n2i = b_n_c, data = _)
+pc  <- function(x) round(100 * (exp(x) - 1))
+rng <- function(lo, hi) paste0(pc(lo), "% to ", ifelse(pc(hi) > 0, "+", ""), pc(hi), "%")
+
+k       <- nrow(dat)
+n_study <- n_distinct(dat$study_id)
+naive   <- mean(dat$yi)
+
+m_ee <- rma(yi, vi, data = dat, method = "EE")
+m_re <- rma(yi, vi, data = dat, test = "knha")
+m_ml <- rma.mv(yi, vi, random = ~ 1 | study_id / es_id, data = dat, test = "t", dfs = "contain")
+m_rb <- robust(m_ml, cluster = study_id, clubSandwich = TRUE)
+p_re <- predict(m_re); p_ml <- predict(m_ml)
+
+# share of the total weight taken by single studies under each model
+share <- function(w, id) round(100 * sum(w[dat$study_id == id]) / sum(w))
+w_ee <- 1 / dat$vi; w_re <- 1 / (dat$vi + m_re$tau2); w_ml <- weights(m_ml, type = "rowsum")
+zhou <- 525; malu <- 645                      # study_id of Zhou et al. 2013, Maluleke et al. 2005
+k_zhou <- sum(dat$study_id == zhou); k_malu <- sum(dat$study_id == malu)
+max_ml <- max(tapply(w_ml, dat$study_id, sum)) / sum(w_ml) * 100
+
+# multilevel I2 (Nakagawa & Santos 2012)
+w  <- 1 / dat$vi
+vt <- (k - 1) * sum(w) / (sum(w)^2 - sum(w^2))
+I2 <- 100 * m_ml$sigma2 / (sum(m_ml$sigma2) + vt)
+```
+
+## Learning objectives {.objectives}
+
+By the end of this session, you will be able to:
+
+1.  Explain why studies are **weighted**, and how the weights change between models.
+2.  Distinguish **common-effect**, **random-effects** and **multilevel** models — and choose one **before** seeing the data.
+3.  Read **μ, its CI, τ², I² and the prediction interval**, and say which answers which question.
+4.  Fit and plot them in R with `metafor` (practical, 33 min).
+
+::: notes
+60 min: ~22 min slides, 33 min practical, 5 min debrief (key messages). Running example: pest abundance, intercropping vs monoculture, the lnRR computed this morning.
+:::
+
+## Where we are
+
+::: {.columns}
+::: {.column width="50%"}
+This morning, `escalc()` gave us, for each of the **`r k`** comparisons of pest abundance:
+
+-   `yi`: the lnRR (effect size)
+-   `vi`: its sampling variance
+
+These come from **`r n_study` studies**.
+:::
+
+::: {.column width="48%"}
+::: {.box .blue}
+[This afternoon's question]{.box-title}
+How do we turn `r k` numbers into **one answer** — and an honest statement of **how certain** and **how variable** it is?
+:::
+
+::: {.fragment .box .warn}
+Plain average of the `r k` lnRR: **`r pc(naive)`%**. Why is that a bad answer? *(think 20 s)*
+:::
+:::
+:::
+
+::: notes
+Expected answers: all comparisons count the same even though some are much more precise; one study with 80 comparisons counts 80 times. The two problems of the session: precision (weights) and dependence (multilevel).
+:::
+
+# Weights and models {.section-divider background-image="../../theme/img/bg-keymessages.jpg"}
+
+## Two views of the world
+
+```{r}
+#| label: plot-views
+#| fig-width: 14
+#| fig-height: 4.6
+set.seed(3)
+x <- seq(-1.8, 1, 0.005)
+mk <- function(model, mu, tau, obs) tibble(model = model, x = x,
+  d = if (tau > 0) dnorm(x, mu, tau) else dnorm(x, mu, 0.012), obs = list(obs))
+true_re <- rnorm(7, -0.3, 0.45)
+views <- bind_rows(
+  tibble(model = "Common effect: ONE true effect", x = x, d = dnorm(x, -0.3, 0.012)),
+  tibble(model = "Random effects: a DISTRIBUTION of true effects", x = x, d = dnorm(x, -0.3, 0.45)))
+pts <- bind_rows(
+  tibble(model = "Common effect: ONE true effect", true = -0.3, obs = -0.3 + rnorm(7, 0, 0.18)),
+  tibble(model = "Random effects: a DISTRIBUTION of true effects", true = true_re, obs = true_re + rnorm(7, 0, 0.18)))
+ggplot() +
+  geom_area(data = views |> group_by(model) |> mutate(d = d / max(d)),
+            aes(x, d), fill = cesab[["teal"]], alpha = 0.35) +
+  geom_point(data = pts, aes(true, 0.06), shape = 17, size = 5, colour = cesab[["blue"]]) +
+  geom_segment(data = pts, aes(x = true, xend = obs, y = 0.06, yend = -0.12),
+               colour = cesab[["grey"]], linewidth = 0.5) +
+  geom_point(data = pts, aes(obs, -0.12), size = 4, colour = cesab[["green"]]) +
+  facet_wrap(~ model) +
+  annotate("text", x = -1.6, y = 0.1, label = "true", colour = cesab[["blue"]], size = 5.5, hjust = 0) +
+  annotate("text", x = -1.6, y = -0.16, label = "observed", colour = cesab[["green"]], size = 5.5, hjust = 0) +
+  labs(x = "Effect (lnRR)", y = NULL) +
+  theme_cesab(19) + theme(axis.text.y = element_blank(), panel.grid = element_blank())
+```
+
+::: {.columns}
+::: {.column width="50%"}
+$y_k = \mu + \varepsilon_k$ — studies differ **only** by sampling error.\
+[Also called "fixed-effect" or "equal-effects" (`method = "EE"`).]{.small .muted}
+:::
+::: {.column width="48%"}
+$y_k = \mu + u_k + \varepsilon_k$, with $\text{Var}(u_k) = \tau^2$ — true effects **really differ** (soils, climates, pests...).
+:::
+:::
+
+::: notes
+~3 min. Triangles: true effects; dots: what the studies observe. Terminology: "common effect" (= "equal effects", method "EE" in metafor). A "fixed-effects" model (plural) estimates the average of the true effects of *these* studies only [@rice2018]; the random-effects model generalises to a *population* of studies.
+:::
+
+## Weights: precise studies count more
+
+::: {.columns}
+::: {.column width="48%"}
+Common effect:
+$$w_k = \frac{1}{v_k}$$
+
+Random effects:
+$$w_k = \frac{1}{v_k + \tau^2}$$
+
+Adding τ² to every variance makes the weights **more equal**: very precise studies dominate less.
+:::
+
+::: {.column width="50%"}
+| Share of the total weight | Common effect | Random effects |
+|---|---|---|
+| Zhou 2013 (`r k_zhou` very precise rows) | **`r share(w_ee, zhou)`%** | `r share(w_re, zhou)`% |
+| Maluleke 2005 (`r k_malu` rows) | `r share(w_ee, malu)`% | **`r share(w_re, malu)`%** |
+
+::: {.fragment .box .warn}
+Common effect: **2 studies out of `r n_study` carry `r share(w_ee, zhou) + share(w_ee, malu)`%** of the weight.\
+Random effects: τ² tames the *precise* studies — but a study with **many rows** still counts a lot. That is the next problem.
+:::
+:::
+:::
+
+::: {.source}
+Source: @zhou2013; @maluleke2005; via @jones2021.
+:::
+
+::: notes
+~2 min. With the common-effect model, the "meta-analysis" is essentially one wheat–garlic study from China. With a simple random-effects model, a study counts roughly in proportion to its number of rows — the non-independence problem, solved by the multilevel model (no study above ~5%). Worth mentioning: Zhou's rows have v ≈ 5×10⁻⁵ (n = 100 subsamples, the same treatment means reused against several controls) — possible pseudo-replication at extraction: always look at your tiniest variances.
+:::
+
+## Which model? Decide **before** seeing the data {.question}
+
+::: question-card
+[Show of hands]{.q-kicker}
+
+[Q is significant (p < 0.001). Should I **switch** from a common-effect to a random-effects model?]{.q-text}
+:::
+
+::: {.fragment .box .green style="width:80%;"}
+**No — the choice is conceptual, not a test result.** Do you want to generalise beyond these exact studies? Do you expect true effects to differ (sites, species, practices)? In ecology and agronomy: **yes and yes → random effects, stated in the protocol.** The Q test has low power with few studies and is almost always significant with many.
+:::
+
+::: notes
+~2 min. Choosing the model from Q or I² is still common in the literature and in last year's slides — it is not recommended [@borenstein2021; @nakagawa2023mee].
+:::
+
+# Heterogeneity {.section-divider background-image="../../theme/img/bg-keymessages.jpg"}
+
+## Three numbers, three meanings
+
+| | Meaning | Our pests (random-effects model, dependence ignored for now) |
+|---|---|---|
+| **τ²** (τ) | Variance (SD) of the **true** effects, in lnRR units | τ = `r round(sqrt(m_re$tau2), 2)` |
+| **I²** | Share of the observed variance **not** due to sampling error — a *relative* measure | `r round(m_re$I2, 1)`% |
+| **Q** | Test of "all true effects are equal" | p < 0.001 |
+
+::: {.fragment .box .warn}
+**I² ≈ 100% does not mean "huge differences"**: it means sampling error is tiny compared with them — typical when studies are large. I² says nothing about **how different** the effects are. For that, use τ and the **prediction interval**.
+:::
+
+::: notes
+~3 min. Median I² in ecological meta-analyses is ~90% [@senior2016]. Avoid the "low/moderate/high" I² thresholds from medicine.
+:::
+
+## Confidence vs prediction interval
+
+```{r}
+#| label: plot-ci-pi
+#| fig-width: 13
+#| fig-height: 3.6
+tibble(what = factor(c("Mean effect: 95% confidence interval", "A new field: 95% prediction interval"),
+                     levels = rev(c("Mean effect: 95% confidence interval", "A new field: 95% prediction interval"))),
+       est = p_re$pred, lo = c(p_re$ci.lb, p_re$pi.lb), hi = c(p_re$ci.ub, p_re$pi.ub)) |>
+  ggplot(aes(est, what)) +
+  geom_vline(xintercept = 0, linetype = 2, colour = cesab[["grey"]]) +
+  geom_errorbarh(aes(xmin = lo, xmax = hi, colour = what), height = 0, linewidth = 4) +
+  geom_point(shape = 23, size = 5, fill = "white", colour = cesab[["blue"]], stroke = 1.5) +
+  scale_colour_manual(values = c(cesab[["teal"]], cesab[["blue"]]), guide = "none") +
+  scale_x_continuous(labels = \(x) pct(x), breaks = log(c(0.25, 0.5, 1, 2, 3)),
+                     expand = expansion(mult = 0.08)) +
+  labs(x = "Pest abundance, intercropping vs monoculture (log scale)", y = NULL) +
+  theme_cesab(19)
+```
+
+::: {.columns}
+::: {.column width="50%"}
+**CI**: `r rng(p_re$ci.lb, p_re$ci.ub)` — how precisely we know the **average**. Shrinks as studies accumulate.
+:::
+::: {.column width="48%"}
+**PI**: `r rng(p_re$pi.lb, p_re$pi.ub)` — where the effect in a **new** field is expected. Reflects τ²; does not shrink [@inthout2016].
+:::
+:::
+
+::: notes
+~2 min. For a farmer or an adviser, the PI is the relevant number. Always report both. Back-transforming the mean lnRR gives the change in a *typical* (median) field; the average % change is exp(mu + tau^2/2) - 1, smaller here. Numbers are from the random-effects model, as in Exercise 3 of the practical; the multilevel model (later) gives a wider CI.
+:::
+
+## Quick quiz {.question}
+
+::: {.columns}
+::: {.column width="33%"}
+**1.** I² = 0%. Are the true effects identical?
+
+::: {.fragment .box .green}
+Not necessarily: with few, imprecise studies, heterogeneity is simply **not detectable**.
+:::
+:::
+::: {.column width="33%"}
+**2.** A farmer asks: "will intercropping reduce pests **on my farm**?" CI or PI?
+
+::: {.fragment .box .green}
+**PI** — and here it includes increases.
+:::
+:::
+::: {.column width="33%"}
+**3.** τ = `r round(sqrt(m_re$tau2), 2)` on the lnRR scale. Small or large?
+
+::: {.fragment .box .green}
+**Large**: mean ± 1 τ already spans `r pc(m_re$b - sqrt(m_re$tau2))`% to +`r pc(m_re$b + sqrt(m_re$tau2))`%.
+:::
+:::
+:::
+
+# Non-independence {.section-divider background-image="../../theme/img/bg-keymessages.jpg"}
+
+## `r k` comparisons are not `r k` studies
+
+::: {.columns}
+::: {.column width="52%"}
+```{r}
+#| label: plot-per-study
+#| fig-width: 7.5
+#| fig-height: 5.2
+dat |> count(study_id) |>
+  mutate(lab = case_when(study_id == zhou ~ "Zhou 2013", study_id == malu ~ "Maluleke 2005", TRUE ~ "")) |>
+  ggplot(aes(n, reorder(factor(study_id), n))) +
+  geom_col(fill = cesab[["teal"]], width = 0.75) +
+  geom_text(aes(label = lab), hjust = -0.1, size = 5.5, colour = cesab[["ink"]]) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.35))) +
+  labs(x = "Comparisons per study", y = "Study") +
+  theme_cesab(17) + theme(axis.text.y = element_blank(), panel.grid.major.y = element_blank())
+```
+:::
+
+::: {.column width="46%"}
+Several taxa, dates, sites or treatments **within the same study**: same team, same field, same weather, sometimes the **same control plots**.
+
+::: {.fragment .box .warn}
+Treating them as independent = **pseudo-replication**: CIs too narrow, studies with many comparisons over-weighted.
+:::
+:::
+:::
+
+## The multilevel (three-level) model
+
+::: {.columns}
+::: {.column width="50%"}
+$$y_{ij} = \mu + u_{j} + u_{ij} + \varepsilon_{ij}$$
+
+-   $u_{j}$: **between-study** variation, $\sigma^2_{study}$
+-   $u_{ij}$: **within-study** variation (between comparisons), $\sigma^2_{within}$
+-   $\varepsilon_{ij}$: sampling error, $v_{ij}$ (known)
+
+`study_id / es_id` = rows **nested** in studies:
+
+```r
+rma.mv(yi, vi,
+       random = ~ 1 | study_id / es_id,
+       test = "t", dfs = "contain",
+       data = dat)
+```
+:::
+
+::: {.column width="48%"}
+::: {.box .blue}
+[Our pests]{.box-title}
+Of the total variance, **`r round(I2[1])`%** is **between studies** and **`r round(I2[2])`%** **within studies** (multilevel I², @nakagawa2012):
+
+$$I^2_{study} = \frac{\sigma^2_{study}}{\sigma^2_{study} + \sigma^2_{within} + \tilde v}$$
+
+[ṽ = a "typical" sampling variance.]{.small .muted}
+:::
+
+::: {.fragment .box .green}
+`test = "t", dfs = "contain"`: t-based CIs whose degrees of freedom follow the number of **studies** (28 − 1 = 27), not of comparisons (381) — safer than z.
+:::
+:::
+:::
+
+## Predict first {.question}
+
+::: question-card
+[Show of hands]{.q-kicker}
+
+[Same `r k` comparisons, four models. Which one gives the **widest** confidence interval — and does the **mean** change much?]{.q-text}
+:::
+
+## Same data, four models
+
+```{r}
+#| label: plot-four
+#| fig-width: 13
+#| fig-height: 4.3
+four <- tibble(
+  model = c("Common effect", "Random effects (ignores dependence)",
+            "Multilevel", "Multilevel + robust (RVE)"),
+  est = c(m_ee$b, m_re$b, m_ml$b, m_rb$b),
+  lo = c(m_ee$ci.lb, m_re$ci.lb, m_ml$ci.lb, m_rb$ci.lb),
+  hi = c(m_ee$ci.ub, m_re$ci.ub, m_ml$ci.ub, m_rb$ci.ub),
+  ok = c("misleading", "misleading", "recommended", "recommended")) |>
+  mutate(model = factor(model, levels = rev(model)))
+ggplot(four, aes(est, model, colour = ok)) +
+  geom_vline(xintercept = 0, linetype = 2, colour = cesab[["grey"]]) +
+  geom_errorbarh(aes(xmin = lo, xmax = hi), height = 0, linewidth = 3) +
+  geom_point(shape = 23, size = 7, fill = "white", stroke = 2) +
+  annotate("text", x = m_ee$b + 0.02, y = 4, label = "CI too narrow to see", size = 5, colour = cesab[["warn"]], hjust = 0) +
+  scale_colour_manual(values = c(misleading = cesab[["warn"]], recommended = cesab[["blue"]]), name = NULL) +
+  scale_x_continuous(labels = \(x) pct(x), breaks = log(c(0.6, 0.7, 0.8, 0.9, 1))) +
+  labs(x = "Pest abundance: mean and 95% CI", y = NULL) +
+  theme_cesab(19)
+```
+
+::: {.columns}
+::: {.column width="50%"}
+::: {.box .warn}
+The first two models are **overconfident**: one study dominates (common effect) or `r k` comparisons are treated as `r k` studies.
+:::
+:::
+::: {.column width="48%"}
+::: {.fragment .box .green}
+**Robust variance estimation** (`robust()`, clustered by study) is a safety net when the dependence structure is uncertain [@pustejovsky2022]. Needs ≳ 10–20 **studies**.
+:::
+:::
+:::
+
+::: notes
+~3 min. The mean barely moves (−17% to −28%), the uncertainty changes a lot — and the uncertainty is what decisions rest on. RVE: robust(m, cluster = study_id, clubSandwich = TRUE). Shared control groups can also be handled with vcalc() (practical, bonus).
+:::
+
+# Showing the results {.section-divider background-image="../../theme/img/bg-keymessages.jpg"}
+
+## Beyond the forest plot: the orchard plot
+
+::: {.columns}
+::: {.column width="58%"}
+```{r}
+#| label: plot-orchard
+#| fig-width: 9
+#| fig-height: 5.6
+set.seed(1)
+ggplot(dat, aes(yi, 1)) +
+  geom_jitter(aes(size = 1 / sqrt(vi)), height = 0.28, alpha = 0.35, colour = cesab[["teal"]]) +
+  annotate("segment", x = p_ml$pi.lb, xend = p_ml$pi.ub, y = 1, yend = 1,
+           linewidth = 1.5, colour = cesab[["ink"]]) +
+  annotate("segment", x = p_ml$ci.lb, xend = p_ml$ci.ub, y = 1, yend = 1,
+           linewidth = 7, colour = cesab[["blue"]]) +
+  annotate("point", x = p_ml$pred, y = 1, size = 4, shape = 21,
+           fill = cesab[["lime"]], colour = cesab[["ink"]], stroke = 1) +
+  geom_vline(xintercept = 0, linetype = 2, colour = cesab[["grey"]]) +
+  scale_size_continuous(range = c(0.8, 6), guide = "none") +
+  scale_x_continuous(labels = \(x) pct(x), breaks = log(c(0.1, 0.5, 1, 2, 5))) +
+  coord_cartesian(xlim = c(-3.2, 2)) +
+  labs(x = "Pest abundance, % change (log scale)", y = NULL,
+       subtitle = paste0("k = ", k, " comparisons, ", n_study, " studies")) +
+  theme_cesab(18) + theme(axis.text.y = element_blank(), panel.grid.major.y = element_blank())
+```
+:::
+
+::: {.column width="40%"}
+-   **Points**: every comparison (`yi`), sized by precision
+-   **Thick bar**: 95% CI of the mean — `ci.lb`, `ci.ub`
+-   **Thin bar**: 95% prediction interval — `pi.lb`, `pi.ub`
+-   **Dot**: the mean — `pred` (all from `predict(model)`)
+-   **k** and number of studies
+
+::: {.box .blue}
+With hundreds of effect sizes, a classic forest plot is unreadable; the orchard plot shows **mean, uncertainty, heterogeneity and raw data** at once [@nakagawa2021].
+:::
+:::
+:::
+
+## Practical · 33 min + debrief
+
+| Time | Task |
+|------|------|
+| 14:22 | Common vs random effects: estimates and **weights** |
+| 14:30 | Heterogeneity: τ², I², **prediction interval** |
+| 14:38 | **Multilevel** model + `robust()` |
+| 14:46 | **Orchard plot**, then *your turn*: change one word, rerun for natural enemies |
+| 14:55 | **Debrief** (all together) |
+
+::: {.box .blue}
+Open **`meta_analysis_course.Rproj`** (the course kit), then **`td_models.R`**. Instructions and folded solutions: the practical web page.
+:::
+
+## Key messages {.key-messages background-image="../../theme/img/bg-keymessages.jpg"}
+
+1.  Studies are **weighted** by precision; τ² (random effects) tames very precise studies, the **multilevel** model stops studies with many rows from dominating.
+2.  Choose the model **a priori**; in ecology: **random effects**, and **multilevel** when a study gives several effect sizes.
+3.  Report **μ with its CI, τ² and the prediction interval**; I² is relative, not a measure of how different effects are.
+4.  Show the data: **orchard plots**. *Next (15:00): are these 28 studies a biased sample?*
+
+## In the online notebook {.dense}
+
+Each point of this session developed further, with the same data, more pitfalls and exercises with solutions:
+
+-   [Dependence: map it before you model it](https://literaturesynthesis.github.io/notebook/chapters/dependence.html)
+-   [Combining effect sizes: fixed, random and multilevel models](https://literaturesynthesis.github.io/notebook/chapters/combining-effect-sizes.html)
+-   [One question from start to finish](https://literaturesynthesis.github.io/notebook/chapters/worked-example.html)
+
+::: {.box .blue}
+**literaturesynthesis.github.io/notebook**
+:::
+
+## References
+
+::: {#refs}
+:::

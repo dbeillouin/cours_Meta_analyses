@@ -1,0 +1,321 @@
+---
+title: "Pooling effect sizes in R"
+subtitle: "Practical · Wednesday 14:25–15:00 · FRB-CESAB training course"
+author: "Damien Beillouin"
+format:
+  html:
+    theme: [cosmo, ../../theme/cesab-doc.scss]
+    toc: true
+    toc-location: left
+    toc-title: "Practical"
+    number-sections: true
+    embed-resources: true
+    html-math-method: mathml
+    code-copy: true
+    fig-width: 9
+    fig-height: 4.5
+    fig-dpi: 150
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup-hidden
+#| include: false
+data_file <- "../../donnees/derivees/intercropping_biodiversity.csv"
+```
+
+::: {.callout-tip appearance="simple" icon="false"}
+## By the end of this practical, you will be able to
+
+1.  Fit **common-effect**, **random-effects** and **multilevel** models with `metafor`, and compare their **weights** and **confidence intervals**.
+2.  Report **τ², I²** and the **prediction interval**.
+3.  Add a **robust** (cluster-robust) safety net.
+4.  Draw an **orchard plot**.
+:::
+
+| Time | What | Section |
+|------|------|---------|
+| 14:22 | Load and compute effect sizes | [1](#setup) |
+| 14:24 | Common vs random effects | [2](#models) |
+| 14:30 | Heterogeneity and prediction interval | [3](#hetero) |
+| 14:38 | Multilevel model + robust | [4](#multilevel) |
+| 14:46 | Orchard plot, then your turn: *natural enemies* | [5](#plot) · [6](#turn) |
+| 14:55 | **Debrief** with the whole group | [7](#key) |
+
+Sections marked *(optional)* are for those who are ahead: skip them if you are short of time.
+
+# Setup {#setup}
+
+Open `meta_analysis_course.Rproj` (the course kit), then `td_models.R` (it contains every exercise with blanks `___`). Same data and same effect sizes as this morning: **pest abundance, intercropping vs monoculture**. As announced this morning, comparisons with a zero mean or no usable SD are **set aside** (`!sd_missing, !zero_mean`) — in a real review, report how many and test the conclusion with imputed SDs.
+
+```{r}
+#| label: load
+library(dplyr)
+library(metafor)
+library(ggplot2)
+
+# In the participant pack: data_file <- "intercropping_biodiversity.csv"
+ic <- read.csv(data_file)
+
+grp <- "Pests"        # <- in section 6 you will change this word only
+
+sub <- ic |>
+  filter(functional_group == grp, !sd_missing, !zero_mean)
+
+dat <- escalc(measure = "ROM",
+              m1i = b_mean_t, sd1i = b_sd_t, n1i = b_n_t,
+              m2i = b_mean_c, sd2i = b_sd_c, n2i = b_n_c,
+              data = sub)
+
+c(comparisons = nrow(dat), studies = n_distinct(dat$study_id))
+```
+
+A small helper to turn lnRR into a % change:
+
+```{r}
+#| label: helper
+pct <- function(x) round(100 * (exp(x) - 1), 1)
+```
+
+# Common vs random effects {#models}
+
+**Exercise 1.** Fit a common-effect model (`method = "EE"`) and a random-effects model (default estimator REML). `test = "knha"` (Knapp–Hartung) widens the CI slightly to account for the uncertainty in τ² — recommended. Compare the estimates and CIs in %.
+
+```{r}
+#| label: ex1-template
+#| eval: false
+m_ee <- rma(yi, vi, data = dat, method = "___")
+m_re <- rma(yi, vi, data = dat, test = "knha")
+
+pct(c(m_ee$b, m_ee$ci.lb, m_ee$ci.ub))
+pct(c(m_re$b, ___, ___))
+```
+
+::: {.callout-note collapse="true" title="Solution"}
+```{r}
+#| label: ex1-solution
+m_ee <- rma(yi, vi, data = dat, method = "EE")
+m_re <- rma(yi, vi, data = dat, test = "knha")
+
+pct(c(m_ee$b, m_ee$ci.lb, m_ee$ci.ub))
+pct(c(m_re$b, m_re$ci.lb, m_re$ci.ub))
+```
+:::
+
+**Exercise 2.** Which study dominates? Compute the share of the total weight taken by each study in both models.
+
+```{r}
+#| label: ex2-template
+#| eval: false
+w_ee <- 1 / dat$vi
+w_re <- 1 / (dat$vi + m_re$___)
+
+share <- function(w) sort(round(100 * tapply(w, dat$study_id, sum) / sum(w), 1), decreasing = TRUE)
+head(share(w_ee), 3)
+head(share(w_re), 3)
+```
+
+::: {.callout-note collapse="true" title="Solution"}
+```{r}
+#| label: ex2-solution
+w_ee <- 1 / dat$vi
+w_re <- 1 / (dat$vi + m_re$tau2)
+
+share <- function(w) sort(round(100 * tapply(w, dat$study_id, sum) / sum(w), 1), decreasing = TRUE)
+head(share(w_ee), 3)
+head(share(w_re), 3)
+```
+
+In the common-effect model, **two studies carry almost all the weight** (study 525, Zhou et al. 2013, and study 645, Maluleke et al. 2005). In the random-effects model the weights are more equal — but study 645, which has 80 comparisons, now counts for about a quarter of the result **because it has many rows**. That is the non-independence problem of section 4.
+
+Look at `dat[dat$study_id == 525, c("b_mean_t", "b_mean_c", "b_n_t", "vi")]`: n = 100 subsamples and the **same treatment means reused** against several controls give tiny variances. Always inspect your smallest variances — they may reveal pseudo-replication at extraction.
+:::
+
+# Heterogeneity and prediction interval {#hetero}
+
+```{r}
+#| label: summary-re
+m_re
+```
+
+::: {.callout-caution icon="false"}
+## Read the output (2 min)
+Find **τ²**, **I²** and **Q** in the output above. What does I² = 99.9% mean — and not mean?
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+τ² ≈ 0.34 (τ ≈ 0.58 on the lnRR scale): true effects vary a lot between comparisons. I² ≈ 99.9% means that almost all the observed variance is real heterogeneity rather than sampling error — because sampling errors are small here, not necessarily because effects are extremely different. I² is **relative**; τ and the prediction interval tell you **how much** effects vary.
+:::
+
+**Exercise 3.** Use `predict()` to get the mean, its CI **and the prediction interval**, back-transformed to %.
+
+```{r}
+#| label: ex3-template
+#| eval: false
+pr <- predict(m_re)
+pct(c(mean = pr$pred, ci.lb = pr$ci.lb, ci.ub = pr$ci.ub, pi.lb = pr$___, pi.ub = pr$___))
+```
+
+::: {.callout-note collapse="true" title="Solution"}
+```{r}
+#| label: ex3-solution
+pr <- predict(m_re)
+pct(c(mean = pr$pred, ci.lb = pr$ci.lb, ci.ub = pr$ci.ub, pi.lb = pr$pi.lb, pi.ub = pr$pi.ub))
+```
+
+In a *typical* field, pests decrease with intercropping, and the CI excludes 0. But the prediction interval spans from a strong decrease to a strong **increase**: in a new field, the effect could go either way. (exp(mean) − 1 is the change in a typical — median — field; the average % change, exp(μ + τ²/2) − 1, is smaller here.)
+:::
+
+# Multilevel model and robust inference {#multilevel}
+
+**Exercise 4.** Fit a three-level model: comparisons (`es_id`) nested in studies (`study_id`). Use `test = "t", dfs = "contain"` so that the degrees of freedom follow the number of studies.
+
+```{r}
+#| label: ex4-template
+#| eval: false
+m_ml <- rma.mv(yi, vi, random = ~ 1 | ___ / ___, data = dat, test = "t", dfs = "contain")
+m_ml
+pct(c(m_ml$b, m_ml$ci.lb, m_ml$ci.ub))
+```
+
+::: {.callout-note collapse="true" title="Solution"}
+```{r}
+#| label: ex4-solution
+m_ml <- rma.mv(yi, vi, random = ~ 1 | study_id / es_id, data = dat, test = "t", dfs = "contain")
+m_ml
+pct(c(m_ml$b, m_ml$ci.lb, m_ml$ci.ub))
+```
+
+The two variance components are `sigma^2.1` (between studies) and `sigma^2.2` (between comparisons within studies). The mean is similar to the random-effects model, but the **CI is more than twice as wide**: we now have 28 studies, not 382 independent observations.
+:::
+
+*(optional)* How is the total variance split between the two levels? Multilevel I² [@nakagawa2012]: each variance component divided by the total, where the total also includes a "typical" sampling variance ṽ (a weighted average of the `vi`):
+
+$$I^2_{study} = \frac{\sigma^2_{study}}{\sigma^2_{study} + \sigma^2_{within} + \tilde v}, \qquad \tilde v = \frac{(k-1)\sum w_i}{(\sum w_i)^2 - \sum w_i^2}, \; w_i = 1/v_i$$
+
+Code given — just run it:
+
+```{r}
+#| label: i2-ml
+w  <- 1 / dat$vi
+k  <- length(w)
+vt <- (k - 1) * sum(w) / (sum(w)^2 - sum(w^2))        # "typical" sampling variance
+round(100 * m_ml$sigma2 / (sum(m_ml$sigma2) + vt), 1)  # % between studies, % within studies
+```
+
+**Exercise 5.** Add cluster-robust inference (a safety net if the dependence structure is misspecified).
+
+```{r}
+#| label: ex5-template
+#| eval: false
+m_rob <- robust(m_ml, cluster = ___, clubSandwich = TRUE)
+m_rob
+```
+
+::: {.callout-note collapse="true" title="Solution"}
+```{r}
+#| label: ex5-solution
+m_rob <- robust(m_ml, cluster = study_id, clubSandwich = TRUE)
+m_rob
+pct(c(m_rob$b, m_rob$ci.lb, m_rob$ci.ub))
+```
+
+Close to the multilevel result: good news, the model-based CI was not over-optimistic.
+:::
+
+::: {.callout-note collapse="true" title="(optional) Correlated sampling errors: shared control plots"}
+When several treatments are compared with the same control, their sampling errors are correlated. A pragmatic "working model" (called CHE + RVE, @pustejovsky2022): assume a correlation (e.g. ρ = 0.5) between all rows of a study, build the variance–covariance matrix with `vcalc()`, and keep `robust()` on top. RVE needs enough studies (≳ 10–20 clusters; `clubSandwich = TRUE` adds the small-sample correction). The ρ assumption is strong; with good group identifiers, `vcalc()` can instead compute the covariance of shared controls exactly (arguments `grp1`, `grp2`, `w1`, `w2`).
+
+```{r}
+#| label: bonus-vcalc
+V <- vcalc(vi, cluster = study_id, obs = es_id, rho = 0.5, data = dat)
+m_v <- rma.mv(yi, V, random = ~ 1 | study_id / es_id, data = dat, test = "t", dfs = "contain")
+pct(c(m_v$b, m_v$ci.lb, m_v$ci.ub))
+m_vr <- robust(m_v, cluster = study_id, clubSandwich = TRUE)
+pct(c(m_vr$b, m_vr$ci.lb, m_vr$ci.ub))
+```
+
+Try ρ = 0.2 and 0.8: if the conclusion does not change, it is robust to this assumption.
+:::
+
+# Show the result: an orchard plot {#plot}
+
+**Exercise 6.** The plotting code is given: run it and **match each element to the output of `predict()`** (`pred`, `ci.lb`/`ci.ub`, `pi.lb`/`pi.ub`). Then answer: what share of the individual comparisons falls outside the prediction interval? Is that what you expected?
+
+
+```{r}
+#| label: ex6-solution
+pr_ml <- predict(m_ml)
+set.seed(1)
+ggplot(dat, aes(x = yi, y = 1)) +
+  geom_jitter(aes(size = 1 / sqrt(vi)), height = 0.3, alpha = 0.3, colour = "#56B8B9") +
+  annotate("segment", x = pr_ml$pi.lb, xend = pr_ml$pi.ub, y = 1, yend = 1, linewidth = 1) +
+  annotate("segment", x = pr_ml$ci.lb, xend = pr_ml$ci.ub, y = 1, yend = 1, linewidth = 4) +
+  annotate("point", x = pr_ml$pred, y = 1, size = 6, shape = 21, fill = "#BCCF00") +
+  geom_vline(xintercept = 0, linetype = 2) +
+  scale_size_continuous(range = c(0.5, 5), guide = "none") +
+  scale_x_continuous(sec.axis = sec_axis(~ 100 * (exp(.) - 1), name = "% change",
+                                         breaks = c(-95, -75, -50, 0, 100, 300))) +
+  coord_cartesian(xlim = c(-4, 2)) +
+  labs(x = "lnRR (pest abundance)", y = NULL,
+       subtitle = paste0("k = ", nrow(dat), " comparisons, ", n_distinct(dat$study_id), " studies")) +
+  theme_minimal(base_size = 13) +
+  theme(axis.text.y = element_blank(), panel.grid.major.y = element_blank())
+```
+
+The `orchaRd` package [@nakagawa2021] draws these plots directly (`orchard_plot()`), including for moderators; it is installed from GitHub, so we build it by hand here.
+
+::: {.callout-note collapse="true" title="Answer"}
+```{r}
+#| label: ex6-answer
+mean(dat$yi < pr_ml$pi.lb | dat$yi > pr_ml$pi.ub)
+```
+About 12% here — more than the naive 5%. The prediction interval is for **true** effects; observed values add their own sampling error on top, and a few studies are extreme. Worth a look: which studies are they?
+:::
+
+# Your turn: natural enemies {#turn}
+
+**Predict first**: will intercropping increase or decrease natural enemies?
+
+Then go back to section 1, replace `grp <- "Pests"` by `grp <- "Natural enemies"`, and **rerun the script from the top**. Compare the multilevel estimate and prediction interval with those for pests.
+
+::: {.callout-note collapse="true" title="Solution"}
+```{r}
+#| label: turn-solution
+ne <- ic |>
+  filter(functional_group == "Natural enemies", !sd_missing, !zero_mean) |>
+  escalc(measure = "ROM", m1i = b_mean_t, sd1i = b_sd_t, n1i = b_n_t,
+         m2i = b_mean_c, sd2i = b_sd_c, n2i = b_n_c, data = _)
+m_ne <- rma.mv(yi, vi, random = ~ 1 | study_id / es_id, data = ne, test = "t", dfs = "contain")   # same as rerunning with grp <- "Natural enemies"
+pr_ne <- predict(m_ne)
+c(k = nrow(ne), studies = n_distinct(ne$study_id))
+pct(c(mean = pr_ne$pred, ci.lb = pr_ne$ci.lb, ci.ub = pr_ne$ci.ub, pi.lb = pr_ne$pi.lb, pi.ub = pr_ne$pi.ub))
+```
+
+Natural enemies tend to be **more abundant** with intercropping, but the CI includes zero: the evidence is weaker than for pests. Comparing both groups properly requires a **meta-regression** (moderator = functional group): that is for the *Advanced methods* session.
+:::
+
+# Debrief and key messages {#key}
+
+::: {.callout-tip appearance="simple" icon="false"}
+1.  Weights follow precision; τ² tames very precise studies, the multilevel model stops studies with many rows from dominating.
+2.  Choose the model **a priori**: random effects, **multilevel** when studies give several effect sizes.
+3.  Report the mean **with** its CI, τ² and the **prediction interval**; add `robust()` as a safety net.
+4.  Show all the data: orchard plots.
+
+**Next session (15:00):** are these 28 studies a representative sample — or is there publication bias?
+:::
+
+## Going further in the online notebook {.unnumbered}
+
+-   [Dependence: map it before you model it](https://literaturesynthesis.github.io/notebook/chapters/dependence.html)
+-   [Combining effect sizes: fixed, random and multilevel models](https://literaturesynthesis.github.io/notebook/chapters/combining-effect-sizes.html)
+-   [One question from start to finish](https://literaturesynthesis.github.io/notebook/chapters/worked-example.html)
+
+## References
+
+::: {#refs}
+:::

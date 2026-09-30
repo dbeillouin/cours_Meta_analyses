@@ -1,0 +1,32 @@
+/*-- scss:defaults --*/
+// FRB-CESAB 2026 look for HTML documents (practicals / handouts)
+$cesab-blue: #045C82;
+$cesab-teal: #56B8B9;
+$cesab-green: #86BC25;
+$cesab-lime: #BCCF00;
+$primary: $cesab-blue;
+$secondary: #5B6770;
+$success: $cesab-green;
+$info: $cesab-teal;
+$body-color: #1F2A33;
+$link-color: $cesab-blue;
+$font-family-sans-serif: "Poppins", "Helvetica Neue", Arial, sans-serif;
+$headings-font-weight: 600;
+$headings-color: $cesab-blue;
+$code-color: $cesab-blue;
+$font-size-root: 16px;
+$web-font-path: false;
+
+/*-- scss:rules --*/
+@@FONTS@@
+
+body { line-height: 1.6; }
+.quarto-title-banner, #title-block-header { border-bottom: 6px solid $cesab-teal; padding-bottom: 0.6em; }
+h1.title { color: $cesab-blue; font-weight: 700; }
+.subtitle { color: $cesab-teal !important; font-weight: 500; }
+h1:not(.title) { border-bottom: 3px solid $cesab-lime; padding-bottom: 0.2em; margin-top: 2.2rem; }
+.callout { border-radius: 10px; }
+table { font-size: 0.92em; }
+thead th { background: $cesab-blue; color: #fff; }
+div.sourceCode { border-left: 4px solid $cesab-teal; background: #F4F7F8; }
+code { color: $cesab-blue; }

@@ -1,0 +1,383 @@
+---
+title: "Mapping the evidence with R"
+subtitle: "R practical · Tuesday 14:00–14:45 · FRB-CESAB training course"
+author: "Damien Beillouin · with Joseph and Devi"
+format:
+  html:
+    theme: [cosmo, ../../theme/cesab-doc.scss]
+    toc: true
+    toc-location: left
+    toc-title: "Practical"
+    number-sections: true
+    embed-resources: true
+    code-copy: true
+    code-tools: false
+    fig-width: 10
+    fig-height: 5.5
+    fig-dpi: 150
+execute:
+  echo: true
+  eval: true
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup-hidden
+#| include: false
+# Path used when this page is rendered inside the course project.
+# Participants use the path given in section 1 instead.
+data_file <- "../../donnees/derivees/comparisons_all.csv"
+```
+
+::: {.callout-tip appearance="simple" icon="false"}
+## By the end of this practical, you will be able to
+
+1.  **Count studies, not rows**, when describing an evidence base.
+2.  Build an **evidence heat map** (intervention × comparator) that shows the **gaps**.
+3.  **Cross a third variable** from the codebook (taxon group, validity...).
+4.  Say what an evidence map **can and cannot** tell you.
+:::
+
+| Time | What | Section |
+|------|------|---------|
+| 14:00 | Framing (slides) | — |
+| 14:08 | Load the data, count studies | [1](#setup) · [2](#rows-studies) |
+| 14:13 | **Exercise:** your first evidence map | [3](#heatmap) |
+| 14:25 | **Exercise (pairs):** add a third dimension (organisms, or a bubble map of evidence volume × reliability) | [4](#third) |
+| 14:35 | Share your maps | [5](#share) |
+| 14:42 | Key messages | [6](#key) |
+| *later* | *Bonus: where and when?* | [7](#bonus) |
+
+# Setup {#setup}
+
+**Before the session**, run `00_install_and_check.R` from the course kit (it installs and checks every package of the week).
+
+Open the RStudio project of the course kit, `meta_analysis_course.Rproj`, then the script `td_evidence_map.R`: it contains every exercise below with blanks (`___`) to fill in.
+
+```{r}
+#| label: load
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(forcats)
+
+# In the participant pack: data_file <- "comparisons_all.csv"
+comp <- readr::read_csv(data_file, show_col_types = FALSE)
+
+dim(comp)
+```
+
+The data come from a published systematic map on **diversified farming, biodiversity and yield** [@jones2021]. Each row is **one comparison** between a diversified system (the *intervention*) and a simpler one (the *comparator*), for one biodiversity outcome. The columns you need today:
+
+| Column | Codebook meaning | Examples |
+|--------|------------------|----------|
+| `study_id` | Study (article) identifier — we count these | 1033 |
+| `year`, `country` | Publication year, country of the study site | 2008, Mexico |
+| `practice` | Diversification practice (**intervention**) | Agroforestry, Intercropping |
+| `comparator_system` | Simplified system it is compared with (**comparator**) | Monoculture, Natural |
+| `taxa_class`, `functional_group` | Which organisms were sampled | Insect · Pests, Natural enemies |
+| `b_measure` | Biodiversity metric | Abundance, Species richness |
+| `validity_biodiv` | Critical appraisal coded by Jones et al.: `1` all criteria met, `0` not, `NA` could not be appraised | 1 |
+
+::: {.callout-note}
+## Link with this morning's codebook
+Every axis of the maps you draw today is a **column of a codebook**. If a category was not coded, it cannot be mapped. You will see that the published data dictionary lists categories ("cover crop") that are absent from the data, and that the data contain categories ("Associated plant species") absent from the dictionary: coding choices shape the map.
+
+Maps usually start from a **broad** question (PECO, or PCC — *Population, Concept, Context* — for scoping reviews), whereas a meta-analysis needs a **focused** PICO/PECO question.
+:::
+
+# Count studies, not rows {#rows-studies}
+
+```{r}
+#| label: rows-vs-studies
+comp |>
+  group_by(year) |>
+  summarise(rows = n(), studies = n_distinct(study_id)) |>
+  arrange(desc(rows)) |>
+  head(5)
+```
+
+In 1992, **360 rows come from only 2 studies**. A study can report dozens of comparisons (several taxa, sites, dates). Counting rows would tell you that 1992 was the richest year in the literature — it was not.
+
+::: {.callout-important}
+## Rule for the whole week
+Describe an evidence base in **number of studies**: `n_distinct(study_id)`. Rows are *comparisons*; they are not independent, which is why on Wednesday we will fit **multilevel** models.
+:::
+
+# Exercise 1 · Your first evidence map {#heatmap}
+
+**Question:** which combinations of *practice* × *comparator* have been studied, and which have not?
+
+**Step 1.** Count the number of **studies** for each combination, and keep the combinations with **zero** studies: they are the gaps.
+
+```{r}
+#| label: ex1-template
+#| eval: false
+map_data_1 <- comp |>
+  distinct(___, practice, comparator_system) |>   # one line per study x combination
+  count(practice, comparator_system, name = "n_studies") |>
+  complete(___, ___, fill = list(n_studies = 0))  # add the empty combinations
+```
+
+**Step 2.** Draw the heat map: one tile per combination, the number of studies written in each tile, and a **sequential** colour scale (light = few studies, dark = many).
+
+```{r}
+#| label: ex1-template-plot
+#| eval: false
+ggplot(map_data_1, aes(x = ___, y = ___, fill = n_studies)) +
+  geom_tile(colour = "white") +
+  geom_text(aes(label = ___)) +
+  scale_fill_gradient(low = "#F4F7F8", high = "#045C82") +
+  labs(x = "Comparator", y = "Diversification practice", fill = "Studies")
+```
+
+::: {.callout-note collapse="true" title="Solution"}
+```{r}
+#| label: ex1-solution
+#| fig-height: 5
+map_data_1 <- comp |>
+  distinct(study_id, practice, comparator_system) |>
+  count(practice, comparator_system, name = "n_studies") |>
+  complete(practice, comparator_system, fill = list(n_studies = 0)) |>
+  mutate(practice = fct_reorder(practice, n_studies, .fun = sum))
+
+ggplot(map_data_1, aes(x = comparator_system, y = practice, fill = n_studies)) +
+  geom_tile(colour = "white", linewidth = 1) +
+  geom_text(aes(label = ifelse(n_studies == 0, "gap", n_studies),
+                colour = n_studies > 30), size = 4.5) +
+  scale_fill_gradient(low = "#F4F7F8", high = "#045C82") +
+  scale_colour_manual(values = c(`TRUE` = "white", `FALSE` = "#1F2A33"), guide = "none") +
+  labs(x = "Comparator", y = "Diversification practice", fill = "Studies") +
+  theme_minimal(base_size = 14) +
+  theme(panel.grid = element_blank())
+```
+
+Three choices make this map honest:
+
+-   `distinct(study_id, ...)` → we count **studies**, not rows;
+-   `complete()` → **empty cells are shown**: the gap is a result;
+-   a **sequential** scale starting near white, plus the numbers in the tiles → no one has to guess values from colours (and the map stays readable in black and white or for colour-blind readers).
+:::
+
+::: {.callout-caution icon="false"}
+## Interpret (2 min, with your neighbour)
+1.  Name one **cluster** (many studies) and one **gap** (no or very few studies).
+2.  Is "Monoculture × Associated plant species" (47 studies) strong evidence that this practice **benefits** biodiversity?
+:::
+
+::: {.callout-note collapse="true" title="Answers"}
+1.  Clusters: agroforestry vs natural habitat (56 studies), associated plant species vs monoculture (47), intercropping vs monoculture (43). Empty or near-empty cells (0–2 studies): e.g. cultivar mixtures vs natural or abandoned land. But many of these are **structural**: a cultivar mixture is logically compared with a pure stand, not with a forest. A gap is only a **knowledge gap** if the comparison makes sense for the question — decide that with stakeholders, not from the map alone [@james2016].
+    Note: the cells add up to more than 237 studies, because some studies compare a practice with several comparators.
+2.  **No.** The map counts studies; it says nothing about the *direction* or *size* of the effect, nor about study quality. That is the job of the meta-analysis (Wednesday) and of critical appraisal (Wednesday morning).
+:::
+
+# Exercise 2 · Add a third dimension (pairs) {#third}
+
+Two variables tell you *what was compared*. The value of a map often comes from crossing a **third** one. Choose **one** option with your neighbour.
+
+## Option A — Which organisms? (practice × functional group, one panel per comparator)
+
+```{r}
+#| label: ex2a-template
+#| eval: false
+map_data_2 <- comp |>
+  filter(comparator_system %in% c("Monoculture", "Natural")) |>
+  distinct(study_id, practice, functional_group, comparator_system) |>
+  count(practice, functional_group, comparator_system, name = "n_studies") |>
+  complete(practice, functional_group, comparator_system, fill = list(n_studies = 0))
+
+ggplot(map_data_2, aes(x = ___, y = ___, fill = n_studies)) +
+  geom_tile(colour = "white") +
+  geom_text(aes(label = n_studies), size = 3) +
+  scale_fill_gradient(low = "#F4F7F8", high = "#045C82") +
+  facet_wrap(~ ___) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+::: {.callout-note collapse="true" title="Solution A"}
+```{r}
+#| label: ex2a-solution
+#| fig-width: 13
+#| fig-height: 7.5
+map_data_2 <- comp |>
+  filter(comparator_system %in% c("Monoculture", "Natural")) |>
+  distinct(study_id, practice, functional_group, comparator_system) |>
+  count(practice, functional_group, comparator_system, name = "n_studies") |>
+  complete(practice, functional_group, comparator_system, fill = list(n_studies = 0))
+
+ggplot(map_data_2, aes(x = functional_group, y = practice, fill = n_studies)) +
+  geom_tile(colour = "white", linewidth = 0.8) +
+  geom_text(aes(label = n_studies), size = 3) +
+  scale_fill_gradient(low = "#F4F7F8", high = "#045C82") +
+  facet_wrap(~ comparator_system) +
+  labs(x = NULL, y = NULL, fill = "Studies",
+       title = "Studies per practice and functional group, by comparator") +
+  theme_minimal(base_size = 12) +
+  theme(panel.grid = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+Zeros are shown: some rows (e.g. cultivar mixtures vs natural habitat) are entirely empty because the combination makes no sense — a coding artefact of `complete()`, not a gap. Against monocultures, pests (62 studies) and natural enemies (52) dominate; pollinators (16) and weeds (3) are much less studied — although both matter for yield.
+:::
+
+## Option B — How much, and how reliable? (a 3-dimension bubble map)
+
+Size of the bubble = **number of studies**; colour = **share of studies whose comparisons meet all validity criteria** (critical appraisal coded by Jones et al.). First compute a validity score **per study**, otherwise big studies dominate the share.
+
+```{r}
+#| label: ex2b-template
+#| eval: false
+map_data_3 <- comp |>
+  group_by(practice, comparator_system, study_id) |>          # 1. one line per study
+  summarise(valid = mean(validity_biodiv == 1, na.rm = TRUE),  #    share of its valid comparisons
+            .groups = "drop") |>
+  group_by(practice, comparator_system) |>                     # 2. then per cell
+  summarise(n_studies   = n_distinct(___),
+            share_valid = mean(valid, na.rm = TRUE),
+            share_na    = mean(is.na(valid)),                  # studies that could not be appraised
+            .groups = "drop")
+
+ggplot(map_data_3, aes(comparator_system, practice)) +
+  geom_point(aes(size = ___, colour = ___)) +
+  scale_size_area(max_size = 18) +
+  scale_colour_viridis_c(direction = -1, labels = scales::percent)   # colour-blind safe
+```
+
+::: {.callout-note collapse="true" title="Solution B"}
+```{r}
+#| label: ex2b-solution
+#| fig-height: 5.5
+map_data_3 <- comp |>
+  group_by(practice, comparator_system, study_id) |>
+  summarise(valid = mean(validity_biodiv == 1, na.rm = TRUE), .groups = "drop") |>
+  mutate(valid = ifelse(is.nan(valid), NA, valid)) |>
+  group_by(practice, comparator_system) |>
+  summarise(n_studies   = n_distinct(study_id),
+            share_valid = mean(valid, na.rm = TRUE),
+            share_na    = mean(is.na(valid)),
+            .groups = "drop") |>
+  mutate(practice = fct_reorder(practice, n_studies, .fun = sum),
+         lab = paste0(n_studies, ifelse(share_na > 0, paste0(" (", round(100 * share_na), "% NA)"), "")))
+
+ggplot(map_data_3, aes(comparator_system, practice)) +
+  geom_point(aes(size = n_studies, colour = share_valid)) +
+  geom_text(aes(label = lab), size = 3.3, colour = "#1F2A33", nudge_x = 0.38) +
+  scale_size_area(max_size = 20, guide = "none") +
+  scale_colour_viridis_c(direction = -1, na.value = "grey80",
+                        labels = scales::percent, limits = c(0, 1),
+                        name = "Mean share of valid\ncomparisons per study") +
+  labs(x = "Comparator", y = NULL,
+       caption = "Bubble area and number = studies; (% NA) = studies that could not be appraised. Grey = none appraised.") +
+  theme_minimal(base_size = 13)
+```
+
+A big dark bubble = abundant evidence that **passes the appraisal**; a big yellow bubble = abundant but questionable; a small bubble = fragile, whatever its colour. Grey bubbles and high % NA: validity could not be appraised — itself a finding. `scale_size_area()` makes the bubble **area**, not its radius, proportional to the number of studies (otherwise big numbers look even bigger). The *viridis* palette stays readable for colour-blind readers — avoid red–green scales.
+:::
+
+# Share your maps {#share}
+
+Two or three pairs project their map (1 min each). Before showing it, each pair writes **three sentences for a decision-maker**: one cluster, one gap, and how reliable the evidence is. Then discuss:
+
+-   **Real gap or coding artefact?** Categories such as "Other", missing values, or merged classes can create — or hide — gaps.
+-   **Is a gap a research priority?** Some combinations are rare because they make little agronomic sense.
+-   **What would you map next** to inform a decision?
+
+# Key messages {#key}
+
+::: {.callout-tip appearance="simple" icon="false"}
+1.  **Count studies, not rows.** Rows are non-independent comparisons.
+2.  **Show the zeros.** In an evidence map, the gap *is* the result.
+3.  **Sequential colours + numbers in the tiles**: readable by everyone, in any print.
+4.  **A map describes the evidence; it does not say what works.** Many studies ≠ a strong or a positive effect.
+5.  **Your codebook sets the axes.** Code with the maps (and analyses) you will need in mind.
+:::
+
+# Bonus · Where and when? {#bonus}
+
+For those who finish early, or to do after the session.
+
+## Where? A world map of studies
+
+The country names of the data and of the map must match exactly. Find the countries that would silently **disappear** from the map, then fix their names.
+
+```{r}
+#| label: bonus-map-check
+world <- map_data("world")          # from the {maps} package, via ggplot2
+
+setdiff(unique(comp$country), unique(world$region))
+```
+
+::: {.callout-note collapse="true" title="Solution"}
+```{r}
+#| label: bonus-map
+#| fig-height: 5.2
+by_country <- comp |>
+  mutate(region = recode(country,
+                         "United States of America" = "USA",
+                         "United Kingdom" = "UK",
+                         "Viet Nam" = "Vietnam")) |>
+  group_by(region) |>
+  summarise(n_studies = n_distinct(study_id))
+
+world |>
+  left_join(by_country, by = "region") |>
+  ggplot(aes(long, lat, group = group, fill = n_studies)) +
+  geom_polygon(colour = "white", linewidth = 0.1) +
+  scale_fill_gradient(low = "#C9E7E7", high = "#045C82", na.value = "grey90",
+                      name = "Studies") +
+  coord_quickmap(ylim = c(-55, 80)) +
+  theme_void(base_size = 13) +
+  theme(legend.position = "bottom")
+```
+
+Without the recoding, the **United States — the country with the most studies (52)** — would be drawn in grey, as if there were no evidence at all. Always check joins with `setdiff()` or `anti_join()`.
+:::
+
+## When? Cumulative number of studies per practice
+
+```{r}
+#| label: bonus-time-template
+#| eval: false
+comp |>
+  distinct(study_id, year, practice) |>
+  count(practice, year) |>
+  group_by(practice) |>
+  arrange(year) |>
+  mutate(cumulative = ___(n)) |>
+  ggplot(aes(year, cumulative, colour = practice)) +
+  geom_step(linewidth = 1)
+```
+
+::: {.callout-note collapse="true" title="Solution"}
+```{r}
+#| label: bonus-time
+comp |>
+  distinct(study_id, year, practice) |>
+  count(practice, year) |>
+  group_by(practice) |>
+  arrange(year) |>
+  mutate(cumulative = cumsum(n)) |>
+  ggplot(aes(year, cumulative, colour = practice)) +
+  geom_step(linewidth = 1) +
+  labs(x = "Publication year", y = "Cumulative number of studies", colour = NULL) +
+  theme_minimal(base_size = 13)
+```
+:::
+
+## Going further
+
+-   Guidance on systematic maps: @james2016; @cee2022 (chapters on mapping); reporting with ROSES [@haddaway2018].
+-   Tools: [EPPI-Mapper](https://eppi.ioe.ac.uk/cms/Default.aspx?tabid=3790) (interactive evidence gap maps), [`eviatlas`](https://github.com/ESHackathon/eviatlas) (interactive evidence atlas), [`PRISMA2020`](https://github.com/prisma-flowdiagram/PRISMA2020) (flow diagrams — the screening records of Jones et al. are in the course folder `donnees/derivees/screening_records.csv`), UpSet plots for multi-category variables.
+
+## Going further in the online notebook {.unnumbered}
+
+-   [The running example and first data checks](https://literaturesynthesis.github.io/notebook/chapters/running-example.html)
+-   [Evidence maps: heat maps, gaps and a third dimension](https://literaturesynthesis.github.io/notebook/chapters/evidence-maps.html)
+-   [Temporal analyses](https://literaturesynthesis.github.io/notebook/chapters/temporal-analyses.html)
+-   [Spatial analyses](https://literaturesynthesis.github.io/notebook/chapters/spatial-analyses.html)
+
+## References
+
+::: {#refs}
+:::

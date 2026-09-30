@@ -1,0 +1,194 @@
+---
+title: "Mapping the evidence with R"
+subtitle: "R practical — heat maps and cross-tabulations for systematic maps"
+---
+
+```{r}
+#| label: setup
+#| include: false
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(forcats)
+library(readr)
+source("../../R/theme_cesab.R")
+knitr::opts_chunk$set(dev = "png", dev.args = list(bg = "transparent"), out.width = "100%")
+comp <- read_csv("../../donnees/derivees/comparisons_all.csv", show_col_types = FALSE)
+y92 <- comp |> filter(year == 1992)
+```
+
+## Learning objectives {.objectives}
+
+By the end of this practical, you will be able to:
+
+1.  **Count studies, not rows**, when describing an evidence base.
+2.  Build an **evidence heat map** that shows clusters **and gaps**.
+3.  **Cross a third variable** from your codebook (organisms, validity...).
+4.  Say what an evidence map **can and cannot** tell you.
+
+::: notes
+45 min: 8 min slides, 30 min practical, 7 min sharing and key messages. Two facilitators walk around while one stays at the screen.
+:::
+
+## From codebook to map
+
+::: {.columns}
+::: {.column width="52%"}
+This morning you designed a **codebook**. Each coded variable can become an **axis** of a map.
+
+Today's data: a published systematic map on **diversified farming and biodiversity** [@jones2021].
+
+-   **`r n_distinct(comp$study_id)`** studies · **`r format(nrow(comp), big.mark = ",")`** comparisons
+-   **`r n_distinct(comp$country)`** countries · 1986–2021
+-   105 coded columns in the full database (32 kept for today): practice, comparator, taxon, functional group, validity...
+:::
+
+::: {.column width="46%"}
+::: {.box .blue}
+[Our question]{.box-title}
+**Where is the evidence — and where is it missing —** on the effects of farm diversification on biodiversity?
+:::
+
+::: {.box .warn}
+[Coding shapes the map]{.box-title}
+The published dictionary lists "cover crop"; the data contain none. The data contain "Associated plant species"; the dictionary does not define it.
+:::
+:::
+:::
+
+::: notes
+Make the link with the codebook workshop explicit: if you did not code it, you cannot map it; if you coded it inconsistently, your map will show artefactual gaps.
+:::
+
+## Quick quiz {.question}
+
+::: question-card
+[Show of hands]{.q-kicker}
+
+[The dataset has **`r nrow(y92)` rows** from 1992. How many **studies** is that?]{.q-text}
+:::
+
+::: answers
+-   `r nrow(y92)`
+-   About 36
+-   [**`r n_distinct(y92$study_id)`**]{.fragment}
+:::
+
+::: {.fragment .box .warn style="width:70%;"}
+One study can report dozens of comparisons (taxa, sites, dates). **Rows are not studies — and they are not independent.** Count with `n_distinct(study_id)`.
+:::
+
+::: notes
+This is the most common error in evidence maps (and it was in last year's version of this practical!). Non-independence comes back on Wednesday with multilevel models.
+:::
+
+## Same data, two maps
+
+```{r}
+#| label: bad-good
+#| fig-width: 16
+#| fig-height: 7
+good_df0 <- comp |> distinct(study_id, practice, comparator_system) |> count(practice, comparator_system)
+rows <- comp |> count(practice, comparator_system, name = "n") |>
+  mutate(practice = factor(practice, levels = levels(fct_reorder(good_df0$practice, good_df0$n, .fun = sum))))
+bad <- ggplot(rows, aes(comparator_system, practice, fill = n)) +
+  geom_tile() +
+  scale_fill_gradientn(colours = c("#C0392B", "#F7F7F7", "#2166AC"), values = c(0, 0.15, 1)) +
+  labs(title = "WRONG: rows, red-white-blue, gaps just missing", x = NULL, y = NULL, fill = "n") +
+  theme_cesab(18) + theme(plot.title = element_text(colour = cesab[["warn"]], size = 17),
+                          axis.text.x = element_text(angle = 30, hjust = 1), legend.position = "right")
+good_df <- comp |>
+  distinct(study_id, practice, comparator_system) |>
+  count(practice, comparator_system, name = "n") |>
+  complete(practice, comparator_system, fill = list(n = 0)) |>
+  mutate(practice = fct_reorder(practice, n, .fun = sum))
+good <- ggplot(good_df, aes(comparator_system, practice, fill = n)) +
+  geom_tile(colour = "white", linewidth = 1) +
+  geom_text(aes(label = ifelse(n == 0, "gap", n), colour = n > 30), size = 5) +
+  scale_fill_gradient(low = "#F4F7F8", high = cesab[["blue"]]) +
+  scale_colour_manual(values = c(`TRUE` = "white", `FALSE` = cesab[["ink"]]), guide = "none") +
+  labs(title = "BETTER: studies, sequential colours, gaps shown", x = NULL, y = NULL, fill = "Studies") +
+  theme_cesab(18) + theme(panel.grid = element_blank(),
+                          plot.title = element_text(colour = cesab[["green"]], size = 17),
+                          axis.text.x = element_text(angle = 30, hjust = 1), legend.position = "right")
+patch <- gridExtra::arrangeGrob(bad, good, ncol = 2)
+grid::grid.draw(patch)
+```
+
+::: notes
+Left: counts rows (inflated, e.g. associated plant species × monoculture = 1070 rows but 47 studies), diverging palette centred on 0 for positive counts, no labels, empty combinations simply missing. Right: what you will build in Exercise 1.
+:::
+
+## What an evidence map tells you — and what it does not
+
+::: {.columns}
+::: {.column width="48%"}
+::: {.box .green}
+[It tells you]{.box-title}
+
+-   **Where** evidence accumulates (clusters)
+-   **Where** it is missing (gaps)
+-   **How** it was produced (designs, metrics, validity)
+-   Whether a **meta-analysis** is feasible, and on what
+:::
+:::
+
+::: {.column width="48%"}
+::: {.box .warn}
+[It does not tell you]{.box-title}
+
+-   **Whether** a practice works, or how much
+-   Whether results are **consistent**
+-   Whether a gap is a **priority** (it may be agronomically irrelevant)
+
+**Many studies ≠ strong effect.** Do not "vote count".
+:::
+:::
+:::
+
+::: {.source}
+Source: @james2016; @cee2022.
+:::
+
+## Your 30 minutes
+
+| Time | Task | Format |
+|------|------|--------|
+| 14:08 | Open the pack, load the data, count studies | Alone |
+| 14:13 | **Exercise 1** — first evidence map (fill the `___`) | Alone |
+| 14:25 | **Exercise 2** — add a third dimension: *organisms* **or** *validity* | Pairs |
+| 14:35 | 2–3 pairs show their map | All |
+| Bonus | Where (world map) and when (cumulative curves) | Later |
+
+::: {.box .blue}
+Open **`meta_analysis_course.Rproj`** (the course kit), then **`td_evidence_map.R`**. Instructions and folded solutions: **the practical web page**.
+:::
+
+::: notes
+If someone's installation fails: pair them with a neighbour; the web page contains all outputs.
+:::
+
+## Key messages {.key-messages background-image="../../theme/img/bg-keymessages.jpg"}
+
+1.  **Count studies, not rows** — rows are non-independent comparisons.
+2.  **Show the zeros**: in an evidence map, the gap *is* the result.
+3.  **Sequential colours and numbers in tiles**: readable by everyone.
+4.  **A map describes the evidence; it does not say what works.** Your codebook sets its axes.
+
+## In the online notebook {.dense}
+
+Each point of this session developed further, with the same data, more pitfalls and exercises with solutions:
+
+-   [The running example and first data checks](https://literaturesynthesis.github.io/notebook/chapters/running-example.html)
+-   [Evidence maps: heat maps, gaps and a third dimension](https://literaturesynthesis.github.io/notebook/chapters/evidence-maps.html)
+-   [Temporal analyses](https://literaturesynthesis.github.io/notebook/chapters/temporal-analyses.html)
+-   [Spatial analyses](https://literaturesynthesis.github.io/notebook/chapters/spatial-analyses.html)
+
+::: {.box .blue}
+**literaturesynthesis.github.io/notebook**
+:::
+
+## References
+
+::: {#refs}
+:::

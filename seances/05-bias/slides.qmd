@@ -1,0 +1,445 @@
+---
+title: "Can we trust the result?"
+subtitle: "Publication bias, robustness and sensitivity"
+---
+
+```{r}
+#| label: setup
+#| include: false
+library(dplyr)
+library(ggplot2)
+library(metafor)
+library(readr)
+source("../../R/theme_cesab.R")
+knitr::opts_chunk$set(dev = "png", dev.args = list(bg = "transparent"), out.width = "100%")
+
+ic <- read_csv("../../donnees/derivees/intercropping_biodiversity.csv", show_col_types = FALSE)
+dat <- ic |>
+  filter(functional_group == "Pests", !sd_missing, !zero_mean) |>
+  escalc(measure = "ROM", m1i = b_mean_t, sd1i = b_sd_t, n1i = b_n_t,
+         m2i = b_mean_c, sd2i = b_sd_c, n2i = b_n_c, data = _) |>
+  mutate(sei = sqrt(vi), year_c = year - mean(year),
+         se_n = sqrt(1 / b_n_t + 1 / b_n_c),   # SE-analogue based on sample size only
+         inv_n = 1 / b_n_t + 1 / b_n_c)
+pc  <- function(x) round(100 * (exp(x) - 1))
+fit <- function(d, mods = ~ 1)
+  rma.mv(yi, vi, mods = mods, random = ~ 1 | study_id / es_id, data = d, test = "t", dfs = "contain")
+
+m     <- fit(dat)
+k     <- nrow(dat); n_study <- n_distinct(dat$study_id)
+eg0   <- regtest(rma(yi, vi, data = dat))                 # classic Egger (ignores dependence)
+pet_se <- fit(dat, ~ sei)                                # multilevel Egger on SE (artefact-prone for lnRR)
+pet   <- fit(dat, ~ se_n)                                 # multilevel Egger / PET on sample size
+pet_r <- robust(pet, cluster = study_id, clubSandwich = TRUE)
+peese <- fit(dat, ~ inv_n)                                # PEESE on sample size
+tl    <- fit(dat, ~ year_c)                               # time-lag bias
+fsn_n <- fsn(yi, vi, data = dat)$fsnum
+
+ids <- unique(dat$study_id)
+loo <- bind_rows(lapply(ids, function(i) {
+  f <- fit(filter(dat, study_id != i))
+  tibble(study_id = i, est = f$b[1], lo = f$ci.lb, hi = f$ci.ub)
+}))
+cook  <- cooks.distance(m, cluster = dat$study_id)
+
+m_val <- fit(filter(dat, validity_biodiv == 1))
+m_vmod <- fit(dat, ~ factor(validity_biodiv))
+n_na_val <- sum(is.na(dat$validity_biodiv))
+n_tiny <- sum(dat$sei < 0.02)
+```
+
+## Learning objectives {.objectives}
+
+By the end of this session, you will be able to:
+
+1.  List the ways a set of studies can be a **biased sample** of the evidence.
+2.  Read a **contour-enhanced funnel plot** — and explain why asymmetry ≠ publication bias.
+3.  Test for small-study effects and time-lag bias **with dependent effect sizes**, and know which classic methods to avoid.
+4.  Run **sensitivity analyses** (leave-one-study-out, influence, study quality) and report robustness.
+
+::: notes
+60 min: ~20 min slides, ~33 min practical, ~5 min debrief. Much of the conceptual content is adapted, with thanks, from Dakis-Yaoba Ouédraogo's 2024 lecture. Same running example as this afternoon: pests, intercropping vs monoculture, multilevel model (−27%).
+:::
+
+## Are our `r n_study` studies a fair sample?
+
+::: {.columns}
+::: {.column width="50%"}
+A meta-analysis assumes the studies it contains are **representative** of all studies done.
+
+But studies with **significant** results are more likely to be:
+
+-   **published** → *publication bias*
+-   published **quickly** → *time-lag bias*
+-   published **in English** → *language bias*
+-   published **more than once** → *multiple-publication bias*
+-   **cited** (and found) → *citation bias*
+:::
+
+::: {.column width="48%"}
+::: {.fragment .box .warn}
+[The consequence]{.box-title}
+The pooled effect can be **overestimated** — sometimes an effect appears where there is none.
+:::
+
+::: {.fragment .box .green}
+[The best cure is prevention]{.box-title}
+Search grey literature, theses, reports and non-English studies (Monday's sessions). The tests we see today can only **detect** and **probe** bias — never repair it.
+:::
+:::
+:::
+
+::: {.source}
+Adapted from @ouedraogo2024; see also @koricheva2013, chap. 14.
+:::
+
+# Publication bias {.section-divider background-image="../../theme/img/bg-keymessages.jpg"}
+
+## The logic of the funnel plot
+
+```{r}
+#| label: plot-funnel-theory
+#| fig-width: 14
+#| fig-height: 5
+set.seed(7)
+sim <- tibble(se = runif(160, 0.03, 0.6)) |>
+  mutate(y = rnorm(n(), -0.3, se),
+         sig = abs(y / se) > 1.96,
+         published = sig | se < 0.15 | runif(n()) < 0.3,
+         panel = "Everything that was done")
+sim2 <- sim |> filter(published) |> mutate(panel = "Only what got published")
+bind_rows(sim, sim2) |>
+  mutate(panel = factor(panel, levels = c("Everything that was done", "Only what got published"))) |>
+  ggplot(aes(y, se)) +
+  geom_line(data = tibble(se = c(0, 0.62), y = -1.96 * se), colour = cesab[["grey"]], linetype = 3) +
+  geom_line(data = tibble(se = c(0, 0.62), y = 1.96 * se), colour = cesab[["grey"]], linetype = 3) +
+  geom_vline(xintercept = -0.3, colour = cesab[["blue"]]) +
+  geom_point(aes(colour = sig), size = 2.4, alpha = 0.8) +
+  scale_colour_manual(values = c(`TRUE` = cesab[["blue"]], `FALSE` = cesab[["lime"]]),
+                      labels = c("not significant", "significant"), name = NULL) +
+  scale_y_reverse() +
+  facet_wrap(~ panel) +
+  labs(x = "Effect size", y = "Standard error (top = most precise)") +
+  theme_cesab(18)
+```
+
+::: {.columns}
+::: {.column width="50%"}
+Large studies (top) cluster near the true effect; small ones (bottom) scatter **symmetrically** → a funnel.
+:::
+::: {.column width="48%"}
+::: {.fragment}
+*Where would the missing studies be?*\
+Small **non-significant** studies (between the dotted lines) stay in drawers → a corner is **missing**.
+:::
+:::
+:::
+
+::: notes
+~2 min. Simulated data. Ask the question before revealing the fragment. Dotted lines: ±1.96 SE around ZERO = significance boundaries.
+:::
+
+## Our funnel, with significance contours
+
+::: {.columns}
+::: {.column width="58%"}
+```{r}
+#| label: plot-funnel-ours
+#| fig-width: 8.5
+#| fig-height: 6
+se_max <- max(dat$sei) * 1.02
+cont <- tibble(se = seq(0, se_max, length.out = 100))
+band <- function(z, lab) geom_ribbon(data = mutate(cont, lab = lab),
+                                       aes(y = se, xmin = -z * se, xmax = z * se, fill = lab), orientation = "y")
+ggplot() +
+  annotate("rect", xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, fill = "#DCE6EA") +
+  band(2.58, "p 0.01-0.05") + band(1.96, "p 0.05-0.10") + band(1.64, "p > 0.10") +
+  scale_fill_manual(values = c("p > 0.10" = "white", "p 0.05-0.10" = "#B8D3DC", "p 0.01-0.05" = "#8DB6C4"),
+                    breaks = c("p > 0.10", "p 0.05-0.10", "p 0.01-0.05"), name = NULL) +
+  geom_vline(xintercept = 0, colour = cesab[["grey"]]) +
+  geom_vline(xintercept = m$b[1], colour = cesab[["blue"]], linetype = 2) +
+  geom_point(data = dat, aes(yi, sei), size = 2, alpha = 0.55, colour = cesab[["blue"]]) +
+  scale_y_reverse(expand = c(0, 0)) +
+  coord_cartesian(xlim = c(-4, 3)) +
+  labs(x = "lnRR (pest abundance)", y = "Standard error") +
+  theme_cesab(17) + theme(legend.position = "top")
+```
+:::
+
+::: {.column width="40%"}
+-   Shaded bands: significance of each comparison (grey background: *p* < 0.01)
+-   Dashed line: the multilevel mean
+-   Top: `r n_tiny` comparisons from 2 studies with SE < 0.02 — suspiciously precise: check the extraction
+
+::: {.fragment .box .blue}
+If missing studies were in the **white** zone (non-significant), publication bias is a plausible cause. If they would sit in significant zones, look for other causes [@peters2008].
+:::
+:::
+:::
+
+::: notes
+~2 min. The bottom of the funnel is roughly symmetric around 0, with imprecise comparisons on both sides, some in the white zone: no obvious gap of non-significant results. The very top (SE < 0.02) comes from 2 studies (525, 645) — possibly SEs entered as SDs, and study 525 reuses its controls.
+:::
+
+## Asymmetry ≠ publication bias {.question}
+
+::: question-card
+[Your call]{.q-kicker}
+
+[Our funnel is asymmetric. List **other reasons** than publication bias.]{.q-text}
+:::
+
+::: {.fragment .box .green style="width:80%;"}
+-   **Heterogeneity**: small studies differ (other crops, pests, methods) — true small-study effects.
+-   **Artefacts**: the variance of lnRR depends on the mean; extraction errors; pseudo-replication.
+-   **Chance**: with few studies, funnels are often asymmetric.
+:::
+
+::: notes
+~2 min. Collect answers first. This is the key conceptual message of Dakis's lecture.
+:::
+
+## Testing for small-study effects: the classic way
+
+::: {.columns}
+::: {.column width="50%"}
+**Egger's test** [@egger1997]: regress each effect size on its standard error. A slope ≠ 0 means small studies give different results.
+
+Our pests: *p* = `r format.pval(eg0$pval, digits = 2)`.
+:::
+
+::: {.column width="48%"}
+::: {.fragment .box .warn}
+[Two problems]{.box-title}
+
+1.  It treats our `r k` comparisons as **independent** — they come from `r n_study` studies.
+2.  For lnRR, the SE is computed **from the means themselves** → an artificial link between effect and SE, even without any bias.
+:::
+:::
+:::
+
+::: notes
+~2 min. Let the room guess problem 1 (they saw non-independence at 14:00). Problem 2 is subtler: v(lnRR) = SD²/(n·mean²), so the effect and its SE share the means.
+:::
+
+## Testing for small-study effects: the multilevel way
+
+::: {.columns}
+::: {.column width="50%"}
+Add a precision measure as a **moderator** of the multilevel model [@nakagawa2022], based on **sample size only**:
+
+$$\sqrt{1/n_T + 1/n_C}$$
+
+```r
+rma.mv(yi, vi,
+       mods = ~ sqrt(1/n_t + 1/n_c),
+       random = ~ 1 | study_id / es_id,
+       test = "t", dfs = "contain",
+       data = dat)
+```
+:::
+
+::: {.column width="48%"}
+| Precision measure | Slope *p* |
+|---|---|
+| SE (artefact-prone) | `r round(pet_se$pval[2], 3)` |
+| $\sqrt{1/n_T + 1/n_C}$ | **`r formatC(pet$pval[2], format = "f", digits = 2)`** |
+| same, cluster-robust (CR2) | `r round(pet_r$pval[2], 2)` |
+
+::: {.fragment .box .green}
+With the recommended measure: **no robust evidence** of a small-study effect.
+:::
+:::
+:::
+
+::: notes
+~2 min. The SE-based test "finds" an effect that disappears with the sample-size-based measure. This multilevel Egger test is simply a meta-regression — the topic of the 16:15 session.
+:::
+
+## If there were bias, would the conclusion change?
+
+::: {.columns}
+::: {.column width="52%"}
+| Estimate | Pest abundance [95% CI] |
+|---|---|
+| Main model | `r pc(m$b)`% [`r pc(m$ci.lb)`; `r pc(m$ci.ub)`] |
+| **PET**: effect of an infinitely large study | `r pc(coef(pet)[1])`% [`r pc(pet$ci.lb[1])`; `r pc(pet$ci.ub[1])`] |
+| **PEESE** | `r pc(coef(peese)[1])`% [`r pc(peese$ci.lb[1])`; `r pc(peese$ci.ub[1])`] |
+:::
+
+::: {.column width="46%"}
+Rule [@stanley2014]: if the PET intercept is significant (here yes), report **PEESE**.
+
+::: {.fragment .box .green}
+Adjusted estimates are, if anything, **stronger**: the pest reduction is **not** an artefact of publication bias.
+:::
+
+::: {.small .muted}
+With strong heterogeneity, PET-PEESE tends to **over-correct**: treat it as a sensitivity check, not as "the true effect". Alternative: **selection models** [@vevea1995; `selmodel()` in metafor], which model the probability of publication given the p-value.
+:::
+:::
+:::
+
+## Time-lag bias
+
+::: {.columns}
+::: {.column width="55%"}
+```{r}
+#| label: plot-timelag
+#| fig-width: 8
+#| fig-height: 5
+ggplot(dat, aes(year, yi)) +
+  geom_hline(yintercept = 0, colour = cesab[["grey"]]) +
+  geom_jitter(aes(size = 1 / sei), width = 0.25, alpha = 0.35, colour = cesab[["teal"]]) +
+  geom_abline(intercept = coef(tl)[1] - coef(tl)[2] * mean(dat$year), slope = coef(tl)[2],
+              colour = cesab[["blue"]], linewidth = 1.5) +
+  scale_size_continuous(range = c(0.6, 5), guide = "none") +
+  coord_cartesian(ylim = c(-4, 2.5)) +
+  labs(x = "Publication year", y = "lnRR") +
+  theme_cesab(17)
+```
+:::
+
+::: {.column width="43%"}
+Do early studies report stronger effects than later ones?
+
+**Year as a moderator** in the multilevel model: slope = `r signif(coef(tl)[2], 2)` per year (*p* = `r signif(tl$pval[2], 2)`).
+
+::: {.fragment .box .green}
+**No evidence** of a decline effect — with only `r n_study` studies, the test has little power.
+:::
+
+::: {.small .muted}
+Also possible: include year and SE together [@nakagawa2022].
+:::
+:::
+:::
+
+## Two classics to avoid (or to use with care)
+
+::: {.columns}
+::: {.column width="50%"}
+::: {.box .warn}
+[Fail-safe N (Rosenthal)]{.box-title}
+"How many null studies would make the result non-significant?"
+
+Our data: **`r format(fsn_n, big.mark = ",")`** studies.
+
+Meaningless: assumes missing studies have zero effect, ignores heterogeneity and dependence, estimates no bias. **Do not report it.**
+:::
+:::
+
+::: {.column width="48%"}
+::: {.box}
+[Trim-and-fill]{.box-title}
+Imputes "missing" studies to make the funnel symmetric.
+
+Assumes asymmetry = publication bias, performs badly with heterogeneity, ignores dependence.\
+→ at most a **sensitivity analysis** on study-level data, never "the corrected effect".
+:::
+:::
+:::
+
+::: {.source}
+Source: @nakagawa2022; @ouedraogo2024.
+:::
+
+# Robustness {.section-divider background-image="../../theme/img/bg-keymessages.jpg"}
+
+## Does one study drive the result?
+
+::: {.columns}
+::: {.column width="55%"}
+```{r}
+#| label: plot-loo
+#| fig-width: 8
+#| fig-height: 5.6
+loo |>
+  mutate(cook = cook[as.character(study_id)]) |>
+  ggplot(aes(est, reorder(factor(study_id), est))) +
+  geom_rect(aes(xmin = m$ci.lb, xmax = m$ci.ub, ymin = -Inf, ymax = Inf), fill = "#EEF5F7") +
+  geom_vline(xintercept = m$b[1], colour = cesab[["blue"]]) +
+  geom_vline(xintercept = 0, linetype = 2, colour = cesab[["grey"]]) +
+  geom_errorbarh(aes(xmin = lo, xmax = hi), height = 0, colour = cesab[["teal"]]) +
+  geom_point(size = 2, colour = cesab[["blue"]]) +
+  scale_x_continuous(labels = \(x) pct(x), breaks = log(c(0.6, 0.8, 1))) +
+  labs(x = "Mean effect when leaving out one study", y = "Study removed") +
+  theme_cesab(16) + theme(axis.text.y = element_blank(), panel.grid.major.y = element_blank())
+```
+:::
+
+::: {.column width="43%"}
+**Leave-one-*study*-out**: refit the model `r n_study` times, dropping one whole study each time.
+
+-   Mean ranges from **`r pc(min(loo$est))`%** to **`r pc(max(loo$est))`%**
+-   The CI never crosses 0
+
+**Cook's distance** by study: largest = `r round(max(cook), 2)`, no study stands out from the others.
+
+::: {.fragment .box .green}
+The conclusion does not depend on any single study.
+:::
+:::
+:::
+
+::: notes
+~3 min. Leave out STUDIES, not rows: rows of a study are not independent. cooks.distance(m, cluster = study_id) [@viechtbauer2010b].
+:::
+
+## A robustness table for your paper
+
+| Analysis | Pest abundance | Conclusion changes? |
+|---|---|---|
+| Main multilevel model (`r n_study` studies) | **`r pc(m$b)`%** [`r pc(m$ci.lb)`; `r pc(m$ci.ub)`] | — |
+| Only comparisons meeting all validity criteria† (`r m_val$s.nlevels[1]` studies; `r n_na_val` comparisons not appraisable) | `r pc(m_val$b)`% [`r pc(m_val$ci.lb)`; `r pc(m_val$ci.ub)`]; validity as moderator *p* = `r round(m_vmod$pval[2], 2)` | No |
+| Leave-one-study-out (range of means) | `r pc(min(loo$est))`% to `r pc(max(loo$est))`% | No |
+| Small-study effect (sample-size based) | slope *p* = `r formatC(pet$pval[2], format = "f", digits = 2)`; PEESE `r pc(coef(peese)[1])`% | No |
+| Time-lag (year as moderator) | slope ≈ 0 (*p* = `r round(tl$pval[2], 2)`) | No (low power) |
+
+[† Critical appraisal coded by @jones2021: enough sampling units in both groups, plots in their state long enough, intervention and comparator < 1.1 km apart. This is **internal validity** of each study (risk of bias, cf. CEE critical appraisal) — a different question from publication bias.]{.small .muted}
+
+::: {.fragment .box .blue}
+Also worth testing: another effect-size metric, the imputation of missing SDs, the correlation ρ assumed within studies. Report **all** sensitivity analyses — including those that change the result.
+:::
+
+::: notes
+~2 min. This table is exactly what reviewers want. The validity subset uses the critical appraisal coded by the authors (this morning's session by Joseph).
+:::
+
+## Practical · 33 min + debrief
+
+| Time | Task |
+|------|------|
+| 15:22 | Contour-enhanced **funnel plot** (code given: interpret) |
+| 15:27 | Classic vs **multilevel Egger** (the lnRR trap); PET-PEESE |
+| 15:37 | **Sensitivity**: leave-one-study-out, validity |
+| 15:47 | *Your turn*: natural enemies — or the optional parts (time-lag, Cook, fail-safe N) |
+| 15:55 | **Debrief** (all together) |
+
+::: {.box .blue}
+Open **`meta_analysis_course.Rproj`** (the course kit), then **`td_bias.R`**. Instructions and folded solutions: the practical web page.
+:::
+
+## Key messages {.key-messages background-image="../../theme/img/bg-keymessages.jpg"}
+
+1.  Bias is best **prevented** by the search, not corrected by statistics.
+2.  **Asymmetry ≠ publication bias**: read the direction, use contour-enhanced funnels.
+3.  With several effect sizes per study, use **multilevel** tests — for lnRR with a **sample-size-based** precision; drop fail-safe N.
+4.  Report a **robustness table**: leave-one-study-out, influence, study quality, analytical choices.
+
+## In the online notebook {.dense}
+
+Each point of this session developed further, with the same data, more pitfalls and exercises with solutions:
+
+-   [Publication bias and sensitivity](https://literaturesynthesis.github.io/notebook/chapters/publication-bias.html)
+-   [Data extraction and critical appraisal](https://literaturesynthesis.github.io/notebook/chapters/extraction-appraisal.html)
+-   [Reading a meta-analysis critically](https://literaturesynthesis.github.io/notebook/chapters/critical-reading.html)
+
+::: {.box .blue}
+**literaturesynthesis.github.io/notebook**
+:::
+
+## References
+
+::: {#refs}
+:::
