@@ -1,9 +1,9 @@
 ---
 title: "Meta-analysis and systematic reviews in ecology and agronomy"
-subtitle: "FRB-CESAB training course 2026 · sessions by Damien Beillouin (CIRAD)"
+subtitle: "FRB-CESAB training course 2026"
 ---
 
-All the material of the course is here: slides, practical pages and the participant kit. Everything uses the same real data, the global database of diversified farming experiments of @jones2021.
+The programme of the week, the participant kit, and the slides and practicals of the meta-analysis sessions. These sessions use the same real data, the global database of diversified farming experiments of @jones2021.
 
 ## Before the course
 
@@ -13,16 +13,39 @@ Download the kit, unzip it, open `meta_analysis_course.Rproj` in RStudio and run
 **[Download the participant kit (zip)](kit_meta_analysis_course_2026.zip)**: R scripts of the four practicals, data, installation check, formula sheet.
 :::
 
-## Sessions
+## Programme of the week
 
-| When | Session | Slides | Practical |
+Sessions in **bold** have their material on this site; the other links open the trainers' slides on Google Drive. All the week's files are also in the [shared course folder](https://drive.google.com/drive/folders/1lsS5qIaio6Ei2iRv-qgGsMtQfxc9GT6F).
+
+| When | Session | Trainer | Material |
 |---|---|---|---|
-| Mon 9:30 | Introduction to evidence synthesis | [web](01-introduction.html) · [pdf](01-introduction.pdf) | |
-| Tue 14:00 | Mapping the evidence with R | [web](02-td-evidence-map.html) · [pdf](02-td-evidence-map.pdf) | [page](02-td-evidence-map_TD.html) |
-| Wed 9:00 | Effect sizes | [web](03-effect-sizes.html) · [pdf](03-effect-sizes.pdf) | [formula sheet](03-effect-sizes_formula_sheet.pdf) |
-| Wed 14:00 | Fixed, random and multilevel models | [web](04-models.html) · [pdf](04-models.pdf) | [page](04-models_TD.html) |
-| Wed 15:00 | Publication bias and sensitivity | [web](05-bias.html) · [pdf](05-bias.pdf) | [page](05-bias_TD.html) |
-| Wed 16:15 | Why does the effect vary? Moderators and missing data | [web](06-advanced.html) · [pdf](06-advanced.pdf) | [page](06-advanced_TD.html) |
+| **Monday** | | | |
+| 9:00 | Welcome and introduction | All | |
+| 9:30 | **Introduction to evidence synthesis** | Damien Beillouin | slides [web](01-introduction.html) · [pdf](01-introduction.pdf) |
+| 10:30 | Stakeholder engagement in systematic reviews | Joseph Langridge | [slides](https://docs.google.com/presentation/d/1_gTL-Nx54PXWF99PHO6bqPcaMSY--Yf8/edit) |
+| 11:15 | Planning a systematic review: the protocol | Joseph Langridge | [slides](https://docs.google.com/presentation/d/10IG387lOvAX_fwHR2QygMH31JjsSgrvs/edit) |
+| 14:00 | Literature search: databases and search equations | Sylvie Campagne | [slides](https://docs.google.com/presentation/d/1IIqGUeAHPsVaQOBMvqNMdnrZliXg7Stk/edit) |
+| 15:00 | Corpus organisation and reference management | Nicolas Casajus | |
+| 15:45 | Screening: title, abstract and full text | Sylvie Campagne | [slides](https://docs.google.com/presentation/d/1475kCg8QI4sAWnmLKJDedFAiKq2fLVR6/edit) |
+| 16:30 | Retrieving full-text PDFs | Nicolas Casajus | |
+| 17:00 | Reporting standards (ROSES) | Joseph Langridge | [slides](https://docs.google.com/presentation/d/1aaMFnoPMxymasElDiKfrDjDoyqIEn3c0buIg7P0moXU/edit) |
+| **Tuesday** | | | |
+| 9:00 | Corpus visualisation approaches | Joseph Langridge | [slides](https://docs.google.com/presentation/d/1m1yQYlPoTobZU0VY4BlChCvrwpOL85-G/edit) |
+| 9:20 | Workshop: from hypotheses to a systematic map | Joseph Langridge, Devi | [slides](https://docs.google.com/presentation/d/1t0bmij_t49Ko7of8o8AymtHUFks_FFPRc-H9JwgHReQ/edit) |
+| 10:30 | Codebook construction and testing | Joseph Langridge, Devi | [slides](https://docs.google.com/presentation/d/1gG5w1JhJfo9EkaprxB1ouxXNptvD6krr/edit) |
+| 14:00 | **R practical: mapping the evidence** | Devi, Damien Beillouin | slides [web](02-td-evidence-map.html) · [pdf](02-td-evidence-map.pdf) · [practical](02-td-evidence-map_TD.html) |
+| 14:45 | Automated techniques: introduction to machine learning | Devi | [slides](https://docs.google.com/presentation/d/1vYK1YD6ZTzcPTOFX6XGWKhCl7QDAK6bFO8sUBbtAFiI/edit) |
+| 16:15 | Applying the RAISE guidelines | Devi | [slides](https://docs.google.com/presentation/d/1vYK1YD6ZTzcPTOFX6XGWKhCl7QDAK6bFO8sUBbtAFiI/edit) |
+| **Wednesday** | | | |
+| 9:00 | **Effect sizes** | Damien Beillouin | slides [web](03-effect-sizes.html) · [pdf](03-effect-sizes.pdf) · [formula sheet](03-effect-sizes_formula_sheet.pdf) |
+| 10:00 | Critical appraisal and study validity | Joseph Langridge | [slides](https://docs.google.com/presentation/d/1RfnkfAmVM9ntNlqbYv8YKK1iEPVTMpDW/edit) |
+| 11:15 | Quantitative data extraction: methods and tools | Joseph Langridge, all | [slides](https://docs.google.com/presentation/d/17E8U4jqCC_2ncjzDFIU9EflX_0ZRN9w1rTAtG22As_k/edit) · [sample papers](https://drive.google.com/drive/folders/1fCz5eYuqeYyvGC4zFngAK1AXMJ2C2Aly) |
+| 14:00 | **Fixed, random and multilevel models** | Damien Beillouin | slides [web](04-models.html) · [pdf](04-models.pdf) · [practical](04-models_TD.html) |
+| 15:00 | **Publication bias and sensitivity** | Damien Beillouin | slides [web](05-bias.html) · [pdf](05-bias.pdf) · [practical](05-bias_TD.html) |
+| 16:15 | **Why does the effect vary? Moderators and missing data** | Damien Beillouin | slides [web](06-advanced.html) · [pdf](06-advanced.pdf) · [practical](06-advanced_TD.html) |
+| 17:00 | Group work: discussion and constitution of groups | All | |
+| **Thursday** | Group projects: a meta-analysis or a systematic review plan | All | [data](https://drive.google.com/drive/folders/1YPYvdcuQVkgpY5xTzxeTAXFtmTZqZvnd) |
+| **Friday** | 9:00 Final presentations and feedback | All | |
 
 In the web version of the slides, press **F** for full screen and **S** for the speaker notes. The practical pages contain every exercise with its solution folded.
 
