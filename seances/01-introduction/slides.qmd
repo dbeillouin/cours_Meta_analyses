@@ -484,6 +484,37 @@ Source: @beillouin2019 and updates.
 ~2 min. Many meta-analyses do not report their search strings, their excluded studies... A meta-analysis is only as good as the systematic review behind it. Joseph covers reporting standards on Monday afternoon.
 :::
 
+## How to conduct a synthesis: guidelines we follow this week
+
+::: {.columns}
+::: {.column width="50%"}
+::: {.box .blue}
+[Guidelines]{.box-title}
+**CEE** Guidelines and Standards, v5.1 [@cee2022] — environment\
+**Cochrane** Handbook, v6.5 [@cochrane2024] — health\
+Campbell Collaboration — social sciences\
+[Environment: mostly field experiments and observational studies, strong spatio-temporal variability → expect heterogeneity.]{.small .muted}
+:::
+
+::: {.box .green}
+[Protocol registration]{.box-title}
+**PROCEED** (environment) · PROSPERO (health) · OSF
+:::
+:::
+
+::: {.column width="48%"}
+::: {.box}
+[Reference books]{.box-title}
+@koricheva2013 · @borenstein2021\
+@harrer2021 (free online, R code)
+:::
+:::
+:::
+
+::: notes
+~1 min. Transition from "quality varies": standards tell you how to conduct and report a synthesis, so that readers can judge and repeat it. Mention the CESAB as a place that hosts synthesis working groups. Next slide: following these standards is not enough, because they do not judge the primary studies themselves.
+:::
+
 ## Garbage in, garbage out: appraise before you pool
 
 ::: {.columns}
@@ -604,37 +635,52 @@ Source: @cee2022; @cochrane2024. Umbrella reviews apply the same logic to existi
 ~2 min. Two axes: what you want (describe where evidence is vs estimate an effect) and how much rigour you invest. Grey dashed boxes = what we want to avoid producing this week. Note that a meta-analysis on a convenience sample is at the bottom: statistics do not make up for a biased sample.
 :::
 
-## A systematic map: where is the evidence?
+## Same database, two products
 
 ```{r}
-#| label: plot-map
-#| fig-width: 13
-#| fig-height: 6
-#| out-width: "90%"
+#| label: plot-two-products
+#| fig-width: 16
+#| fig-height: 6.4
 top_taxa <- comp |> distinct(study_id, taxa_class) |> count(taxa_class, sort = TRUE) |>
-  filter(!is.na(taxa_class)) |> slice_head(n = 9) |> pull(taxa_class)
+  filter(!is.na(taxa_class)) |> slice_head(n = 7) |> pull(taxa_class)
 map_df <- comp |>
   filter(taxa_class %in% top_taxa, !is.na(practice)) |>
   distinct(study_id, practice, taxa_class) |>
   count(practice, taxa_class) |>
   tidyr::complete(practice, taxa_class, fill = list(n = 0))
-ggplot(map_df, aes(taxa_class, practice, fill = n)) +
-  geom_tile(colour = "white", linewidth = 1.5) +
-  geom_text(aes(label = ifelse(n == 0, "gap", n),
-                colour = n > 15, fontface = ifelse(n == 0, "italic", "plain")), size = 6) +
-  scale_fill_gradient(low = "#F4F7F8", high = cesab[["blue"]], name = "Number of studies") +
+p_map <- ggplot(map_df, aes(taxa_class, practice, fill = n)) +
+  geom_tile(colour = "white", linewidth = 1.2) +
+  geom_text(aes(label = ifelse(n == 0, "gap", n), colour = n > 15,
+                fontface = ifelse(n == 0, "italic", "plain")), size = 4.5) +
+  scale_fill_gradient(low = "#F4F7F8", high = cesab[["blue"]], guide = "none") +
   scale_colour_manual(values = c(`TRUE` = "white", `FALSE` = cesab[["ink"]]), guide = "none") +
-  labs(x = NULL, y = NULL) +
-  theme_cesab(17) +
-  theme(panel.grid = element_blank(), legend.key.width = unit(2.5, "cm"))
+  labs(title = "Systematic map: where is the evidence?", subtitle = "Number of studies, all practices and taxa",
+       x = NULL, y = NULL) +
+  theme_cesab(15) +
+  theme(panel.grid = element_blank(), axis.text.x = element_text(angle = 30, hjust = 1))
+fd <- by_study |> arrange(est) |> mutate(row = row_number())
+p_ma <- ggplot(fd, aes(est, row)) +
+  geom_vline(xintercept = 0, linetype = 2, colour = cesab[["grey"]]) +
+  geom_errorbarh(aes(xmin = lo, xmax = hi), height = 0, colour = cesab[["teal"]], linewidth = 0.8) +
+  geom_point(colour = cesab[["teal"]], size = 2) +
+  annotate("errorbarh", y = -2, xmin = pr$ci.lb, xmax = pr$ci.ub, height = 0, linewidth = 2.5, colour = cesab[["blue"]]) +
+  annotate("point", x = pr$pred, y = -2, shape = 23, size = 6, fill = cesab[["blue"]], colour = "white") +
+  annotate("text", x = log(0.04), y = -2, label = "Pooled", hjust = 0, size = 5, colour = cesab[["blue"]], fontface = "bold") +
+  scale_x_continuous(labels = \(x) pct(x), breaks = log(c(0.1, 0.25, 0.5, 1, 2))) +
+  coord_cartesian(xlim = log(c(0.04, 3.5))) +
+  labs(title = "Meta-analysis: what is the effect?", subtitle = "Pests, intercropping vs monoculture: one line per study",
+       x = "Pest abundance (% change)", y = NULL) +
+  theme_cesab(15) +
+  theme(axis.text.y = element_blank(), panel.grid.major.y = element_blank())
+patchwork::wrap_plots(p_map, p_ma, widths = c(1.15, 1))
 ```
 
 ::: {.source}
-Number of studies per practice × taxon, from @jones2021. You will build this kind of map on Tuesday afternoon.
+Both from @jones2021. The map counts studies for every practice and taxon (you build it on Tuesday); the meta-analysis pools one question, pests under intercropping (you fit it on Wednesday).
 :::
 
 ::: notes
-~2 min. A map answers "what has been studied, where, how?" and shows GAPS (e.g. no study on ... ). It does NOT say whether practices work: many studies ≠ a strong effect. Maps are also the first step to decide where a meta-analysis is possible.
+~2 min. Same database, two questions. The map describes the whole evidence base and shows its gaps; it does not say whether practices work (many studies is not a strong effect). The meta-analysis takes one cell of the map with enough studies and estimates an effect and its spread. Maps are often the first step that tells you where a meta-analysis is possible. Transition: what can a meta-analysis do, and what can it not?
 :::
 
 ## Strengths and limits of meta-analysis {.big-table}
@@ -697,43 +743,6 @@ Adapted to ecology and agronomy from @murad2016.
 
 ::: notes
 ~1.5 min. The old slide had a medical pyramid with MA above SR above RCTs. Ecology rarely has RCTs in the clinical sense; field experiments and observational gradients dominate.
-:::
-
-## Standards exist — we follow them this week
-
-::: {.columns}
-::: {.column width="50%"}
-::: {.box .blue}
-[Guidelines]{.box-title}
-**CEE** Guidelines and Standards, v5.1 [@cee2022] — environment\
-**Cochrane** Handbook, v6.5 [@cochrane2024] — health\
-Campbell Collaboration — social sciences\
-[Environment: mostly field experiments and observational studies, strong spatio-temporal variability → expect heterogeneity.]{.small .muted}
-:::
-
-::: {.box .green}
-[Protocol registration]{.box-title}
-**PROCEED** (environment) · PROSPERO (health) · OSF
-:::
-:::
-
-::: {.column width="48%"}
-::: {.box}
-[Reporting]{.box-title}
-**ROSES** [@haddaway2018]\
-**PRISMA 2020** [@page2021] and PRISMA-EcoEvo [@odea2021]
-:::
-
-::: {.box}
-[Reference books]{.box-title}
-@koricheva2013 · @borenstein2021\
-@harrer2021 (free online, R code)
-:::
-:::
-:::
-
-::: notes
-~1 min. Mention the CESAB itself as a place that hosts synthesis working groups.
 :::
 
 ## Which method for which question? {.question}
