@@ -184,8 +184,8 @@ Each effect size comes with its **sampling variance** $v_k$. In the meta-analysi
   <div class="box blue" style="margin:0;"><b>Continuous outcome, two groups</b><br><span class="muted">means, SD, n</span>
     <ul style="margin-top:8px;">
       <li>Same unit everywhere &rarr; <b>Mean difference (MD)</b></li>
-      <li>Different scales, additive effect &rarr; <b>standardised mean difference</b> (Hedges' <i>g</i>)</li>
-      <li>Positive values, proportional effect &rarr; <b>log response ratio (lnRR)</b></li>
+      <li>Scores, indices, values that can be negative &rarr; <b>standardised mean difference</b> (Hedges' <i>g</i>)</li>
+      <li>Quantities: counts, biomass, yield &rarr; <b>log response ratio (lnRR)</b></li>
     </ul></div>
   <div class="box green" style="margin:0;"><b>Binary outcome, two groups</b><br><span class="muted">counts in a 2&times;2 table</span>
     <ul style="margin-top:8px;">
@@ -201,23 +201,22 @@ Each effect size comes with its **sampling variance** $v_k$. In the meta-analysi
 ::: {.columns style="margin-top:18px;"}
 ::: {.column width="50%"}
 ::: {.box .blue}
-**Proportional** (→ lnRR): "−30% aphids", same meaning with 10 or 1,000 aphids. Abundance, biomass, yield: a true zero, effects multiply.\
-**Additive** (→ *g*): "+5 units". Scores, indices, variables with an arbitrary zero.
+Test: does **"twice as many"** make sense?\
+Yes (aphids, yield) → **lnRR**.\
+No → ***g***: damage scores, soil quality indices, assays that differ between studies, values that can be negative (change in soil C stock).
 :::
 :::
 ::: {.column width="48%"}
 ::: {.fragment .box .warn}
-In ecology and agronomy, **lnRR** and **Hedges' *g*** (a standardised mean difference, SMD) dominate. Our running example → **lnRR**. Fix the metric **in the protocol**, before seeing the results.
+Our running example → **lnRR**. Fix the metric **in the protocol**, before seeing the results.\
+*Show of hands: which metric for your own data?*
 :::
 :::
 :::
 
-::: {.fragment .small .muted}
-Show of hands: *which metric for your own data?*
-:::
 
 ::: notes
-~4 min. The choice follows the data AND the question: an additive vs a proportional effect. Changing metric after looking at the results is a form of p-hacking.
+~4 min. The choice follows the data AND the question: if "twice as many" makes sense, use a ratio (lnRR); if not (scores, indices), use a difference in SD units (g). Changing metric after looking at the results is a form of p-hacking.
 :::
 
 ## Our worked example
@@ -342,7 +341,7 @@ Ask for the prediction (-1.053 from Exercise 1) before running. For SMD, escalc 
 
 $$d = \frac{\bar X_T - \bar X_C}{SD_{pooled}}$$
 
-Useful when studies use **different scales** and the effect is additive.
+Useful when studies use **different scales** (scores, indices), where "twice as many" means nothing.
 
 ::: {.box .warn}
 Small samples **inflate** *d* → multiply by a correction *J* < 1: that is **Hedges' *g*** [@hedges1981].
