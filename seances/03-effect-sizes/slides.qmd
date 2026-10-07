@@ -62,9 +62,9 @@ By the end of this session, you will be able to:
 
 ::: {.columns}
 ::: {.column width="50%"}
-The `r nrow(ic)` intercropping comparisons of our running example report biodiversity as:
+Each of the `r nrow(ic)` comparisons gives a **mean in the intervention** (intercropping) and a **mean in the comparator** (monoculture), each in the study's own unit: per trap, per plant, per m²...
 
-Each comparison gives a **mean in the intervention** (intercropping) and a **mean in the comparator** (monoculture), as abundance or richness, per trap, per plant, per m²... The raw means span several orders of magnitude.
+The raw differences (+115, −5.6, −0.035) cannot be compared. The **ratio** can: two studies halve the abundance, one barely changes it.
 
 ::: {.fragment .box .blue}
 [An effect size]{.box-title}
@@ -77,24 +77,34 @@ compares the **intervention mean with the comparator mean** on **one common scal
 #| label: plot-means
 #| fig-width: 6.5
 #| fig-height: 5.6
-ic |>
-  filter(b_mean_t > 0, b_mean_c > 0) |>
-  ggplot(aes(b_mean_c, b_mean_t, colour = b_measure)) +
-  geom_abline(slope = 1, intercept = 0, linetype = 2, colour = cesab[["grey"]]) +
-  geom_point(alpha = 0.55, size = 2.2) +
-  scale_x_log10(labels = scales::label_number(drop0trailing = TRUE)) +
-  scale_y_log10(labels = scales::label_number(drop0trailing = TRUE)) +
-  scale_colour_manual(values = c(cesab[["blue"]], cesab[["green"]]), name = NULL) +
-  annotate("text", x = 0.02, y = 2000, label = "above the line:\nmore with intercropping", hjust = 0, size = 4.5, colour = cesab[["grey"]]) +
-  labs(x = "Mean in the comparator (monoculture, log scale)", y = "Mean in the intervention (log scale)",
-       title = "One point = one comparison") +
-  theme_cesab(16)
+ex <- tribble(
+  ~case, ~system, ~mean,
+  "Wheat–garlic\npests (thousands)", "Mono", 1223 / 1000, "Wheat–garlic\npests (thousands)", "Inter", 1338 / 1000,
+  "Cotton–basil\npests", "Mono", 10.8, "Cotton–basil\npests", "Inter", 5.2,
+  "Broccoli–chili\nnatural enemies", "Mono", 0.071, "Broccoli–chili\nnatural enemies", "Inter", 0.036) |>
+  mutate(case = factor(case, unique(case)), system = factor(system, c("Mono", "Inter")))
+lab <- tibble(case = levels(ex$case),
+              txt = c("difference  +115\nratio  1.09  (+9%)",
+                      "difference  −5.6\nratio  0.48  (−52%)",
+                      "difference  −0.035\nratio  0.50  (−50%)")) |>
+  mutate(case = factor(case, levels(ex$case)),
+         y = c(1.338, 10.8, 0.071) * 1.32)
+ggplot(ex, aes(system, mean, fill = system)) +
+  geom_col(width = 0.65) +
+  geom_text(data = lab, aes(x = 1.5, y = y, label = txt), inherit.aes = FALSE,
+            size = 4.3, lineheight = 0.95, colour = cesab[["ink"]]) +
+  facet_wrap(~case, scales = "free_y") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.45))) +
+  scale_fill_manual(values = c(Mono = cesab[["grey"]], Inter = cesab[["green"]]), guide = "none") +
+  labs(x = NULL, y = "Mean abundance (study's own unit)",
+       title = "Three comparisons, three scales") +
+  theme_cesab(15) + theme(strip.text = element_text(size = 12))
 ```
 :::
 :::
 
 ::: {.source}
-Source: @jones2021; the authors converted everything to SD before sharing the data.
+Source: three comparisons from @jones2021.
 :::
 
 ## Why not just use p-values?
