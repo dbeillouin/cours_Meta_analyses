@@ -93,7 +93,7 @@ Search grey literature, theses, reports and non-English studies (Monday's sessio
 Adapted from @ouedraogo2024; see also @koricheva2013, chap. 14.
 :::
 
-# Publication bias {.section-divider background-image="../../theme/img/bg-keymessages.jpg"}
+# Publication bias and small-study effects {.section-divider background-image="../../theme/img/bg-keymessages.jpg"}
 
 ## The logic of the funnel plot
 
@@ -205,6 +205,8 @@ If missing studies were in the **white** zone (non-significant), publication bia
 ::: {.column width="50%"}
 **Egger's test** [@egger1997]: regress each effect size on its standard error. A slope ≠ 0 means small studies give different results.
 
+It is a test of **funnel-plot asymmetry (small-study effects)**, not a test of publication bias: asymmetry can also come from heterogeneity or from design differences between small and large studies.
+
 Our pests: *p* = `r format.pval(eg0$pval, digits = 2)`.
 :::
 
@@ -271,7 +273,7 @@ With the recommended measure: **no robust evidence** of a small-study effect.
 Rule [@stanley2014]: if the PET intercept is significant (here yes), report **PEESE**.
 
 ::: {.fragment .box .green}
-Adjusted estimates are, if anything, **stronger**: the pest reduction is **not** an artefact of publication bias.
+Adjusted estimates are, if anything, **stronger**: the pest reduction is **not** an artefact of small-study effects (whatever their cause).
 :::
 
 ::: {.small .muted}

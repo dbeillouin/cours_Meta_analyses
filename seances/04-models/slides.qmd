@@ -98,13 +98,14 @@ set.seed(3)
 x <- seq(-1.8, 1, 0.005)
 mk <- function(model, mu, tau, obs) tibble(model = model, x = x,
   d = if (tau > 0) dnorm(x, mu, tau) else dnorm(x, mu, 0.012), obs = list(obs))
-true_re <- rnorm(7, -0.3, 0.45)
+obs_k   <- c(-0.85, -0.6, -0.42, -0.3, -0.15, -0.02, 0.2)   # the SAME observed effects in both panels
+true_re <- -0.3 + 0.75 * (obs_k + 0.3)           # random effects: true effects spread too
 views <- bind_rows(
   tibble(model = "Common effect: ONE true effect", x = x, d = dnorm(x, -0.3, 0.012)),
   tibble(model = "Random effects: a DISTRIBUTION of true effects", x = x, d = dnorm(x, -0.3, 0.45)))
 pts <- bind_rows(
-  tibble(model = "Common effect: ONE true effect", true = -0.3, obs = -0.3 + rnorm(7, 0, 0.18)),
-  tibble(model = "Random effects: a DISTRIBUTION of true effects", true = true_re, obs = true_re + rnorm(7, 0, 0.18)))
+  tibble(model = "Common effect: ONE true effect", true = -0.3, obs = obs_k),
+  tibble(model = "Random effects: a DISTRIBUTION of true effects", true = true_re, obs = obs_k))
 ggplot() +
   geom_area(data = views |> group_by(model) |> mutate(d = d / max(d)),
             aes(x, d), fill = cesab[["teal"]], alpha = 0.35) +
@@ -144,6 +145,10 @@ Random effects:
 $$w_k = \frac{1}{v_k + \tau^2}$$
 
 Adding τ² to every variance makes the weights **more equal**: very precise studies dominate less.
+
+::: {.small}
+Why? Under random effects each study measures **its own** true effect. A perfectly measured study is still **one field among many**: its weight cannot exceed 1/τ², however small its sampling variance.
+:::
 :::
 
 ::: {.column width="50%"}

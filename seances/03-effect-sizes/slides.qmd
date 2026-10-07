@@ -64,32 +64,31 @@ By the end of this session, you will be able to:
 ::: {.column width="50%"}
 The `r nrow(ic)` intercropping comparisons of our running example report biodiversity as:
 
--   **abundance** or **species richness**,
--   in individuals per trap, per plant, per m², per hour...
--   with **SD**, **SE**, **95% CI** or **median + IQR** as the measure of spread.
+Each comparison gives a **mean in the intervention** (intercropping) and a **mean in the comparator** (monoculture), as abundance or richness, per trap, per plant, per m²... The raw means span several orders of magnitude.
 
 ::: {.fragment .box .blue}
 [An effect size]{.box-title}
-puts all studies on **one common scale**: the **direction** and **magnitude** of the difference between intervention and comparator — plus its **uncertainty**.
+compares the **intervention mean with the comparator mean** on **one common scale** (direction and magnitude), and comes with its **uncertainty**.
 :::
 :::
 
 ::: {.column width="48%"}
 ```{r}
-#| label: plot-reported
+#| label: plot-means
 #| fig-width: 6.5
-#| fig-height: 5
+#| fig-height: 5.6
 ic |>
-  count(b_error_reported) |>
-  mutate(b_error_reported = recode(b_error_reported,
-    "standard error" = "Standard error", "standard deviation" = "Standard deviation",
-    "confidence intervals" = "Confidence interval", "median,iqr" = "Median + IQR")) |>
-  ggplot(aes(n, reorder(b_error_reported, n))) +
-  geom_col(fill = cesab[["teal"]], width = 0.65) +
-  geom_text(aes(label = n), hjust = -0.2, size = 6) +
-  scale_x_continuous(expand = expansion(mult = c(0, 0.2))) +
-  labs(x = "Number of comparisons", y = NULL, title = "How spread was reported") +
-  theme_cesab(18)
+  filter(b_mean_t > 0, b_mean_c > 0) |>
+  ggplot(aes(b_mean_c, b_mean_t, colour = b_measure)) +
+  geom_abline(slope = 1, intercept = 0, linetype = 2, colour = cesab[["grey"]]) +
+  geom_point(alpha = 0.55, size = 2.2) +
+  scale_x_log10(labels = scales::label_number(drop0trailing = TRUE)) +
+  scale_y_log10(labels = scales::label_number(drop0trailing = TRUE)) +
+  scale_colour_manual(values = c(cesab[["blue"]], cesab[["green"]]), name = NULL) +
+  annotate("text", x = 0.02, y = 2000, label = "above the line:\nmore with intercropping", hjust = 0, size = 4.5, colour = cesab[["grey"]]) +
+  labs(x = "Mean in the comparator (monoculture, log scale)", y = "Mean in the intervention (log scale)",
+       title = "One point = one comparison") +
+  theme_cesab(16)
 ```
 :::
 :::
@@ -422,7 +421,7 @@ Also possible: from a 95% CI, or from a median and IQR [@wan2014] — see the fo
 ::: {.column width="43%"}
 ::: {.fragment .box .warn}
 **`r sum(ic$sd_missing)`** comparisons (**`r round(100 * mean(ic$sd_missing))`%**) have **no usable SD**.\
-Never set it to 0 or drop silently. Robust fix for lnRR: compute the sampling variance from the **average squared coefficient of variation** (CV = SD/mean, weighted by *n*) of the other studies [@nakagawa2023]. Not possible for zero means.
+Never set it to 0 or drop silently. Robust fix for lnRR: compute the sampling variance from the **typical coefficient of variation** of the other studies (CV = SD/mean, averaged with weights *n*, then squared) [@nakagawa2023], after screening implausible CVs (Wednesday 16:15). Not possible for zero means.
 :::
 :::
 :::
@@ -544,6 +543,58 @@ Possible (log OR → *d*, *r* → *d*), but only for a **minority** of studies: 
 -   **Variability as an outcome**: lnCVR, the log ratio of coefficients of variation [@nakagawa2015].
 -   **Paired / before–after designs** (SMCC, ROMC in `escalc`) need the correlation between measurements.
 -   **Several treatments vs one control** create **dependent** effect sizes → multilevel models, this afternoon.
+
+# Extra, if time remains {.section-divider background-image="../../theme/img/bg-keymessages.jpg"}
+
+## Can we just average the percentages?
+
+```{r}
+#| label: extra-pct
+pp <- ic |> filter(functional_group == "Pests", b_mean_t > 0, b_mean_c > 0) |>
+  mutate(lr = log(b_mean_t / b_mean_c), pc = 100 * (b_mean_t / b_mean_c - 1))
+mean_pc <- mean(pp$pc); back_lr <- 100 * (exp(mean(pp$lr)) - 1)
+```
+
+::: {.columns}
+::: {.column width="50%"}
+Same `r nrow(pp)` pest comparisons, two "averages" (unweighted):
+
+-   mean of the % changes: **`r sprintf("%+.0f", mean_pc)`%**
+-   back-transformed mean lnRR: **`r sprintf("%+.0f", back_lr)`%**
+:::
+
+::: {.column width="48%"}
+::: {.fragment .box .warn}
+[Why so different?]{.box-title}
+A % change is **asymmetric**: halving gives −50%, doubling gives +100%. A few large increases pull the mean of percentages up. Average on the **log scale**, back-transform at the end.
+:::
+:::
+:::
+
+::: notes
+~2 min. Ask the room to guess before showing the second number. Same reason why lnRR is symmetric: ln(2) = −ln(1/2).
+:::
+
+## Which effect size? {.question}
+
+::: question-card
+[Pairs, 3 minutes]{.q-kicker}
+
+[For each case, which effect size would you use?]{.q-text}
+:::
+
+1.  Presence or absence of a pest in 20 intercropped and 20 monoculture fields.
+2.  Wheat yield in t/ha, same unit in every study.
+3.  Species richness, with several monocultures at **zero**.
+4.  Correlation between landscape complexity and pest abundance across farms.
+
+::: {.fragment .box .green}
+1 · log **odds ratio** (`"OR"`) · 2 · **mean difference** (`"MD"`) or lnRR if you want a relative effect · 3 · **SMD** (`"SMD"`), lnRR is undefined · 4 · **Fisher's z** (`"ZCOR"`)
+:::
+
+::: notes
+~4 min. The point is that the effect size follows the question and the data, not habit. All four are in escalc; see the formula sheet.
+:::
 
 ## In the online notebook {.dense}
 

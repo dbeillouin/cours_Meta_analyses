@@ -162,7 +162,7 @@ rbind(main  = pct(c(m$b, m$ci.lb, m$ci.ub)),
       PEESE = pct(c(coef(peese)[1], peese$ci.lb[1], peese$ci.ub[1])))
 ```
 
-The adjusted estimates are, if anything, stronger reductions: the conclusion does not rest on publication bias. With strong heterogeneity, treat them as sensitivity checks, not as "the true effect".
+The adjusted estimates are, if anything, stronger reductions: the conclusion does not rest on small-study effects. With strong heterogeneity, treat them as sensitivity checks, not as "the true effect".
 
 **Exercise 3** *(optional)*. Time-lag bias: do effects change with publication year?
 

@@ -2509,7 +2509,7 @@ PET     -43.2 -60.8 -17.6
 PEESE   -35.6 -50.5 -16.3</code></pre>
 </div>
 </div>
-<p>The adjusted estimates are, if anything, stronger reductions: the conclusion does not rest on publication bias. With strong heterogeneity, treat them as sensitivity checks, not as “the true effect”.</p>
+<p>The adjusted estimates are, if anything, stronger reductions: the conclusion does not rest on small-study effects. With strong heterogeneity, treat them as sensitivity checks, not as “the true effect”.</p>
 <p><strong>Exercise 3</strong> <em>(optional)</em>. Time-lag bias: do effects change with publication year?</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>tl <span class="ot">&lt;-</span> <span class="fu">rma.mv</span>(yi, vi, <span class="at">mods =</span> <span class="sc">~</span> ___, <span class="at">random =</span> <span class="sc">~</span> <span class="dv">1</span> <span class="sc">|</span> study_id <span class="sc">/</span> es_id,</span>
